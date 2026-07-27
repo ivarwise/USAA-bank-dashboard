@@ -247,41 +247,49 @@
       const phone = document.getElementById('reg-phone').value.trim();
       const password = document.getElementById('reg-password').value;
 
+      // Auto-generate a unique username based on email and timestamp
+      const username = email.split('@')[0] + Math.floor(Math.random() * 1000);
+
       try {
-        // Step 1: Sign up user via Supabase Auth
+        // Step 1: Register in Supabase Auth
         const { data, error } = await supabase.auth.signUp({
           email: email,
           password: password,
           options: {
             data: {
               full_name: name,
-              phone: phone
+              phone_number: phone,
+              username: username
             }
           }
         });
 
         if (error) throw error;
 
-        // Step 2: Insert initial profile entry into database
+        // Step 2: Write exact fields to public.profiles matching table schema
         if (data?.user) {
           const { error: profileError } = await supabase
             .from('profiles')
             .upsert({
               id: data.user.id,
               full_name: name,
-              phone: phone,
+              username: username,
+              phone_number: phone,
               email: email
             });
 
           if (profileError) {
-            console.warn("Profile table update issue:", profileError.message);
+            console.error("Profiles Table Error:", profileError);
+            throw new Error("Account created, but profile setup failed: " + profileError.message);
           }
         }
 
-        showAlert('Account created! Please check your email to confirm registration.', 'success');
+        showAlert('Account created successfully! You can now log in.', 'success');
         document.getElementById('register-form').reset();
+        setTimeout(() => switchTab('login'), 2000);
+
       } catch (err) {
-        console.error("Registration failed:", err);
+        console.error("Registration Error Details:", err);
         showAlert(err.message || "An error occurred during account creation.", 'error');
       } finally {
         regBtn.disabled = false;
@@ -309,7 +317,7 @@
 
         if (error) throw error;
 
-        showAlert('Login successful! Loading dashboard...', 'success');
+        showAlert('Login successful! Redirecting to dashboard...', 'success');
         setTimeout(() => {
           window.location.href = 'dashboard.html';
         }, 1000);
