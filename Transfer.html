@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>USAA - Money Transfer</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --usaa-navy: #002244;
@@ -12,6 +13,11 @@
             --usaa-light-bg: #f4f6f8;
             --usaa-red: #d9534f;
             --usaa-green: #2e7d32;
+            --usaa-border: #d1dbe5;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
@@ -70,6 +76,7 @@
             font-weight: 600;
             margin-bottom: 8px;
             font-size: 0.9rem;
+            color: var(--usaa-navy);
         }
 
         select, input {
@@ -102,19 +109,59 @@
             background-color: var(--usaa-red);
         }
 
+        /* DIGITAL RECEIPT CARD VIEW */
         .receipt-card {
-            border: 2px dashed #bbb;
-            padding: 20px;
-            background: #fafafa;
-            border-radius: 6px;
+            border: 1px solid var(--usaa-border);
+            padding: 24px;
+            background: #ffffff;
+            border-radius: 8px;
             margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .receipt-header-branding {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--usaa-navy);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .receipt-header-branding .brand-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--usaa-navy);
+            letter-spacing: 1px;
+        }
+
+        .receipt-header-branding .doc-type {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #666;
+            letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .receipt-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 0.95rem;
+            border-bottom: 1px dashed #e5e5e5;
+            padding-bottom: 8px;
+        }
+
+        .receipt-row:last-child {
+            border-bottom: none;
+        }
+
+        .receipt-row span {
+            color: #555;
+        }
+
+        .receipt-row strong {
+            color: var(--usaa-navy);
         }
 
         .share-grid {
@@ -125,7 +172,7 @@
         }
 
         .share-btn {
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ccc;
             background: white;
             border-radius: 4px;
@@ -135,6 +182,14 @@
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .share-btn:hover {
+            background-color: #f8f9fa;
         }
 
         .alert-box {
@@ -145,6 +200,74 @@
             border: 1px solid #f5c6cb;
             margin-bottom: 15px;
             display: none;
+        }
+
+        .watermark-footer {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #777;
+        }
+
+        /* PRINT STYLES FOR HIGH QUALITY PAPER USAA RECEIPT */
+        @media print {
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+            }
+
+            .header, 
+            .back-btn, 
+            .btn, 
+            .share-grid, 
+            .no-print, 
+            h3:has(+ .share-grid) {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+
+            .step-panel {
+                display: none !important;
+            }
+
+            .step-panel.active {
+                display: block !important;
+            }
+
+            .receipt-card {
+                border: 2px solid #002244 !important;
+                padding: 30px !important;
+                margin: 20px 0 !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                background: #ffffff !important;
+            }
+
+            .receipt-header-branding {
+                border-bottom: 3px solid #002244 !important;
+            }
+
+            .receipt-row {
+                border-bottom: 1px solid #ccc !important;
+                padding: 10px 0 !important;
+                font-size: 11pt !important;
+            }
+
+            .watermark-footer {
+                display: block !important;
+                font-size: 9pt !important;
+                color: #333 !important;
+                margin-top: 40px !important;
+            }
         }
     </style>
 </head>
@@ -213,7 +336,7 @@
 
             <div class="form-group">
                 <label>Estimated Transfer Fee:</label>
-                <strong id="feeDisplay">$0.00</strong>
+                <strong id="feeDisplay" style="font-size: 1.1rem; color: var(--usaa-navy);">$0.00</strong>
             </div>
 
             <button class="btn" onclick="goToStep(2)">Continue to Review</button>
@@ -223,12 +346,16 @@
         <div id="step2" class="step-panel">
             <h2>Review Transfer</h2>
             <div class="receipt-card">
-                <div class="receipt-row"><span>From:</span><strong id="revFrom">--</strong></div>
-                <div class="receipt-row"><span>To Bank:</span><strong id="revBank">--</strong></div>
-                <div class="receipt-row"><span>Account #:</span><strong id="revAcc">--</strong></div>
-                <div class="receipt-row"><span>Amount:</span><strong id="revAmount">$0.00</strong></div>
-                <div class="receipt-row"><span>Bank Fee:</span><strong id="revFee">$0.00</strong></div>
-                <div class="receipt-row"><span>Date:</span><strong id="revDate">--</strong></div>
+                <div class="receipt-header-branding">
+                    <span class="brand-title">USAA FINANCIAL</span>
+                    <span class="doc-type">Transfer Pre-Review</span>
+                </div>
+                <div class="receipt-row"><span>From Account:</span><strong id="revFrom">--</strong></div>
+                <div class="receipt-row"><span>Destination Bank:</span><strong id="revBank">--</strong></div>
+                <div class="receipt-row"><span>Account / IBAN:</span><strong id="revAcc">--</strong></div>
+                <div class="receipt-row"><span>Transfer Amount:</span><strong id="revAmount">$0.00</strong></div>
+                <div class="receipt-row"><span>Calculated Bank Fee:</span><strong id="revFee">$0.00</strong></div>
+                <div class="receipt-row"><span>Execution Date:</span><strong id="revDate">--</strong></div>
             </div>
             <button class="btn" onclick="goToStep(3)">Confirm & Proceed to PIN</button>
             <button class="btn" style="background:#6c757d; margin-top:5px;" onclick="goToStep(1)">Edit Details</button>
@@ -246,31 +373,46 @@
             <button class="btn" onclick="verifyAndExecuteTransfer()">Authorize Transfer</button>
         </div>
 
-        <!-- STEP 4: SUCCESS & RECEIPT -->
+        <!-- STEP 4: SUCCESS & OFFICIAL PRINTABLE RECEIPT -->
         <div id="step4" class="step-panel">
-            <h2 style="color: var(--usaa-green);">✓ Transfer Complete</h2>
-            <p>Your funds have been successfully processed.</p>
+            <h2 class="no-print" style="color: var(--usaa-green);">✓ Transfer Complete</h2>
+            <p class="no-print">Your funds have been successfully processed.</p>
 
             <div class="receipt-card" id="printableReceipt">
-                <h3 style="margin-top:0; color: var(--usaa-navy);">USAA Official Transfer Receipt</h3>
+                <div class="receipt-header-branding">
+                    <div>
+                        <div class="brand-title">USAA FEDERAL SAVINGS BANK</div>
+                        <div style="font-size:0.7rem; color:#666; margin-top:2px;">Official Transaction Record</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="doc-type" style="color: var(--usaa-green); font-size: 0.85rem;">COMPLETED</span>
+                    </div>
+                </div>
+
                 <div class="receipt-row"><span>Confirmation #:</span><strong id="recConf">--</strong></div>
                 <div class="receipt-row"><span>Date & Time:</span><strong id="recTime">--</strong></div>
                 <div class="receipt-row"><span>From Account:</span><strong id="recFrom">--</strong></div>
                 <div class="receipt-row"><span>Destination:</span><strong id="recBank">--</strong></div>
+                <div class="receipt-row"><span>Recipient Account:</span><strong id="recAccNum">--</strong></div>
                 <div class="receipt-row"><span>Amount Sent:</span><strong id="recAmount">$0.00</strong></div>
                 <div class="receipt-row"><span>Transfer Fee:</span><strong id="recFee">$0.00</strong></div>
-                <div class="receipt-row"><span>Status:</span><strong style="color:var(--usaa-green);">SUCCESSFUL</strong></div>
+                <div class="receipt-row"><span>Status:</span><strong style="color:var(--usaa-green);">SUCCESSFUL / PROCESSED</strong></div>
+
+                <div class="watermark-footer">
+                    <p><strong>USAA Official Customer Paper Receipt</strong></p>
+                    <p style="margin-top: 3px;">Member FDIC. Equal Housing Lender. © 2026 USAA. All rights reserved.</p>
+                </div>
             </div>
 
-            <h3>Share / Download Receipt</h3>
-            <div class="share-grid">
-                <button class="share-btn" onclick="window.print()">🖨️ Download / Print</button>
-                <a id="waShareBtn" class="share-btn" target="_blank">📱 Send to WhatsApp</a>
-                <a id="emailShareBtn" class="share-btn">✉️ Send to Email</a>
-                <a id="smsShareBtn" class="share-btn">💬 Send to Phone (SMS)</a>
+            <h3 class="no-print">Share / Download Receipt</h3>
+            <div class="share-grid no-print">
+                <button class="share-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Download / Print</button>
+                <a id="waShareBtn" class="share-btn" target="_blank"><i class="fa-brands fa-whatsapp"></i> Send to WhatsApp</a>
+                <a id="emailShareBtn" class="share-btn"><i class="fa-solid fa-envelope"></i> Send to Email</a>
+                <a id="smsShareBtn" class="share-btn"><i class="fa-solid fa-comment-sms"></i> Send to Phone (SMS)</a>
             </div>
 
-            <button class="btn" style="margin-top: 20px;" onclick="window.location.href='dashboard.html'">Return to Dashboard</button>
+            <button class="btn no-print" style="margin-top: 20px;" onclick="window.location.href='dashboard.html'">Return to Dashboard</button>
         </div>
 
     </div>
@@ -424,16 +566,16 @@
             }
 
             const selectedAcc = userAccounts.find(a => a.id === fromAccId);
-            if (selectedAcc.balance < totalDeduction) {
+            if (!selectedAcc || selectedAcc.balance < totalDeduction) {
                 alert("Insufficient funds to cover transfer amount and fees.");
                 return;
             }
 
             const newBalance = selectedAcc.balance - totalDeduction;
-            const { error } = await client.from('accounts').update({ balance: newBalance }).eq('id', fromAccId);
+            const { error: balanceError } = await client.from('accounts').update({ balance: newBalance }).eq('id', fromAccId);
 
-            if (error) {
-                alert("Transfer failed: " + error.message);
+            if (balanceError) {
+                alert("Transfer failed: " + balanceError.message);
                 return;
             }
 
@@ -442,16 +584,31 @@
             const timeStr = new Date().toLocaleString();
             const bank = document.getElementById('countrySelect').value === "MANUAL" ? 
                          document.getElementById('manualBankName').value : document.getElementById('toBank').value;
+            const recipientAccNum = document.getElementById('accountNum').value || 'N/A';
 
             document.getElementById('recConf').textContent = confNum;
             document.getElementById('recTime').textContent = timeStr;
             document.getElementById('recFrom').textContent = selectedAcc.account_name;
             document.getElementById('recBank').textContent = bank;
+            document.getElementById('recAccNum').textContent = recipientAccNum;
             document.getElementById('recAmount').textContent = `$${amt.toFixed(2)}`;
             document.getElementById('recFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
 
+            // Log entry into transactions table so Dashboard updates live
+            const { data: { user } } = await client.auth.getUser();
+            if (user) {
+                await client.from('transactions').insert([{
+                    user_id: user.id,
+                    description: `Transfer to ${bank}`,
+                    recipient_name: bank,
+                    amount: -amt,
+                    type: 'transfer_out',
+                    created_at: new Date().toISOString()
+                }]);
+            }
+
             // Share Links Setup
-            const receiptSummary = `USAA Transfer Receipt%0AConf: ${confNum}%0AAmount: $${amt.toFixed(2)}%0ATo: ${bank}%0ADate: ${timeStr}`;
+            const receiptSummary = `USAA Transfer Receipt%0AConf: ${confNum}%0AAmount: $${amt.toFixed(2)}%0AFee: $${calculatedFeeValue.toFixed(2)}%0ATo: ${bank}%0ADate: ${timeStr}`;
             document.getElementById('waShareBtn').href = `https://api.whatsapp.com/send?text=${receiptSummary}`;
             document.getElementById('emailShareBtn').href = `mailto:?subject=USAA Transfer Receipt&body=${receiptSummary}`;
             document.getElementById('smsShareBtn').href = `sms:?body=${receiptSummary}`;
