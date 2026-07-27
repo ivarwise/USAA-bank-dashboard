@@ -395,7 +395,6 @@
 
   <!-- ACCOUNTS CARD -->
   <div class="accounts-card" id="accounts-container">
-    <!-- Account items will be injected here via JavaScript -->
     <div style="padding: 20px; text-align: center; color: #666;">Loading account balances...</div>
   </div>
 
@@ -485,7 +484,6 @@
       const { data: { user }, error: authError } = await supabase.auth.getUser();
 
       if (authError || !user) {
-        // Redirect to login if unauthenticated
         window.location.href = 'index.html';
         return;
       }
@@ -508,7 +506,7 @@
       await loadAccounts(user.id);
       await loadTransactions(user.id);
 
-      // 3. Subscribe to Realtime Updates (Accounts & Transactions)
+      // 3. Subscribe to Realtime Updates
       supabase
         .channel('schema-db-changes')
         .on(
@@ -533,7 +531,6 @@
 
       const accountsContainer = document.getElementById('accounts-container');
 
-      // If user has no account records yet, automatically generate default $0.00 accounts for them
       if (!accounts || accounts.length === 0) {
         await createDefaultAccounts(userId);
         return loadAccounts(userId);
@@ -572,11 +569,12 @@
     }
 
     async function loadTransactions(userId) {
+      // Query transactions matching exact table schema
       const { data: transactions, error } = await supabase
         .from('transactions')
         .select('*')
         .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+        .order('transaction_date', { ascending: false });
 
       const txContainer = document.getElementById('transactions-container');
 
@@ -603,24 +601,22 @@
       loadedTransactions = transactions;
 
       txContainer.innerHTML = transactions.map((tx, index) => {
-        const isPositive = (tx.amount > 0) || (tx.type === 'deposit') || (tx.type === 'transfer_in');
+        const isPositive = (tx.amount > 0);
         const amountClass = isPositive ? 'positive' : 'negative';
         const formattedAmount = `${isPositive ? '+' : '-'}${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(tx.amount || 0))}`;
 
         let iconBg = 'transfer';
         let iconName = 'fa-arrow-right-arrow-left';
 
-        if (tx.type === 'deposit') { iconBg = 'deposit'; iconName = 'fa-arrow-down'; }
-        else if (tx.type === 'shopping') { iconBg = 'shopping'; iconName = 'fa-cart-shopping'; }
-        else if (tx.type === 'gas') { iconBg = 'gas'; iconName = 'fa-gas-pump'; }
+        if (isPositive) { iconBg = 'deposit'; iconName = 'fa-arrow-down'; }
 
-        const txDate = tx.created_at ? new Date(tx.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent activity';
+        const txDate = tx.transaction_date ? new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent activity';
 
         return `
           <div class="tx-row" onclick="viewReceipt(${index})">
             <div class="tx-icon ${iconBg}"><i class="fa-solid ${iconName}"></i></div>
             <div class="tx-info">
-              <div class="tx-title">${tx.description || tx.recipient_name || 'Transaction'}</div>
+              <div class="tx-title">${tx.merchant_name || 'Transaction'}</div>
               <div class="tx-date">${txDate}</div>
             </div>
             <div class="tx-amount ${amountClass}">${formattedAmount} <i class="fa-solid fa-chevron-right" style="font-size: 10px; color: #ccc;"></i></div>
