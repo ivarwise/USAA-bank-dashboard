@@ -238,6 +238,12 @@
       align-items: center;
       padding: 14px 16px;
       border-bottom: 1px solid #f0f4f8;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .tx-row:hover {
+      background-color: #f9fbfd;
     }
 
     .tx-row:last-child {
@@ -259,6 +265,7 @@
     .tx-icon.shopping { background-color: #e8f4fd; color: #1da1f2; }
     .tx-icon.gas { background-color: #e6f8ee; color: #17bf63; }
     .tx-icon.deposit { background-color: #e8f4fd; color: #002244; }
+    .tx-icon.transfer { background-color: #fbf0e6; color: #d97706; }
 
     .tx-info {
       flex: 1;
@@ -342,7 +349,7 @@
       background: #ffffff;
       border-top: 1px solid #e1e8ed;
       display: flex;
-      justify-around;
+      justify-content: space-around;
       padding: 10px 0;
       z-index: 1000;
     }
@@ -424,14 +431,7 @@
   </div>
 
   <div class="transactions-card" id="transactions-container">
-    <div class="tx-row">
-      <div class="tx-icon shopping"><i class="fa-solid fa-cart-shopping"></i></div>
-      <div class="tx-info">
-        <div class="tx-title">Walmart Supercenter</div>
-        <div class="tx-date">Recent activity</div>
-      </div>
-      <div class="tx-amount negative">-$0.00 <i class="fa-solid fa-chevron-right" style="font-size: 10px; color: #ccc;"></i></div>
-    </div>
+    <div style="padding: 20px; text-align: center; color: #666;">Loading transactions...</div>
   </div>
 
   <!-- SECURITY CENTER -->
@@ -478,6 +478,7 @@
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
+    let loadedTransactions = [];
 
     // Load User Data & Account Balances
     async function initDashboard() {
@@ -503,16 +504,22 @@
         document.getElementById('user-greeting').innerText = `Good morning, ${firstName}`;
       }
 
-      // 2. Fetch Accounts
+      // 2. Fetch Accounts & Transactions
       await loadAccounts(user.id);
+      await loadTransactions(user.id);
 
-      // 3. Subscribe to Realtime Updates (So when you edit balances in Supabase, screen updates automatically!)
+      // 3. Subscribe to Realtime Updates (Accounts & Transactions)
       supabase
         .channel('schema-db-changes')
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'accounts', filter: `user_id=eq.${user.id}` },
           () => loadAccounts(user.id)
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` },
+          () => loadTransactions(user.id)
         )
         .subscribe();
     }
@@ -563,6 +570,73 @@
         `;
       }).join('');
     }
+
+    async function loadTransactions(userId) {
+      const { data: transactions, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      const txContainer = document.getElementById('transactions-container');
+
+      if (error) {
+        console.error('Error fetching transactions:', error);
+        txContainer.innerHTML = `<div style="padding: 16px; text-align: center; color: #666;">Unable to load transactions.</div>`;
+        return;
+      }
+
+      if (!transactions || transactions.length === 0) {
+        txContainer.innerHTML = `
+          <div class="tx-row">
+            <div class="tx-icon shopping"><i class="fa-solid fa-cart-shopping"></i></div>
+            <div class="tx-info">
+              <div class="tx-title">No recent transactions</div>
+              <div class="tx-date">Activity will show here</div>
+            </div>
+            <div class="tx-amount negative">$0.00</div>
+          </div>
+        `;
+        return;
+      }
+
+      loadedTransactions = transactions;
+
+      txContainer.innerHTML = transactions.map((tx, index) => {
+        const isPositive = (tx.amount > 0) || (tx.type === 'deposit') || (tx.type === 'transfer_in');
+        const amountClass = isPositive ? 'positive' : 'negative';
+        const formattedAmount = `${isPositive ? '+' : '-'}${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(tx.amount || 0))}`;
+
+        let iconBg = 'transfer';
+        let iconName = 'fa-arrow-right-arrow-left';
+
+        if (tx.type === 'deposit') { iconBg = 'deposit'; iconName = 'fa-arrow-down'; }
+        else if (tx.type === 'shopping') { iconBg = 'shopping'; iconName = 'fa-cart-shopping'; }
+        else if (tx.type === 'gas') { iconBg = 'gas'; iconName = 'fa-gas-pump'; }
+
+        const txDate = tx.created_at ? new Date(tx.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent activity';
+
+        return `
+          <div class="tx-row" onclick="viewReceipt(${index})">
+            <div class="tx-icon ${iconBg}"><i class="fa-solid ${iconName}"></i></div>
+            <div class="tx-info">
+              <div class="tx-title">${tx.description || tx.recipient_name || 'Transaction'}</div>
+              <div class="tx-date">${txDate}</div>
+            </div>
+            <div class="tx-amount ${amountClass}">${formattedAmount} <i class="fa-solid fa-chevron-right" style="font-size: 10px; color: #ccc;"></i></div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Opens receipt page with selected transaction data
+    window.viewReceipt = function(index) {
+      const tx = loadedTransactions[index];
+      if (tx) {
+        sessionStorage.setItem('selectedTransaction', JSON.stringify(tx));
+        window.location.href = 'receipt.html';
+      }
+    };
 
     // Helper to seed initial 4 accounts at $0.00 if brand new user
     async function createDefaultAccounts(userId) {
