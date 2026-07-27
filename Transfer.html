@@ -105,6 +105,11 @@
             background-color: var(--usaa-navy);
         }
 
+        .btn:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+
         .btn-danger {
             background-color: var(--usaa-red);
         }
@@ -370,7 +375,7 @@
                 <input type="password" id="pinInput" maxlength="4" placeholder="••••" style="text-align: center; font-size: 1.8rem; letter-spacing: 8px;">
             </div>
 
-            <button class="btn" onclick="verifyAndExecuteTransfer()">Authorize Transfer</button>
+            <button class="btn" id="authBtn" onclick="verifyAndExecuteTransfer()">Authorize Transfer</button>
         </div>
 
         <!-- STEP 4: SUCCESS & OFFICIAL PRINTABLE RECEIPT -->
@@ -440,15 +445,31 @@
                 return;
             }
 
-            const { data: accounts } = await client.from('accounts').select('*').eq('user_id', user.id);
+            const { data: accounts, error } = await client.from('accounts').select('*').eq('user_id', user.id);
+            if (error) {
+                alert("Error loading accounts: " + error.message);
+                return;
+            }
+
             userAccounts = accounts || [];
 
             const fromSelect = document.getElementById('fromAccount');
             fromSelect.innerHTML = "";
+            
+            if (userAccounts.length === 0) {
+                let opt = document.createElement('option');
+                opt.textContent = "No active accounts found";
+                fromSelect.appendChild(opt);
+                return;
+            }
+
             userAccounts.forEach(acc => {
                 let opt = document.createElement('option');
                 opt.value = acc.id;
-                opt.textContent = `${acc.account_name} (••••${acc.account_number_last4}) - $${parseFloat(acc.balance).toFixed(2)}`;
+                opt.textContent = `${acc.account_name} (••••${acc.account_number_last4 || '0000'}) - $${parseFloat(acc.balance).toFixed(2)}`;
+                if (acc.status === 'FROZEN') {
+                    opt.textContent += " [FROZEN]";
+                }
                 fromSelect.appendChild(opt);
             });
 
@@ -488,7 +509,7 @@
             if (amt === 0) {
                 calculatedFeeValue = 0;
             } else if (country === "USA") {
-                calculatedFeeValue = 0.00; // Standard domestic ACH
+                calculatedFeeValue = 0.00;
             } else if (country === "CANADA") {
                 calculatedFeeValue = 35.00;
             } else if (country === "UK") {
@@ -509,24 +530,40 @@
             if (!savedPin) {
                 document.getElementById('pinTitle').textContent = "Create Security PIN";
                 document.getElementById('pinSubtext').textContent = "Set a 4-digit transfer PIN for first-time account authorization.";
+            } else {
+                document.getElementById('pinTitle').textContent = "Security Authentication";
+                document.getElementById('pinSubtext').textContent = "Enter your 4-digit transfer PIN to authorize this transaction.";
             }
         }
 
         function goToStep(stepNum) {
             if (stepNum === 2) {
                 const amt = parseFloat(document.getElementById('amount').value);
+                const accNum = document.getElementById('accountNum').value.trim();
+
                 if (!amt || amt <= 0) {
-                    alert("Please enter a valid amount.");
+                    alert("Please enter a valid transfer amount.");
+                    return;
+                }
+
+                if (!accNum) {
+                    alert("Please enter the recipient's account number or IBAN.");
                     return;
                 }
                 
-                const fromAcc = userAccounts.find(a => a.id === document.getElementById('fromAccount').value);
+                const selectedAccId = document.getElementById('fromAccount').value;
+                const fromAcc = userAccounts.find(a => a.id === selectedAccId);
                 const bank = document.getElementById('countrySelect').value === "MANUAL" ? 
-                             document.getElementById('manualBankName').value : document.getElementById('toBank').value;
+                             document.getElementById('manualBankName').value.trim() : document.getElementById('toBank').value;
+
+                if (!bank) {
+                    alert("Please specify a valid bank name.");
+                    return;
+                }
 
                 document.getElementById('revFrom').textContent = fromAcc ? fromAcc.account_name : "--";
                 document.getElementById('revBank').textContent = bank;
-                document.getElementById('revAcc').textContent = document.getElementById('accountNum').value;
+                document.getElementById('revAcc').textContent = accNum;
                 document.getElementById('revAmount').textContent = `$${amt.toFixed(2)}`;
                 document.getElementById('revFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
                 document.getElementById('revDate').textContent = document.getElementById('transferDate').value;
@@ -539,9 +576,10 @@
         async function verifyAndExecuteTransfer() {
             const inputPin = document.getElementById('pinInput').value;
             const savedPin = localStorage.getItem('usaa_user_pin');
+            const authBtn = document.getElementById('authBtn');
 
-            if (inputPin.length !== 4) {
-                alert("Please enter a valid 4-digit PIN.");
+            if (inputPin.length !== 4 || isNaN(inputPin)) {
+                alert("Please enter a valid 4-digit numerical PIN.");
                 return;
             }
 
@@ -555,65 +593,61 @@
 
             const fromAccId = document.getElementById('fromAccount').value;
             const amt = parseFloat(document.getElementById('amount').value);
-            const totalDeduction = amt + calculatedFeeValue;
-
-            // 100K SAFETY BLOCK TRIGGER
-            if (amt > 100000) {
-                await client.from('accounts').update({ status: 'FROZEN' }).eq('id', fromAccId);
-                document.getElementById('step3').classList.remove('active');
-                document.getElementById('freezeAlert').style.display = 'block';
-                return;
-            }
-
-            const selectedAcc = userAccounts.find(a => a.id === fromAccId);
-            if (!selectedAcc || selectedAcc.balance < totalDeduction) {
-                alert("Insufficient funds to cover transfer amount and fees.");
-                return;
-            }
-
-            const newBalance = selectedAcc.balance - totalDeduction;
-            const { error: balanceError } = await client.from('accounts').update({ balance: newBalance }).eq('id', fromAccId);
-
-            if (balanceError) {
-                alert("Transfer failed: " + balanceError.message);
-                return;
-            }
-
-            // Populate Final Receipt
-            const confNum = "USAA-" + Math.floor(10000000 + Math.random() * 90000000);
-            const timeStr = new Date().toLocaleString();
             const bank = document.getElementById('countrySelect').value === "MANUAL" ? 
-                         document.getElementById('manualBankName').value : document.getElementById('toBank').value;
-            const recipientAccNum = document.getElementById('accountNum').value || 'N/A';
+                         document.getElementById('manualBankName').value.trim() : document.getElementById('toBank').value;
+            const recipientAccNum = document.getElementById('accountNum').value.trim() || 'N/A';
 
-            document.getElementById('recConf').textContent = confNum;
-            document.getElementById('recTime').textContent = timeStr;
-            document.getElementById('recFrom').textContent = selectedAcc.account_name;
-            document.getElementById('recBank').textContent = bank;
-            document.getElementById('recAccNum').textContent = recipientAccNum;
-            document.getElementById('recAmount').textContent = `$${amt.toFixed(2)}`;
-            document.getElementById('recFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
+            authBtn.disabled = true;
+            authBtn.textContent = "Processing Transaction...";
 
-            // Log entry into transactions table so Dashboard updates live
-            const { data: { user } } = await client.auth.getUser();
-            if (user) {
-                await client.from('transactions').insert([{
-                    user_id: user.id,
-                    description: `Transfer to ${bank}`,
-                    recipient_name: bank,
-                    amount: -amt,
-                    type: 'transfer_out',
-                    created_at: new Date().toISOString()
-                }]);
+            try {
+                // Execute atomic database function via RPC
+                const { data, error } = await client.rpc('execute_transfer', {
+                    p_from_account_id: fromAccId,
+                    p_recipient_bank: bank,
+                    p_recipient_account: recipientAccNum,
+                    p_amount: amt,
+                    p_fee: calculatedFeeValue
+                });
+
+                if (error) {
+                    if (error.message.includes('ACCOUNT_FROZEN')) {
+                        document.getElementById('step3').classList.remove('active');
+                        document.getElementById('freezeAlert').style.display = 'block';
+                    } else if (error.message.includes('INSUFFICIENT_FUNDS')) {
+                        alert("Insufficient funds to cover the transfer amount and associated fee.");
+                    } else {
+                        alert("Transfer Failed: " + error.message);
+                    }
+                    return;
+                }
+
+                // Render Final Digital Receipt
+                const confNum = "USAA-" + Math.floor(10000000 + Math.random() * 90000000);
+                const timeStr = new Date().toLocaleString();
+                const selectedAcc = userAccounts.find(a => a.id === fromAccId);
+
+                document.getElementById('recConf').textContent = confNum;
+                document.getElementById('recTime').textContent = timeStr;
+                document.getElementById('recFrom').textContent = selectedAcc ? selectedAcc.account_name : 'USAA Account';
+                document.getElementById('recBank').textContent = bank;
+                document.getElementById('recAccNum').textContent = recipientAccNum;
+                document.getElementById('recAmount').textContent = `$${amt.toFixed(2)}`;
+                document.getElementById('recFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
+
+                // Setup External Share Links
+                const receiptSummary = `USAA Transfer Receipt%0AConf: ${confNum}%0AAmount: $${amt.toFixed(2)}%0AFee: $${calculatedFeeValue.toFixed(2)}%0ATo: ${bank}%0ADate: ${timeStr}`;
+                document.getElementById('waShareBtn').href = `https://api.whatsapp.com/send?text=${receiptSummary}`;
+                document.getElementById('emailShareBtn').href = `mailto:?subject=USAA Transfer Receipt&body=${receiptSummary}`;
+                document.getElementById('smsShareBtn').href = `sms:?body=${receiptSummary}`;
+
+                goToStep(4);
+            } catch (err) {
+                alert("An unexpected error occurred: " + err.message);
+            } finally {
+                authBtn.disabled = false;
+                authBtn.textContent = "Authorize Transfer";
             }
-
-            // Share Links Setup
-            const receiptSummary = `USAA Transfer Receipt%0AConf: ${confNum}%0AAmount: $${amt.toFixed(2)}%0AFee: $${calculatedFeeValue.toFixed(2)}%0ATo: ${bank}%0ADate: ${timeStr}`;
-            document.getElementById('waShareBtn').href = `https://api.whatsapp.com/send?text=${receiptSummary}`;
-            document.getElementById('emailShareBtn').href = `mailto:?subject=USAA Transfer Receipt&body=${receiptSummary}`;
-            document.getElementById('smsShareBtn').href = `sms:?body=${receiptSummary}`;
-
-            goToStep(4);
         }
 
         window.onload = initTransferPage;
