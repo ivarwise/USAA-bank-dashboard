@@ -6,8 +6,6 @@
   <title>USAA - Access Your Account</title>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -17,7 +15,7 @@
     }
 
     body {
-      background-color: #002649; /* USAA Deep Navy Blue */
+      background-color: #002649; /* USAA Navy */
       color: #ffffff;
       display: flex;
       justify-content: center;
@@ -157,13 +155,13 @@
       <h1>USAA</h1>
     </div>
 
-    <!-- Tab Navigation -->
+    <!-- Navigation Tabs -->
     <div class="tabs">
-      <button id="login-tab" class="tab-btn active" onclick="switchTab('login')">Log In</button>
-      <button id="register-tab" class="tab-btn" onclick="switchTab('register')">Register</button>
+      <button id="login-tab" class="tab-btn active">Log In</button>
+      <button id="register-tab" class="tab-btn">Register</button>
     </div>
 
-    <!-- Feedback Banner -->
+    <!-- Alert Message Box -->
     <div id="alert-box" class="alert"></div>
 
     <!-- LOGIN FORM -->
@@ -201,27 +199,38 @@
     </form>
   </div>
 
-  <script>
-    // Configured Supabase Credentials
+  <!-- JavaScript Module -->
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
     const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Tab Switching Functionality
+    const loginTab = document.getElementById('login-tab');
+    const registerTab = document.getElementById('register-tab');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
 
     function switchTab(tab) {
       showAlert('');
       if (tab === 'login') {
-        document.getElementById('login-form').style.display = 'block';
-        document.getElementById('register-form').style.display = 'none';
-        document.getElementById('login-tab').classList.add('active');
-        document.getElementById('register-tab').classList.remove('active');
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        loginTab.classList.add('active');
+        registerTab.classList.remove('active');
       } else {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('register-form').style.display = 'block';
-        document.getElementById('register-tab').classList.add('active');
-        document.getElementById('login-tab').classList.remove('active');
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        registerTab.classList.add('active');
+        loginTab.classList.remove('active');
       }
     }
+
+    loginTab.addEventListener('click', () => switchTab('login'));
+    registerTab.addEventListener('click', () => switchTab('register'));
 
     function showAlert(msg, type = 'error') {
       const box = document.getElementById('alert-box');
@@ -233,8 +242,8 @@
       box.innerText = msg;
     }
 
-    // Handle User Registration
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
+    // REGISTRATION HANDLER
+    registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const regBtn = document.getElementById('reg-btn');
@@ -247,12 +256,12 @@
       const phone = document.getElementById('reg-phone').value.trim();
       const password = document.getElementById('reg-password').value;
 
-      // Auto-generate a unique username based on email and timestamp
-      const username = email.split('@')[0] + Math.floor(Math.random() * 1000);
+      // Generate unique username to satisfy table constraints
+      const username = email.split('@')[0] + Math.floor(Math.random() * 10000);
 
       try {
-        // Step 1: Register in Supabase Auth
-        const { data, error } = await supabase.auth.signUp({
+        // 1. Create Auth User
+        const { data: authData, error: authError } = await supabase.auth.signUp({
           email: email,
           password: password,
           options: {
@@ -264,14 +273,14 @@
           }
         });
 
-        if (error) throw error;
+        if (authError) throw authError;
 
-        // Step 2: Write exact fields to public.profiles matching table schema
-        if (data?.user) {
+        // 2. Insert User into public.profiles
+        if (authData?.user) {
           const { error: profileError } = await supabase
             .from('profiles')
             .upsert({
-              id: data.user.id,
+              id: authData.user.id,
               full_name: name,
               username: username,
               phone_number: phone,
@@ -280,25 +289,24 @@
 
           if (profileError) {
             console.error("Profiles Table Error:", profileError);
-            throw new Error("Account created, but profile setup failed: " + profileError.message);
           }
         }
 
-        showAlert('Account created successfully! You can now log in.', 'success');
-        document.getElementById('register-form').reset();
-        setTimeout(() => switchTab('login'), 2000);
+        showAlert('Account created successfully! Switching to login...', 'success');
+        registerForm.reset();
+        setTimeout(() => switchTab('login'), 1500);
 
       } catch (err) {
-        console.error("Registration Error Details:", err);
-        showAlert(err.message || "An error occurred during account creation.", 'error');
+        console.error("Registration failed:", err);
+        showAlert(err.message || "Could not register. Check credentials.", 'error');
       } finally {
         regBtn.disabled = false;
         regBtn.innerText = "Create Account";
       }
     });
 
-    // Handle User Login
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
+    // LOGIN HANDLER
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const loginBtn = document.getElementById('login-btn');
@@ -321,9 +329,10 @@
         setTimeout(() => {
           window.location.href = 'dashboard.html';
         }, 1000);
+
       } catch (err) {
         console.error("Login failed:", err);
-        showAlert(err.message || "Invalid credentials. Please try again.", 'error');
+        showAlert(err.message || "Invalid email or password.", 'error');
       } finally {
         loginBtn.disabled = false;
         loginBtn.innerText = "Log In";
