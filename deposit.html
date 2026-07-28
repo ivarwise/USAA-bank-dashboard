@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>USAA - Mobile Check Deposit</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --usaa-navy: #002244;
+      --usaa-blue: #005691;
+      --usaa-light: #f4f6f8;
+      --usaa-green: #2e7d32;
+      --border: #d1dbe5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--usaa-light); color: #333; max-width: 480px; margin: 0 auto; min-height: 100vh; }
+
+    .header {
+      background: linear-gradient(180deg, #002244 0%, #003366 100%);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .back-btn { color: white; font-size: 20px; text-decoration: none; }
+    .header h1 { font-size: 18px; font-weight: 700; }
+
+    .tabs {
+      display: flex;
+      background: white;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 14px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #657786;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    .tab.active {
+      color: var(--usaa-navy);
+      border-bottom-color: var(--usaa-navy);
+    }
+
+    .container { padding: 16px; }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--usaa-navy);
+      margin-bottom: 12px;
+    }
+
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--usaa-navy); margin-bottom: 6px; }
+    select, input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      background: white;
+    }
+
+    .btn {
+      width: 100%;
+      background: var(--usaa-blue);
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .btn:disabled { background: #a0a0a0; cursor: not-allowed; }
+    .btn-secondary {
+      background: white;
+      color: var(--usaa-navy);
+      border: 1px solid var(--border);
+    }
+    .btn-outline {
+      background: white;
+      color: var(--usaa-navy);
+      border: 2px dashed var(--border);
+      padding: 40px 20px;
+      font-size: 15px;
+    }
+
+    .camera-box {
+      background: #111;
+      border-radius: 12px;
+      height: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .camera-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .camera-placeholder {
+      text-align: center;
+      padding: 20px;
+    }
+    .camera-placeholder i { font-size: 42px; margin-bottom: 12px; opacity: 0.7; }
+
+    .preview-img {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .review-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px dashed #e5e5e5;
+      font-size: 14px;
+    }
+    .review-row:last-child { border-bottom: none; }
+    .review-row span { color: #657786; }
+    .review-row strong { color: var(--usaa-navy); }
+
+    .success-box { text-align: center; padding: 30px 10px; }
+    .success-icon {
+      width: 72px; height: 72px;
+      background: #e8f5e9;
+      color: var(--usaa-green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 34px;
+      margin: 0 auto 16px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .status-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+    .status-processing { background: #fff3e0; color: #ef6c00; }
+    .status-completed { background: #e8f5e9; color: #2e7d32; }
+
+    .step { display: none; }
+    .step.active { display: block; }
+
+    .info-box {
+      background: #eef5fc;
+      border: 1px solid #d0e3f7;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 13px;
+      color: #333;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+    <h1 id="pageTitle">Mobile Check Deposit</h1>
+  </div>
+
+  <!-- ===================== HOME ===================== -->
+  <div id="step-home" class="step active">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('deposit')">Deposit a Check</div>
+      <div class="tab" onclick="switchTab('history')">Deposit History</div>
+      <div class="tab" onclick="switchTab('limits')">Limits & Help</div>
+    </div>
+
+    <div class="container">
+      <div id="tab-deposit">
+        <div class="card" style="text-align:center; padding:30px 20px;">
+          <div style="width:70px;height:70px;background:#e8f4fd;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <i class="fa-solid fa-money-check" style="font-size:30px;color:var(--usaa-navy);"></i>
+          </div>
+          <h2 style="font-size:18px;color:var(--usaa-navy);margin-bottom:8px;">Deposit a Check</h2>
+          <p style="font-size:14px;color:#657786;margin-bottom:20px;">Take photos of the front and back of your check to deposit it instantly.</p>
+          <button class="btn" onclick="startDeposit()">Start Deposit</button>
+        </div>
+      </div>
+
+      <div id="tab-history" style="display:none;">
+        <div class="section-title">Recent Deposits</div>
+        <div class="card" id="historyList">
+          <div class="history-item">
+            <div>
+              <div style="font-weight:700;">$1,250.00</div>
+              <div style="font-size:12px;color:#657786;">Jul 28, 2026</div>
+            </div>
+            <span class="status-badge status-processing">Processing</span>
+          </div>
+          <div class="history-item">
+            <div>
+              <div style="font-weight:700;">$325.50</div>
+              <div style="font-size:12px;color:#657786;">Jul 24, 2026</div>
+            </div>
+            <span class="status-badge status-completed">Completed</span>
+          </div>
+          <div class="history-item">
+            <div>
+              <div style="font-weight:700;">$2,150.00</div>
+              <div style="font-size:12px;color:#657786;">Jul 18, 2026</div>
+            </div>
+            <span class="status-badge status-completed">Completed</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-limits" style="display:none;">
+        <div class="section-title">Deposit Limits</div>
+        <div class="card">
+          <div class="review-row"><span>Daily Limit</span><strong>$5,000</strong></div>
+          <div class="review-row"><span>Monthly Limit</span><strong>$25,000</strong></div>
+          <div class="review-row"><span>Per Check Limit</span><strong>$5,000</strong></div>
+        </div>
+        <div class="info-box">
+          <strong>Helpful Tips:</strong><br>
+          • Use a dark background<br>
+          • Ensure all four corners are visible<br>
+          • Sign and write “For Mobile Deposit at USAA” on the back<br>
+          • Avoid shadows and glare
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SELECT ACCOUNT + AMOUNT ===================== -->
+  <div id="step-amount" class="step">
+    <div class="container">
+      <div class="section-title">Deposit To</div>
+      <div class="form-group">
+        <select id="depositAccount"></select>
+      </div>
+
+      <div class="section-title">Check Amount</div>
+      <div class="form-group">
+        <input type="number" id="checkAmount" placeholder="0.00" step="0.01">
+      </div>
+
+      <button class="btn" onclick="goToEndorse()">Continue</button>
+      <button class="btn btn-secondary" onclick="goHome()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ===================== ENDORSE ===================== -->
+  <div id="step-endorse" class="step">
+    <div class="container">
+      <div class="section-title">Endorse the Check</div>
+      <div class="info-box">
+        <strong>Before taking photos:</strong><br><br>
+        1. Sign the back of the check<br>
+        2. Write clearly:<br>
+        <strong style="display:block;margin:8px 0;padding:10px;background:#fff;border-radius:6px;">
+          For Mobile Deposit at USAA
+        </strong>
+        Make sure the endorsement is complete and readable.
+      </div>
+
+      <div class="card" style="text-align:center;background:#f8fafc;">
+        <div style="font-size:13px;color:#657786;margin-bottom:8px;">Example endorsement:</div>
+        <div style="font-family:Georgia,serif;font-size:16px;line-height:1.6;">
+          John Smith<br>
+          For Mobile Deposit at USAA<br>
+          <span style="font-style:italic;">Signature</span>
+        </div>
+      </div>
+
+      <button class="btn" onclick="goToFront()">I have endorsed the check</button>
+      <button class="btn btn-secondary" onclick="goToAmount()">Back</button>
+    </div>
+  </div>
+
+  <!-- ===================== CAPTURE FRONT ===================== -->
+  <div id="step-front" class="step">
+    <div class="container">
+      <div class="section-title">Capture Front of Check</div>
+      <div class="info-box">
+        Place the check on a dark background. Align it within the frame. Ensure all four corners are visible.
+      </div>
+
+      <div class="camera-box" id="frontPreview">
+        <div class="camera-placeholder">
+          <i class="fa-solid fa-camera"></i>
+          <div>Front of Check</div>
+        </div>
+      </div>
+
+      <input type="file" id="frontInput" accept="image/*" capture="environment" style="display:none;" onchange="previewFront(event)">
+      <button class="btn" onclick="document.getElementById('frontInput').click()">
+        <i class="fa-solid fa-camera"></i> Capture Front
+      </button>
+      <button class="btn btn-secondary" id="frontContinue" style="display:none;" onclick="goToBack()">Continue</button>
+      <button class="btn btn-secondary" onclick="goToEndorse()">Back</button>
+    </div>
+  </div>
+
+  <!-- ===================== CAPTURE BACK ===================== -->
+  <div id="step-back" class="step">
+    <div class="container">
+      <div class="section-title">Capture Back of Check</div>
+      <div class="info-box">
+        Make sure the signature and “For Mobile Deposit at USAA” are clearly visible.
+      </div>
+
+      <div class="camera-box" id="backPreview">
+        <div class="camera-placeholder">
+          <i class="fa-solid fa-camera"></i>
+          <div>Back of Check</div>
+        </div>
+      </div>
+
+      <input type="file" id="backInput" accept="image/*" capture="environment" style="display:none;" onchange="previewBack(event)">
+      <button class="btn" onclick="document.getElementById('backInput').click()">
+        <i class="fa-solid fa-camera"></i> Capture Back
+      </button>
+      <button class="btn btn-secondary" id="backContinue" style="display:none;" onclick="goToReview()">Continue</button>
+      <button class="btn btn-secondary" onclick="goToFront()">Back</button>
+    </div>
+  </div>
+
+  <!-- ===================== REVIEW ===================== -->
+  <div id="step-review" class="step">
+    <div class="container">
+      <div class="section-title">Review Mobile Deposit</div>
+      <div class="card">
+        <div class="review-row"><span>Deposit To</span><strong id="revAccount">—</strong></div>
+        <div class="review-row"><span>Amount</span><strong id="revAmount">$0.00</strong></div>
+        <div class="review-row"><span>Front Image</span><strong style="color:var(--usaa-green);">✓ Captured</strong></div>
+        <div class="review-row"><span>Back Image</span><strong style="color:var(--usaa-green);">✓ Captured</strong></div>
+      </div>
+      <button class="btn" onclick="goToPin()">Submit Deposit</button>
+      <button class="btn btn-secondary" onclick="goToBack()">Edit</button>
+    </div>
+  </div>
+
+  <!-- ===================== PIN ===================== -->
+  <div id="step-pin" class="step">
+    <div class="container">
+      <div class="section-title" style="text-align:center;">Security Verification</div>
+      <p style="text-align:center;color:#657786;margin-bottom:24px;font-size:14px;">Enter your 4-digit PIN to authorize this deposit.</p>
+      <div class="form-group">
+        <input type="password" id="depositPin" maxlength="4" placeholder="••••" style="text-align:center;font-size:28px;letter-spacing:12px;">
+      </div>
+      <button class="btn" id="pinBtn" onclick="submitDeposit()">Authorize Deposit</button>
+      <button class="btn btn-secondary" onclick="goToReview()">Back</button>
+    </div>
+  </div>
+
+  <!-- ===================== SUCCESS ===================== -->
+  <div id="step-success" class="step">
+    <div class="container">
+      <div class="success-box">
+        <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+        <h2 style="color:var(--usaa-green);margin-bottom:6px;">Deposit Received</h2>
+        <p style="color:#657786;font-size:14px;">Your check has been submitted successfully.</p>
+      </div>
+
+      <div class="card">
+        <div class="review-row"><span>Confirmation #</span><strong id="sucConf">—</strong></div>
+        <div class="review-row"><span>Amount</span><strong id="sucAmount">$0.00</strong></div>
+        <div class="review-row"><span>Deposit Account</span><strong id="sucAccount">—</strong></div>
+        <div class="review-row"><span>Date & Time</span><strong id="sucTime">—</strong></div>
+        <div class="review-row"><span>Status</span><strong style="color:#ef6c00;">Processing</strong></div>
+      </div>
+
+      <div class="info-box">
+        <strong>Funds Availability</strong><br>
+        First $225 available today<br>
+        Remaining balance available after verification (usually 1–2 business days)
+      </div>
+
+      <button class="btn" onclick="goHome()">Done</button>
+      <button class="btn btn-secondary" onclick="startDeposit()">Deposit Another Check</button>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+    let userAccounts = [];
+    let depositAmount = 0;
+    let frontCaptured = false;
+    let backCaptured = false;
+
+    async function init() {
+      const { data: { user } } = await client.auth.getUser();
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+      currentUser = user;
+
+      const { data: accounts } = await client.from('accounts').select('*').eq('user_id', user.id);
+      userAccounts = accounts || [];
+
+      const select = document.getElementById('depositAccount');
+      select.innerHTML = '';
+      userAccounts.forEach(acc => {
+        const opt = document.createElement('option');
+        opt.value = acc.id;
+        opt.textContent = `${acc.account_name} (••••${acc.account_number_last4 || '0000'})`;
+        select.appendChild(opt);
+      });
+    }
+
+    function startDeposit() {
+      showStep('amount');
+      document.getElementById('pageTitle').textContent = 'Deposit Check';
+    }
+
+    function goToAmount() {
+      showStep('amount');
+    }
+
+    function goToEndorse() {
+      const amt = parseFloat(document.getElementById('checkAmount').value);
+      if (!amt || amt <= 0) {
+        alert("Please enter a valid check amount.");
+        return;
+      }
+      depositAmount = amt;
+      showStep('endorse');
+      document.getElementById('pageTitle').textContent = 'Endorse Check';
+    }
+
+    function goToFront() {
+      showStep('front');
+      document.getElementById('pageTitle').textContent = 'Front of Check';
+    }
+
+    function goToBack() {
+      if (!frontCaptured) {
+        alert("Please capture the front of the check first.");
+        return;
+      }
+      showStep('back');
+      document.getElementById('pageTitle').textContent = 'Back of Check';
+    }
+
+    function goToReview() {
+      if (!backCaptured) {
+        alert("Please capture the back of the check first.");
+        return;
+      }
+      const accId = document.getElementById('depositAccount').value;
+      const acc = userAccounts.find(a => a.id === accId);
+
+      document.getElementById('revAccount').textContent = acc ? acc.account_name : '—';
+      document.getElementById('revAmount').textContent = `$${depositAmount.toFixed(2)}`;
+
+      showStep('review');
+      document.getElementById('pageTitle').textContent = 'Review Deposit';
+    }
+
+    function goToPin() {
+      showStep('pin');
+      document.getElementById('pageTitle').textContent = 'Security Verification';
+    }
+
+    function goHome() {
+      showStep('home');
+      document.getElementById('pageTitle').textContent = 'Mobile Check Deposit';
+      // reset
+      frontCaptured = false;
+      backCaptured = false;
+      document.getElementById('frontPreview').innerHTML = `<div class="camera-placeholder"><i class="fa-solid fa-camera"></i><div>Front of Check</div></div>`;
+      document.getElementById('backPreview').innerHTML = `<div class="camera-placeholder"><i class="fa-solid fa-camera"></i><div>Back of Check</div></div>`;
+      document.getElementById('frontContinue').style.display = 'none';
+      document.getElementById('backContinue').style.display = 'none';
+      document.getElementById('checkAmount').value = '';
+    }
+
+    function previewFront(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        document.getElementById('frontPreview').innerHTML = `<img src="${ev.target.result}">`;
+        frontCaptured = true;
+        document.getElementById('frontContinue').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewBack(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        document.getElementById('backPreview').innerHTML = `<img src="${ev.target.result}">`;
+        backCaptured = true;
+        document.getElementById('backContinue').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function submitDeposit() {
+      const pin = document.getElementById('depositPin').value;
+      const savedPin = localStorage.getItem('usaa_user_pin');
+      const btn = document.getElementById('pinBtn');
+
+      if (pin.length !== 4 || isNaN(pin)) {
+        alert("Please enter a valid 4-digit PIN.");
+        return;
+      }
+      if (savedPin && savedPin !== pin) {
+        alert("Incorrect PIN.");
+        return;
+      }
+      if (!savedPin) localStorage.setItem('usaa_user_pin', pin);
+
+      btn.disabled = true;
+      btn.textContent = "Processing...";
+
+      try {
+        const accId = document.getElementById('depositAccount').value;
+        const acc = userAccounts.find(a => a.id === accId);
+
+        // Credit the account
+        const newBalance = (acc.balance || 0) + depositAmount;
+        await client.from('accounts').update({ balance: newBalance }).eq('id', accId);
+
+        // Log transaction
+        await client.from('transactions').insert([{
+          user_id: currentUser.id,
+          account_id: accId,
+          merchant_name: 'Mobile Check Deposit',
+          amount: depositAmount,
+          transaction_date: new Date().toISOString(),
+          description: `Mobile Check Deposit - $${depositAmount.toFixed(2)}`,
+          recipient_name: 'Check Deposit',
+          type: 'deposit'
+        }]);
+
+        // Success
+        const conf = "MD-" + Math.floor(10000000 + Math.random() * 90000000);
+        document.getElementById('sucConf').textContent = conf;
+        document.getElementById('sucAmount').textContent = `$${depositAmount.toFixed(2)}`;
+        document.getElementById('sucAccount').textContent = acc.account_name;
+        document.getElementById('sucTime').textContent = new Date().toLocaleString();
+
+        showStep('success');
+        document.getElementById('pageTitle').textContent = 'Deposit Submitted';
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Authorize Deposit";
+      }
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
+
+      if (tab === 'deposit') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('tab-deposit').style.display = 'block';
+      } else if (tab === 'history') {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('tab-history').style.display = 'block';
+      } else {
+        document.querySelectorAll('.tab')[2].classList.add('active');
+        document.getElementById('tab-limits').style.display = 'block';
+      }
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step-' + step).classList.add('active');
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
