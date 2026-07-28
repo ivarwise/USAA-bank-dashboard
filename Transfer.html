@@ -637,14 +637,40 @@
                         return;
                     }
 
-                    // Direct transaction log fallback
-                    await client.from('transactions').insert([
+                    // Direct transaction log fallback – NOW MATCHES YOUR TABLE SCHEMA
+                    const { error: txError } = await client.from('transactions').insert([
                         {
                             user_id: currentUser.id,
+                            account_id: fromAccId,
+                            merchant_name: `Transfer to ${bank}`,
                             amount: -amt,
-                            created_at: new Date().toISOString()
+                            transaction_date: new Date().toISOString(),
+                            description: `Transfer to ${bank} | Account: ${recipientAccNum}`,
+                            recipient_name: bank,
+                            type: 'transfer'
                         }
                     ]);
+
+                    if (txError) {
+                        console.error("Transaction insert failed:", txError);
+                        alert("Balance updated but transaction record failed: " + txError.message);
+                    }
+
+                    // Also log the fee as a separate transaction (optional but clean)
+                    if (calculatedFeeValue > 0) {
+                        await client.from('transactions').insert([
+                            {
+                                user_id: currentUser.id,
+                                account_id: fromAccId,
+                                merchant_name: 'Transfer Fee',
+                                amount: -calculatedFeeValue,
+                                transaction_date: new Date().toISOString(),
+                                description: `Fee for transfer to ${bank}`,
+                                recipient_name: bank,
+                                type: 'fee'
+                            }
+                        ]);
+                    }
                 }
 
                 // Render Receipt
