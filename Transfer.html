@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>USAA - Money Transfer</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -418,10 +419,10 @@
 
             <h3 class="no-print">Share / Download Receipt</h3>
             <div class="share-grid no-print">
-                <button class="share-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Download / Print</button>
-                <a id="waShareBtn" class="share-btn" target="_blank"><i class="fa-brands fa-whatsapp"></i> Send to WhatsApp</a>
-                <a id="emailShareBtn" class="share-btn"><i class="fa-solid fa-envelope"></i> Send to Email</a>
-                <a id="smsShareBtn" class="share-btn"><i class="fa-solid fa-comment-sms"></i> Send to Phone (SMS)</a>
+                <button class="share-btn" onclick="downloadReceiptImage()"><i class="fa-solid fa-download"></i> Download Receipt</button>
+                <button class="share-btn" onclick="shareReceiptImage('whatsapp')"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+                <button class="share-btn" onclick="shareReceiptImage('email')"><i class="fa-solid fa-envelope"></i> Email</button>
+                <button class="share-btn" onclick="shareReceiptImage('sms')"><i class="fa-solid fa-comment-sms"></i> Phone (SMS)</button>
             </div>
 
             <button class="btn no-print" style="margin-top: 20px;" onclick="window.location.href='dashboard.html'">Return to Dashboard</button>
@@ -437,6 +438,8 @@
         let userAccounts = [];
         let calculatedFeeValue = 0;
         let currentUser = null;
+        let senderFullName = "USAA Member";
+        let lastReceiptData = null;
 
         const bankData = {
             USA: ["JPMorgan Chase", "Bank of America", "Wells Fargo", "Citigroup", "Capital One"],
@@ -453,6 +456,17 @@
                 return;
             }
             currentUser = user;
+
+            // Get sender full name from profiles
+            const { data: profile } = await client
+                .from('profiles')
+                .select('full_name')
+                .eq('id', user.id)
+                .single();
+
+            if (profile && profile.full_name) {
+                senderFullName = profile.full_name;
+            }
 
             const { data: accounts, error } = await client.from('accounts').select('*').eq('user_id', user.id);
             if (error) {
@@ -515,7 +529,6 @@
             if (amt === 0) {
                 calculatedFeeValue = 0;
             } else if (country === "USA") {
-                // Domestic: free under $1,000 → then 0.25% of amount
                 calculatedFeeValue = amt <= 1000 ? 0 : +(amt * 0.0025).toFixed(2);
             } else if (country === "CANADA") {
                 calculatedFeeValue = +(25 + (amt * 0.005)).toFixed(2);
@@ -574,7 +587,7 @@
                     return;
                 }
 
-                document.getElementById('revFrom').textContent = fromAcc ? fromAcc.account_name : "--";
+                document.getElementById('revFrom').textContent = senderFullName;
                 document.getElementById('revName').textContent = recipName;
                 document.getElementById('revBank').textContent = bank;
                 document.getElementById('revAcc').textContent = accNum;
@@ -616,7 +629,6 @@
             authBtn.textContent = "Processing Transaction...";
 
             try {
-                // 1. Try execute RPC
                 const { data, error } = await client.rpc('execute_transfer', {
                     p_from_account_id: fromAccId,
                     p_recipient_bank: bank,
@@ -625,7 +637,6 @@
                     p_fee: calculatedFeeValue
                 });
 
-                // 2. If RPC fails due to missing table columns, run direct frontend update fallback
                 if (error) {
                     console.warn("RPC call failed, executing fallback update:", error.message);
                     
@@ -639,7 +650,6 @@
                         return;
                     }
 
-                    // Direct balance deduction fallback
                     const newBalance = selectedAcc.balance - totalDeduction;
                     const { error: updateError } = await client
                         .from('accounts')
@@ -653,9 +663,6 @@
                         return;
                     }
 
-                    // Direct transaction log fallback
-                    // merchant_name = BANK NAME
-                    // recipient_name = PERSON'S NAME
                     const { error: txError } = await client.from('transactions').insert([
                         {
                             user_id: currentUser.id,
@@ -674,7 +681,6 @@
                         alert("Balance updated but transaction record failed: " + txError.message);
                     }
 
-                    // Also log the fee as a separate transaction
                     if (calculatedFeeValue > 0) {
                         await client.from('transactions').insert([
                             {
@@ -698,17 +704,23 @@
 
                 document.getElementById('recConf').textContent = confNum;
                 document.getElementById('recTime').textContent = timeStr;
-                document.getElementById('recFrom').textContent = selectedAcc ? selectedAcc.account_name : 'USAA Account';
+                document.getElementById('recFrom').textContent = senderFullName;
                 document.getElementById('recName').textContent = recipientFullName;
                 document.getElementById('recBank').textContent = bank;
                 document.getElementById('recAccNum').textContent = recipientAccNum;
                 document.getElementById('recAmount').textContent = `$${amt.toFixed(2)}`;
                 document.getElementById('recFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
 
-                const receiptSummary = `USAA Transfer Receipt%0AConf: ${confNum}%0ATo: ${recipientFullName}%0AAmount: $${amt.toFixed(2)}%0AFee: $${calculatedFeeValue.toFixed(2)}%0ABank: ${bank}%0ADate: ${timeStr}`;
-                document.getElementById('waShareBtn').href = `https://api.whatsapp.com/send?text=${receiptSummary}`;
-                document.getElementById('emailShareBtn').href = `mailto:?subject=USAA Transfer Receipt&body=${receiptSummary}`;
-                document.getElementById('smsShareBtn').href = `sms:?body=${receiptSummary}`;
+                lastReceiptData = {
+                    conf: confNum,
+                    time: timeStr,
+                    from: senderFullName,
+                    name: recipientFullName,
+                    bank: bank,
+                    acc: recipientAccNum,
+                    amount: amt.toFixed(2),
+                    fee: calculatedFeeValue.toFixed(2)
+                };
 
                 goToStep(4);
             } catch (err) {
@@ -717,6 +729,56 @@
                 authBtn.disabled = false;
                 authBtn.textContent = "Authorize Transfer";
             }
+        }
+
+        // Generate high quality receipt image
+        async function generateReceiptImage() {
+            const element = document.getElementById('printableReceipt');
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                backgroundColor: '#ffffff',
+                useCORS: true
+            });
+            return canvas;
+        }
+
+        async function downloadReceiptImage() {
+            const canvas = await generateReceiptImage();
+            const link = document.createElement('a');
+            link.download = `USAA_Receipt_${lastReceiptData.conf}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        async function shareReceiptImage(type) {
+            const canvas = await generateReceiptImage();
+            
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], `USAA_Receipt_${lastReceiptData.conf}.png`, { type: 'image/png' });
+                const textSummary = `USAA Transfer Receipt\nConf: ${lastReceiptData.conf}\nFrom: ${lastReceiptData.from}\nTo: ${lastReceiptData.name}\nBank: ${lastReceiptData.bank}\nAmount: $${lastReceiptData.amount}\nFee: $${lastReceiptData.fee}\nDate: ${lastReceiptData.time}`;
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'USAA Transfer Receipt',
+                            text: textSummary
+                        });
+                        return;
+                    } catch (err) {
+                        console.log('Share cancelled or failed', err);
+                    }
+                }
+
+                // Fallbacks
+                if (type === 'whatsapp') {
+                    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textSummary)}`, '_blank');
+                } else if (type === 'email') {
+                    window.location.href = `mailto:?subject=USAA Transfer Receipt&body=${encodeURIComponent(textSummary)}`;
+                } else if (type === 'sms') {
+                    window.location.href = `sms:?body=${encodeURIComponent(textSummary)}`;
+                }
+            }, 'image/png');
         }
 
         window.onload = initTransferPage;
