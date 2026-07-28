@@ -653,12 +653,14 @@
                         return;
                     }
 
-                    // Direct transaction log fallback – NOW INCLUDES RECIPIENT NAME
+                    // Direct transaction log fallback
+                    // merchant_name = BANK NAME
+                    // recipient_name = PERSON'S NAME
                     const { error: txError } = await client.from('transactions').insert([
                         {
                             user_id: currentUser.id,
                             account_id: fromAccId,
-                            merchant_name: recipientFullName,
+                            merchant_name: bank,
                             amount: -amt,
                             transaction_date: new Date().toISOString(),
                             description: `Transfer to ${recipientFullName} via ${bank} | Account: ${recipientAccNum}`,
