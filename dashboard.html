@@ -426,7 +426,7 @@
   <!-- TRANSACTIONS -->
   <div class="section-header">
     <h2>Transactions</h2>
-    <a href="#">View all <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i></a>
+    <a href="transactions.html">View all <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i></a>
   </div>
 
   <div class="transactions-card" id="transactions-container">
@@ -598,9 +598,11 @@
         return;
       }
 
-      loadedTransactions = transactions;
+      // Show only the latest 3 transactions on the dashboard
+      const recentTransactions = transactions.slice(0, 3);
+      loadedTransactions = recentTransactions;
 
-      txContainer.innerHTML = transactions.map((tx, index) => {
+      txContainer.innerHTML = recentTransactions.map((tx, index) => {
         const isPositive = (tx.amount > 0);
         const amountClass = isPositive ? 'positive' : 'negative';
         const formattedAmount = `${isPositive ? '+' : '-'}${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(tx.amount || 0))}`;
