@@ -1,550 +1,611 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USAA - Pay Bills</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --usaa-navy: #002244;
-            --usaa-blue: #005691;
-            --usaa-light-bg: #f4f6f8;
-            --usaa-red: #d9534f;
-            --usaa-green: #2e7d32;
-            --usaa-border: #d1dbe5;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>USAA - Pay Bills</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --usaa-navy: #002244;
+      --usaa-blue: #005691;
+      --usaa-light: #f4f6f8;
+      --usaa-green: #2e7d32;
+      --usaa-red: #d9534f;
+      --border: #d1dbe5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--usaa-light); color: #333; max-width: 480px; margin: 0 auto; min-height: 100vh; }
 
-        * { box-sizing: border-box; }
+    .header {
+      background: linear-gradient(180deg, #002244 0%, #003366 100%);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .back-btn { color: white; font-size: 20px; text-decoration: none; }
+    .header h1 { font-size: 18px; font-weight: 700; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--usaa-light-bg);
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
+    .tabs {
+      display: flex;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 14px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #657786;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+    }
+    .tab.active {
+      color: var(--usaa-navy);
+      border-bottom-color: var(--usaa-navy);
+    }
 
-        .header {
-            background-color: var(--usaa-navy);
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    .container { padding: 16px; }
 
-        .header h1 { margin: 0; font-size: 1.2rem; letter-spacing: 1px; }
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--usaa-navy);
+      margin: 8px 0 12px;
+    }
 
-        .back-btn {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
+    .bill-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .bill-row {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .bill-row:hover { background: #f9fbfd; }
+    .bill-row + .bill-row { border-top: 1px solid #f0f4f8; }
 
-        .container {
-            max-width: 680px;
-            margin: 20px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
+    .logo-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: white;
+      font-weight: 700;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
 
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-            border-bottom: 2px solid var(--usaa-border);
-            margin-bottom: 20px;
-            overflow-x: auto;
-        }
+    .bill-info { flex: 1; min-width: 0; }
+    .bill-name { font-size: 15px; font-weight: 700; color: var(--usaa-navy); }
+    .bill-due { font-size: 12px; color: #657786; margin-top: 2px; }
+    .bill-amount { text-align: right; }
+    .bill-amount .amt { font-size: 15px; font-weight: 700; color: var(--usaa-navy); }
+    .bill-amount .status {
+      font-size: 11px;
+      font-weight: 600;
+      color: #d97706;
+      margin-top: 2px;
+    }
 
-        .nav-tab {
-            padding: 10px 15px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #666;
-            border: none;
-            background: none;
-            cursor: pointer;
-            white-space: nowrap;
-        }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--usaa-navy); margin-bottom: 6px; }
+    select, input[type="text"], input[type="number"], input[type="date"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      background: white;
+    }
 
-        .nav-tab.active {
-            color: var(--usaa-blue);
-            border-bottom: 3px solid var(--usaa-blue);
-        }
+    .amount-options {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .amount-opt {
+      flex: 1;
+      text-align: center;
+      padding: 10px 6px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: white;
+    }
+    .amount-opt.active {
+      background: var(--usaa-navy);
+      color: white;
+      border-color: var(--usaa-navy);
+    }
 
-        .step-panel { display: none; }
-        .step-panel.active { display: block; }
+    .btn {
+      width: 100%;
+      background: var(--usaa-blue);
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .btn:disabled { background: #a0a0a0; cursor: not-allowed; }
+    .btn-secondary {
+      background: white;
+      color: var(--usaa-navy);
+      border: 1px solid var(--border);
+    }
 
-        .form-group { margin-bottom: 20px; }
+    .review-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .review-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px dashed #e5e5e5;
+      font-size: 14px;
+    }
+    .review-row:last-child { border-bottom: none; }
+    .review-row span { color: #657786; }
+    .review-row strong { color: var(--usaa-navy); }
 
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: var(--usaa-navy);
-        }
+    .success-box {
+      text-align: center;
+      padding: 30px 20px;
+    }
+    .success-icon {
+      width: 70px;
+      height: 70px;
+      background: #e8f5e9;
+      color: var(--usaa-green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 16px;
+    }
 
-        select, input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
+    .step { display: none; }
+    .step.active { display: block; }
 
-        .btn {
-            width: 100%;
-            background-color: var(--usaa-blue);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .btn:hover { background-color: var(--usaa-navy); }
-
-        /* BILLS TABLE STYLING */
-        .bills-table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
-            background-color: #f8f9fa;
-            color: var(--usaa-navy);
-            font-weight: 700;
-        }
-
-        .bill-row {
-            cursor: pointer;
-            transition: background 0.15s ease;
-        }
-
-        .bill-row:hover { background-color: #f0f4f8; }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            background-color: #ffeeba;
-            color: #856404;
-        }
-
-        /* RECEIPT & REVIEW STYLING */
-        .receipt-card {
-            border: 1px solid var(--usaa-border);
-            padding: 24px;
-            background: #ffffff;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .receipt-header-branding {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--usaa-navy);
-            padding-bottom: 12px;
-            margin-bottom: 20px;
-        }
-
-        .receipt-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-            border-bottom: 1px dashed #e5e5e5;
-            padding-bottom: 8px;
-        }
-
-        .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.95rem;
-        }
-
-        .radio-option input[type="radio"] {
-            width: auto;
-        }
-    </style>
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #657786;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="header">
-        <a href="dashboard.html" class="back-btn">&larr; Back to Dashboard</a>
-        <h1>USAA BILL PAY</h1>
+  <div class="header">
+    <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+    <h1 id="pageTitle">Pay Bills</h1>
+  </div>
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <div id="step-dashboard" class="step active">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('bills')">Bills Due</div>
+      <div class="tab" onclick="switchTab('activity')">Payment Activity</div>
+      <div class="tab" onclick="switchTab('add')">Add Payee</div>
     </div>
 
     <div class="container">
-        <!-- HEADER SUB-NAVIGATION -->
-        <div class="nav-tabs">
-            <button class="nav-tab active">Pay Bills</button>
-            <button class="nav-tab" onclick="alert('Schedule Payments feature coming soon!')">Schedule Payments</button>
-            <button class="nav-tab" onclick="alert('Payment Activity feature coming soon!')">Payment Activity</button>
-            <button class="nav-tab" onclick="alert('AutoPay feature coming soon!')">AutoPay</button>
-            <button class="nav-tab" onclick="alert('Add Payee feature coming soon!')">Add Payee</button>
+      <!-- Bills Due -->
+      <div id="tab-bills">
+        <div class="section-title">Bills Due</div>
+        <div id="billsList"></div>
+      </div>
+
+      <!-- Payment Activity -->
+      <div id="tab-activity" style="display:none;">
+        <div class="section-title">Recent Payments</div>
+        <div id="activityList">
+          <div class="empty-state">
+            <i class="fa-solid fa-receipt" style="font-size:40px;margin-bottom:12px;color:#cbd5e1;"></i>
+            <p>No payment activity yet</p>
+          </div>
         </div>
+      </div>
 
-        <!-- STEP 1: BILL PAY DASHBOARD -->
-        <div id="step1" class="step-panel active">
-            <h2>Bills Due</h2>
-            <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">Select a company below to initiate payment.</p>
-            
-            <div class="bills-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Company</th>
-                            <th>Due Date</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="billsTableBody">
-                        <!-- Populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
+      <!-- Add Payee -->
+      <div id="tab-add" style="display:none;">
+        <div class="section-title">Add a New Payee</div>
+        <div class="bill-card" style="padding:20px;">
+          <div class="form-group">
+            <label>Search Company</label>
+            <input type="text" id="newPayeeName" placeholder="e.g. Duke Energy, Verizon, Xfinity">
+          </div>
+          <div class="form-group">
+            <label>Account Number</label>
+            <input type="text" id="newPayeeAccount" placeholder="Enter your account number">
+          </div>
+          <button class="btn" onclick="addNewPayee()">Save Payee</button>
         </div>
-
-        <!-- STEP 2: SELECT & CONFIGURE BILL PAYMENT -->
-        <div id="step2" class="step-panel">
-            <h2 id="billerNameTitle">Bill Details</h2>
-
-            <div class="receipt-card">
-                <div class="receipt-row"><span>Account Number:</span><strong id="billerAccNum">••••4821</strong></div>
-                <div class="receipt-row"><span>Total Amount Due:</span><strong id="billerTotalDue">$0.00</strong></div>
-                <div class="receipt-row"><span>Minimum Due:</span><strong id="billerMinDue">$40.00</strong></div>
-                <div class="receipt-row"><span>Due Date:</span><strong id="billerDueDate">--</strong></div>
-            </div>
-
-            <div class="form-group">
-                <label for="payFromAccount">Pay From Account</label>
-                <select id="payFromAccount"></select>
-            </div>
-
-            <div class="form-group">
-                <label>Payment Amount Choice</label>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="amtChoice" value="full" checked onclick="toggleAmountInput(false)">
-                        <span>Full Balance (<strong id="lblFullAmt">$0.00</strong>)</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="amtChoice" value="min" onclick="toggleAmountInput(false)">
-                        <span>Minimum Payment ($40.00)</span>
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="amtChoice" value="other" onclick="toggleAmountInput(true)">
-                        <span>Other Amount</span>
-                    </label>
-                </div>
-            </div>
-
-            <div id="customAmountGroup" class="form-group" style="display: none;">
-                <label for="customAmount">Custom Amount ($ USD)</label>
-                <input type="number" id="customAmount" placeholder="0.00">
-            </div>
-
-            <div class="form-group">
-                <label for="payDate">Payment Execution Date</label>
-                <select id="payDate">
-                    <option value="Today">Today (Immediate)</option>
-                    <option value="Scheduled">Schedule Future Date</option>
-                </select>
-            </div>
-
-            <button class="btn" onclick="goToStep(3)">Continue to Review</button>
-            <button class="btn" style="background:#6c757d; margin-top:5px;" onclick="goToStep(1)">Cancel</button>
-        </div>
-
-        <!-- STEP 3: REVIEW PAYMENT -->
-        <div id="step3" class="step-panel">
-            <h2>Review Payment</h2>
-            <div class="receipt-card">
-                <div class="receipt-header-branding">
-                    <span style="font-weight: 800; color: var(--usaa-navy);">USAA BILL PAY</span>
-                    <span style="font-size: 0.75rem; color: #666;">PRE-PAYMENT REVIEW</span>
-                </div>
-                <div class="receipt-row"><span>Payee:</span><strong id="revPayee">--</strong></div>
-                <div class="receipt-row"><span>From:</span><strong id="revFromAcc">--</strong></div>
-                <div class="receipt-row"><span>Payment Amount:</span><strong id="revAmt">$0.00</strong></div>
-                <div class="receipt-row"><span>Delivery Method:</span><strong>Electronic</strong></div>
-                <div class="receipt-row"><span>Estimated Delivery:</span><strong id="revDelivery">Today</strong></div>
-                <div class="receipt-row"><span>Fee:</span><strong style="color:var(--usaa-green);">$0.00</strong></div>
-            </div>
-
-            <button class="btn" onclick="goToStep(4)">Submit Payment</button>
-            <button class="btn" style="background:#6c757d; margin-top:5px;" onclick="goToStep(2)">Edit Payment</button>
-        </div>
-
-        <!-- STEP 4: SECURITY AUTHENTICATION -->
-        <div id="step4" class="step-panel">
-            <h2>Security Authentication</h2>
-            <p>Enter your 4-digit security PIN to authorize this bill payment.</p>
-            
-            <div class="form-group">
-                <input type="password" id="pinInput" maxlength="4" placeholder="••••" style="text-align: center; font-size: 1.8rem; letter-spacing: 8px;">
-            </div>
-
-            <button class="btn" id="authBtn" onclick="verifyAndExecuteBillPayment()">Authorize Payment</button>
-        </div>
-
-        <!-- STEP 5: PAYMENT SUCCESS / RECEIPT -->
-        <div id="step5" class="step-panel">
-            <h2 style="color: var(--usaa-green);">✓ Payment Scheduled</h2>
-            <p>Your payment has been successfully recorded and processed.</p>
-
-            <div class="receipt-card">
-                <div class="receipt-header-branding">
-                    <div>
-                        <div style="font-weight: 800; color: var(--usaa-navy);">USAA FEDERAL SAVINGS BANK</div>
-                        <div style="font-size: 0.7rem; color: #666;">Bill Payment Record</div>
-                    </div>
-                    <strong style="color: var(--usaa-green); font-size: 0.85rem;">COMPLETED</strong>
-                </div>
-
-                <div class="receipt-row"><span>Confirmation #:</span><strong id="recConf">--</strong></div>
-                <div class="receipt-row"><span>Payee:</span><strong id="recPayee">--</strong></div>
-                <div class="receipt-row"><span>Amount Paid:</span><strong id="recAmt">$0.00</strong></div>
-                <div class="receipt-row"><span>Payment Date:</span><strong id="recDate">--</strong></div>
-                <div class="receipt-row"><span>Delivery Date:</span><strong id="recDelivery">--</strong></div>
-                <div class="receipt-row"><span>Status:</span><strong style="color:var(--usaa-green);">PROCESSED</strong></div>
-            </div>
-
-            <button class="btn" onclick="window.location.href='dashboard.html'">Return to Dashboard</button>
-        </div>
-
+      </div>
     </div>
+  </div>
 
-    <script>
-        const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
-        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <!-- ===================== BILL DETAILS ===================== -->
+  <div id="step-details" class="step">
+    <div class="container">
+      <div class="bill-card" style="padding:20px; margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+          <div class="logo-circle" id="detailLogo" style="background:#005691;"></div>
+          <div>
+            <div style="font-size:18px;font-weight:700;color:var(--usaa-navy);" id="detailName">—</div>
+            <div style="font-size:13px;color:#657786;" id="detailAccount">Account ••••0000</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;">
+          <div>
+            <div style="color:#657786;">Amount Due</div>
+            <div style="font-size:22px;font-weight:800;color:var(--usaa-navy);" id="detailAmount">$0.00</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="color:#657786;">Due Date</div>
+            <div style="font-weight:700;" id="detailDue">—</div>
+          </div>
+        </div>
+      </div>
 
-        let currentUser = null;
-        let userAccounts = [];
-        let selectedBiller = null;
+      <div class="form-group">
+        <label>Pay From</label>
+        <select id="payFromAccount"></select>
+      </div>
 
-        const defaultBills = [
-            { company: "Duke Energy", dueDate: "Today", amountDue: 148.26, accNum: "••••8821" },
-            { company: "Verizon Wireless", dueDate: "Tomorrow", amountDue: 96.54, accNum: "••••4821" },
-            { company: "Xfinity", dueDate: "Jul 31", amountDue: 84.99, accNum: "••••1039" },
-            { company: "Capital One Credit Card", dueDate: "Aug 2", amountDue: 325.00, accNum: "••••9941" },
-            { company: "Discover Card", dueDate: "Aug 5", amountDue: 125.00, accNum: "••••3312" },
-            { company: "Chase Visa", dueDate: "Aug 7", amountDue: 412.60, accNum: "••••7102" },
-            { company: "American Express", dueDate: "Aug 9", amountDue: 210.15, accNum: "••••5541" },
-            { company: "Progressive Insurance", dueDate: "Aug 10", amountDue: 163.48, accNum: "••••2910" },
-            { company: "State Farm", dueDate: "Aug 12", amountDue: 118.00, accNum: "••••8819" },
-            { company: "AT&T", dueDate: "Aug 13", amountDue: 87.29, accNum: "••••3190" },
-            { company: "T-Mobile", dueDate: "Aug 15", amountDue: 94.12, accNum: "••••4421" },
-            { company: "Spectrum Internet", dueDate: "Aug 16", amountDue: 79.99, accNum: "••••6120" },
-            { company: "Water Utility", dueDate: "Aug 18", amountDue: 42.35, accNum: "••••0012" },
-            { company: "Gas Utility", dueDate: "Aug 19", amountDue: 58.14, accNum: "••••4912" },
-            { company: "Waste Management", dueDate: "Aug 21", amountDue: 34.00, accNum: "••••7219" },
-            { company: "IRS Estimated Tax", dueDate: "Aug 25", amountDue: 650.00, accNum: "••••0911" }
-        ];
+      <div class="form-group">
+        <label>Payment Amount</label>
+        <div class="amount-options">
+          <div class="amount-opt active" onclick="setAmountType('full', this)">Full Balance</div>
+          <div class="amount-opt" onclick="setAmountType('min', this)">Minimum</div>
+          <div class="amount-opt" onclick="setAmountType('other', this)">Other</div>
+        </div>
+        <input type="number" id="payAmount" placeholder="0.00" step="0.01">
+      </div>
 
-        async function initBillPayPage() {
-            const { data: { user } } = await client.auth.getUser();
-            if (!user) {
-                window.location.href = "index.html";
-                return;
-            }
-            currentUser = user;
+      <div class="form-group">
+        <label>Payment Date</label>
+        <select id="payDate">
+          <option value="Today">Today (Immediate)</option>
+          <option value="Tomorrow">Tomorrow</option>
+          <option value="Future">Schedule Future Date</option>
+        </select>
+      </div>
 
-            const { data: accounts } = await client.from('accounts').select('*').eq('user_id', user.id);
-            userAccounts = accounts || [];
+      <button class="btn" onclick="goToReview()">Continue</button>
+      <button class="btn btn-secondary" onclick="goToDashboard()">Cancel</button>
+    </div>
+  </div>
 
-            populateAccountsDropdown();
-            renderBillsTable();
+  <!-- ===================== REVIEW ===================== -->
+  <div id="step-review" class="step">
+    <div class="container">
+      <div class="section-title">Review Payment</div>
+      <div class="review-card">
+        <div class="review-row"><span>Payee</span><strong id="revPayee">—</strong></div>
+        <div class="review-row"><span>From Account</span><strong id="revFrom">—</strong></div>
+        <div class="review-row"><span>Amount</span><strong id="revAmount">$0.00</strong></div>
+        <div class="review-row"><span>Payment Date</span><strong id="revDate">Today</strong></div>
+        <div class="review-row"><span>Delivery Method</span><strong>Electronic</strong></div>
+        <div class="review-row"><span>Estimated Delivery</span><strong>Same day</strong></div>
+        <div class="review-row"><span>Fee</span><strong>$0.00</strong></div>
+      </div>
+      <button class="btn" onclick="goToPin()">Submit Payment</button>
+      <button class="btn btn-secondary" onclick="goToDetails()">Edit</button>
+    </div>
+  </div>
+
+  <!-- ===================== PIN ===================== -->
+  <div id="step-pin" class="step">
+    <div class="container">
+      <div class="section-title" style="text-align:center;">Security Verification</div>
+      <p style="text-align:center;color:#657786;margin-bottom:24px;font-size:14px;">Enter your 4-digit transfer PIN to authorize this payment.</p>
+      <div class="form-group">
+        <input type="password" id="billPin" maxlength="4" placeholder="••••" style="text-align:center;font-size:28px;letter-spacing:12px;">
+      </div>
+      <button class="btn" id="pinBtn" onclick="confirmPayment()">Authorize Payment</button>
+      <button class="btn btn-secondary" onclick="goToReview()">Back</button>
+    </div>
+  </div>
+
+  <!-- ===================== SUCCESS ===================== -->
+  <div id="step-success" class="step">
+    <div class="container">
+      <div class="success-box">
+        <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+        <h2 style="color:var(--usaa-green);margin-bottom:8px;">Payment Scheduled</h2>
+        <p style="color:#657786;margin-bottom:24px;">Your payment has been successfully submitted.</p>
+      </div>
+
+      <div class="review-card">
+        <div class="review-row"><span>Confirmation #</span><strong id="sucConf">—</strong></div>
+        <div class="review-row"><span>Payee</span><strong id="sucPayee">—</strong></div>
+        <div class="review-row"><span>Amount</span><strong id="sucAmount">$0.00</strong></div>
+        <div class="review-row"><span>Payment Date</span><strong id="sucDate">—</strong></div>
+        <div class="review-row"><span>From Account</span><strong id="sucFrom">—</strong></div>
+      </div>
+
+      <button class="btn" onclick="goToDashboard()">Done</button>
+      <button class="btn btn-secondary" onclick="switchTab('activity'); goToDashboard();">View Activity</button>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+    let userAccounts = [];
+    let selectedBill = null;
+    let paymentAmount = 0;
+
+    // Realistic sample bills with brand colors
+    const sampleBills = [
+      { id: 1, name: "Duke Energy", account: "••••4821", amount: 148.26, min: 50.00, due: "Today", color: "#e31837", icon: "fa-bolt" },
+      { id: 2, name: "Verizon Wireless", account: "••••7392", amount: 96.54, min: 40.00, due: "Tomorrow", color: "#cd040b", icon: "fa-mobile-screen" },
+      { id: 3, name: "Xfinity", account: "••••1156", amount: 84.99, min: 30.00, due: "Jul 31", color: "#000000", icon: "fa-wifi" },
+      { id: 4, name: "Capital One", account: "••••9012", amount: 325.00, min: 35.00, due: "Aug 2", color: "#004977", icon: "fa-credit-card" },
+      { id: 5, name: "Discover Card", account: "••••3344", amount: 125.00, min: 25.00, due: "Aug 5", color: "#ff6000", icon: "fa-credit-card" },
+      { id: 6, name: "Chase Visa", account: "••••7788", amount: 412.60, min: 45.00, due: "Aug 7", color: "#117aca", icon: "fa-credit-card" },
+      { id: 7, name: "American Express", account: "••••5566", amount: 210.15, min: 30.00, due: "Aug 9", color: "#006fcf", icon: "fa-credit-card" },
+      { id: 8, name: "Progressive Insurance", account: "••••2233", amount: 163.48, min: 163.48, due: "Aug 10", color: "#0080c5", icon: "fa-shield-halved" },
+      { id: 9, name: "State Farm", account: "••••8899", amount: 118.00, min: 118.00, due: "Aug 12", color: "#e31837", icon: "fa-car" },
+      { id: 10, name: "AT&T", account: "••••4411", amount: 87.29, min: 35.00, due: "Aug 13", color: "#00a8e0", icon: "fa-mobile-screen" },
+      { id: 11, name: "T-Mobile", account: "••••6677", amount: 94.12, min: 40.00, due: "Aug 15", color: "#e20074", icon: "fa-mobile-screen" },
+      { id: 12, name: "Spectrum", account: "••••9900", amount: 79.99, min: 30.00, due: "Aug 16", color: "#000000", icon: "fa-wifi" },
+      { id: 13, name: "Water Utility", account: "••••1122", amount: 42.35, min: 42.35, due: "Aug 18", color: "#0288d1", icon: "fa-droplet" },
+      { id: 14, name: "Gas Utility", account: "••••3344", amount: 58.14, min: 58.14, due: "Aug 19", color: "#f57c00", icon: "fa-fire" },
+      { id: 15, name: "Waste Management", account: "••••5566", amount: 34.00, min: 34.00, due: "Aug 21", color: "#2e7d32", icon: "fa-trash" }
+    ];
+
+    async function init() {
+      const { data: { user } } = await client.auth.getUser();
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+      currentUser = user;
+
+      const { data: accounts } = await client.from('accounts').select('*').eq('user_id', user.id);
+      userAccounts = accounts || [];
+
+      const select = document.getElementById('payFromAccount');
+      select.innerHTML = '';
+      userAccounts.forEach(acc => {
+        const opt = document.createElement('option');
+        opt.value = acc.id;
+        opt.textContent = `${acc.account_name} (••••${acc.account_number_last4 || '0000'}) - $${parseFloat(acc.balance||0).toFixed(2)}`;
+        select.appendChild(opt);
+      });
+
+      renderBills();
+    }
+
+    function renderBills() {
+      const list = document.getElementById('billsList');
+      list.innerHTML = sampleBills.map(bill => `
+        <div class="bill-card">
+          <div class="bill-row" onclick="openBill(${bill.id})">
+            <div class="logo-circle" style="background:${bill.color}">
+              <i class="fa-solid ${bill.icon}"></i>
+            </div>
+            <div class="bill-info">
+              <div class="bill-name">${bill.name}</div>
+              <div class="bill-due">Due ${bill.due}</div>
+            </div>
+            <div class="bill-amount">
+              <div class="amt">$${bill.amount.toFixed(2)}</div>
+              <div class="status">Due</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openBill(id) {
+      selectedBill = sampleBills.find(b => b.id === id);
+      if (!selectedBill) return;
+
+      document.getElementById('detailLogo').style.background = selectedBill.color;
+      document.getElementById('detailLogo').innerHTML = `<i class="fa-solid ${selectedBill.icon}"></i>`;
+      document.getElementById('detailName').textContent = selectedBill.name;
+      document.getElementById('detailAccount').textContent = `Account ${selectedBill.account}`;
+      document.getElementById('detailAmount').textContent = `$${selectedBill.amount.toFixed(2)}`;
+      document.getElementById('detailDue').textContent = selectedBill.due;
+      document.getElementById('payAmount').value = selectedBill.amount.toFixed(2);
+      paymentAmount = selectedBill.amount;
+
+      // reset amount options
+      document.querySelectorAll('.amount-opt').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.amount-opt')[0].classList.add('active');
+
+      showStep('details');
+      document.getElementById('pageTitle').textContent = selectedBill.name;
+    }
+
+    function setAmountType(type, el) {
+      document.querySelectorAll('.amount-opt').forEach(o => o.classList.remove('active'));
+      el.classList.add('active');
+
+      if (type === 'full') {
+        document.getElementById('payAmount').value = selectedBill.amount.toFixed(2);
+        paymentAmount = selectedBill.amount;
+      } else if (type === 'min') {
+        document.getElementById('payAmount').value = selectedBill.min.toFixed(2);
+        paymentAmount = selectedBill.min;
+      } else {
+        document.getElementById('payAmount').value = '';
+        document.getElementById('payAmount').focus();
+      }
+    }
+
+    function goToReview() {
+      const amt = parseFloat(document.getElementById('payAmount').value);
+      if (!amt || amt <= 0) {
+        alert("Please enter a valid payment amount.");
+        return;
+      }
+      paymentAmount = amt;
+
+      const accId = document.getElementById('payFromAccount').value;
+      const acc = userAccounts.find(a => a.id === accId);
+
+      document.getElementById('revPayee').textContent = selectedBill.name;
+      document.getElementById('revFrom').textContent = acc ? acc.account_name : '—';
+      document.getElementById('revAmount').textContent = `$${amt.toFixed(2)}`;
+      document.getElementById('revDate').textContent = document.getElementById('payDate').value;
+
+      showStep('review');
+      document.getElementById('pageTitle').textContent = 'Review Payment';
+    }
+
+    function goToPin() {
+      showStep('pin');
+      document.getElementById('pageTitle').textContent = 'Security Verification';
+    }
+
+    function goToDetails() {
+      showStep('details');
+      document.getElementById('pageTitle').textContent = selectedBill.name;
+    }
+
+    function goToDashboard() {
+      showStep('dashboard');
+      document.getElementById('pageTitle').textContent = 'Pay Bills';
+    }
+
+    async function confirmPayment() {
+      const pin = document.getElementById('billPin').value;
+      const savedPin = localStorage.getItem('usaa_user_pin');
+      const btn = document.getElementById('pinBtn');
+
+      if (pin.length !== 4 || isNaN(pin)) {
+        alert("Please enter a valid 4-digit PIN.");
+        return;
+      }
+      if (savedPin && savedPin !== pin) {
+        alert("Incorrect PIN.");
+        return;
+      }
+      if (!savedPin) {
+        localStorage.setItem('usaa_user_pin', pin);
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Processing...";
+
+      try {
+        const accId = document.getElementById('payFromAccount').value;
+        const acc = userAccounts.find(a => a.id === accId);
+        const total = paymentAmount;
+
+        if ((acc.balance || 0) < total) {
+          alert("Insufficient funds.");
+          btn.disabled = false;
+          btn.textContent = "Authorize Payment";
+          return;
         }
 
-        function populateAccountsDropdown() {
-            const payFromSelect = document.getElementById('payFromAccount');
-            payFromSelect.innerHTML = "";
-            
-            userAccounts.forEach(acc => {
-                let opt = document.createElement('option');
-                opt.value = acc.id;
-                opt.textContent = `${acc.account_name || 'USAA Checking'} (••••${acc.account_number_last4 || '1234'}) - $${parseFloat(acc.balance || 0).toFixed(2)}`;
-                payFromSelect.appendChild(opt);
-            });
-        }
+        // Deduct balance
+        const newBalance = acc.balance - total;
+        await client.from('accounts').update({ balance: newBalance }).eq('id', accId);
 
-        function renderBillsTable() {
-            const tbody = document.getElementById('billsTableBody');
-            tbody.innerHTML = "";
+        // Log transaction
+        await client.from('transactions').insert([{
+          user_id: currentUser.id,
+          account_id: accId,
+          merchant_name: selectedBill.name,
+          amount: -total,
+          transaction_date: new Date().toISOString(),
+          description: `Bill payment to ${selectedBill.name} | Account ${selectedBill.account}`,
+          recipient_name: selectedBill.name,
+          type: 'bill_payment'
+        }]);
 
-            defaultBills.forEach((bill, idx) => {
-                const tr = document.createElement('tr');
-                tr.className = 'bill-row';
-                tr.onclick = () => selectBill(idx);
+        // Success screen
+        const conf = "USAA-" + Math.floor(10000000 + Math.random() * 90000000);
+        document.getElementById('sucConf').textContent = conf;
+        document.getElementById('sucPayee').textContent = selectedBill.name;
+        document.getElementById('sucAmount').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('sucDate').textContent = document.getElementById('payDate').value;
+        document.getElementById('sucFrom').textContent = acc.account_name;
 
-                tr.innerHTML = `
-                    <td><strong>${bill.company}</strong></td>
-                    <td>${bill.dueDate}</td>
-                    <td>$${bill.amountDue.toFixed(2)}</td>
-                    <td><span class="status-badge">Due</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+        showStep('success');
+        document.getElementById('pageTitle').textContent = 'Payment Successful';
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Authorize Payment";
+      }
+    }
 
-        function selectBill(index) {
-            selectedBiller = defaultBills[index];
+    function addNewPayee() {
+      const name = document.getElementById('newPayeeName').value.trim();
+      const acc = document.getElementById('newPayeeAccount').value.trim();
+      if (!name || !acc) {
+        alert("Please fill in both fields.");
+        return;
+      }
+      alert(`Payee "${name}" has been saved successfully!\nYou can now make payments to this company.`);
+      document.getElementById('newPayeeName').value = '';
+      document.getElementById('newPayeeAccount').value = '';
+      switchTab('bills');
+    }
 
-            document.getElementById('billerNameTitle').textContent = `Pay ${selectedBiller.company}`;
-            document.getElementById('billerAccNum').textContent = selectedBiller.accNum;
-            document.getElementById('billerTotalDue').textContent = `$${selectedBiller.amountDue.toFixed(2)}`;
-            document.getElementById('lblFullAmt').textContent = `$${selectedBiller.amountDue.toFixed(2)}`;
-            document.getElementById('billerDueDate').textContent = selectedBiller.dueDate;
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
 
-            goToStep(2);
-        }
+      if (tab === 'bills') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('tab-bills').style.display = 'block';
+      } else if (tab === 'activity') {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('tab-activity').style.display = 'block';
+      } else {
+        document.querySelectorAll('.tab')[2].classList.add('active');
+        document.getElementById('tab-add').style.display = 'block';
+      }
+    }
 
-        function toggleAmountInput(show) {
-            document.getElementById('customAmountGroup').style.display = show ? 'block' : 'none';
-        }
+    function showStep(step) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step-' + step).classList.add('active');
+    }
 
-        function getFinalSelectedAmount() {
-            const choice = document.querySelector('input[name="amtChoice"]:checked').value;
-            if (choice === 'full') return selectedBiller.amountDue;
-            if (choice === 'min') return 40.00;
-            if (choice === 'other') return parseFloat(document.getElementById('customAmount').value) || 0;
-            return 0;
-        }
-
-        function goToStep(stepNum) {
-            if (stepNum === 3) {
-                const amt = getFinalSelectedAmount();
-                if (amt <= 0) {
-                    alert("Please enter a valid payment amount.");
-                    return;
-                }
-
-                const selectedAccId = document.getElementById('payFromAccount').value;
-                const acc = userAccounts.find(a => a.id === selectedAccId);
-
-                document.getElementById('revPayee').textContent = selectedBiller.company;
-                document.getElementById('revFromAcc').textContent = acc ? acc.account_name : 'USAA Checking';
-                document.getElementById('revAmt').textContent = `$${amt.toFixed(2)}`;
-                document.getElementById('revDelivery').textContent = document.getElementById('payDate').value === 'Today' ? 'Today' : 'Scheduled Date';
-            }
-
-            document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-            document.getElementById(`step${stepNum}`).classList.add('active');
-        }
-
-        async function verifyAndExecuteBillPayment() {
-            const inputPin = document.getElementById('pinInput').value;
-            const savedPin = localStorage.getItem('usaa_user_pin');
-            const authBtn = document.getElementById('authBtn');
-
-            if (inputPin.length !== 4 || isNaN(inputPin)) {
-                alert("Please enter a valid 4-digit numerical PIN.");
-                return;
-            }
-
-            if (!savedPin) {
-                localStorage.setItem('usaa_user_pin', inputPin);
-            } else if (savedPin !== inputPin) {
-                alert("Incorrect PIN. Please try again.");
-                return;
-            }
-
-            const amt = getFinalSelectedAmount();
-            const fromAccId = document.getElementById('payFromAccount').value;
-            const selectedAcc = userAccounts.find(a => a.id === fromAccId);
-
-            if ((selectedAcc.balance || 0) < amt) {
-                alert("Insufficient funds to cover this bill payment.");
-                return;
-            }
-
-            authBtn.disabled = true;
-            authBtn.textContent = "Processing Payment...";
-
-            try {
-                // 1. Deduct balance from account
-                const newBalance = selectedAcc.balance - amt;
-                const { error: updateError } = await client
-                    .from('accounts')
-                    .update({ balance: newBalance })
-                    .eq('id', fromAccId);
-
-                if (updateError) {
-                    alert("Payment Failed: " + updateError.message);
-                    return;
-                }
-
-                // 2. Insert transaction record into Supabase (matches dashboard schema)
-                const { error: txError } = await client.from('transactions').insert([
-                    {
-                        user_id: currentUser.id,
-                        account_id: fromAccId,
-                        merchant_name: selectedBiller.company,
-                        amount: -amt,
-                        transaction_date: new Date().toISOString(),
-                        description: `Bill Payment to ${selectedBiller.company} (${selectedBiller.accNum})`,
-                        type: 'bill_pay'
-                    }
-                ]);
-
-                if (txError) {
-                    console.error("Transaction insert error:", txError);
-                }
-
-                // 3. Render Receipt
-                const confNum = "BP-" + Math.floor(10000000 + Math.random() * 90000000);
-                const timeStr = new Date().toLocaleString();
-
-                document.getElementById('recConf').textContent = confNum;
-                document.getElementById('recPayee').textContent = selectedBiller.company;
-                document.getElementById('recAmt').textContent = `$${amt.toFixed(2)}`;
-                document.getElementById('recDate').textContent = timeStr;
-                document.getElementById('recDelivery').textContent = document.getElementById('payDate').value === 'Today' ? 'Today' : 'Scheduled Date';
-
-                goToStep(5);
-            } catch (err) {
-                alert("An unexpected error occurred: " + err.message);
-            } finally {
-                authBtn.disabled = false;
-                authBtn.textContent = "Authorize Payment";
-            }
-        }
-
-        window.onload = initBillPayPage;
-    </script>
+    window.onload = init;
+  </script>
 </body>
 </html>
