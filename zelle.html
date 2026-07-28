@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>USAA - Send Money with Zelle®</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --usaa-navy: #002244;
+      --usaa-blue: #005691;
+      --zelle-purple: #6d1ed4;
+      --zelle-pink: #e6007e;
+      --light: #f4f6f8;
+      --border: #d1dbe5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--light); color: #333; max-width: 480px; margin: 0 auto; min-height: 100vh; }
+
+    .header {
+      background: linear-gradient(135deg, #6d1ed4 0%, #e6007e 100%);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .back-btn { color: white; font-size: 20px; text-decoration: none; }
+    .header h1 { font-size: 18px; font-weight: 700; }
+
+    .zelle-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .tabs {
+      display: flex;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 14px 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #657786;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+    }
+    .tab.active {
+      color: var(--zelle-purple);
+      border-bottom-color: var(--zelle-purple);
+    }
+
+    .container { padding: 16px; }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--usaa-navy);
+      margin: 8px 0 12px;
+    }
+
+    .recipient-row {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f4f8;
+      cursor: pointer;
+    }
+    .recipient-row:last-child { border-bottom: none; }
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6d1ed4, #e6007e);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+    .rec-info { flex: 1; }
+    .rec-name { font-weight: 700; color: var(--usaa-navy); font-size: 15px; }
+    .rec-detail { font-size: 12px; color: #657786; margin-top: 2px; }
+    .enrolled {
+      font-size: 11px;
+      color: #2e7d32;
+      font-weight: 600;
+    }
+
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--usaa-navy); margin-bottom: 6px; }
+    select, input[type="text"], input[type="number"], input[type="tel"], input[type="email"] {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      background: white;
+    }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, #6d1ed4, #e6007e);
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .btn:disabled { background: #a0a0a0; cursor: not-allowed; }
+    .btn-secondary {
+      background: white;
+      color: var(--usaa-navy);
+      border: 1px solid var(--border);
+    }
+
+    .review-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 11px 0;
+      border-bottom: 1px dashed #e5e5e5;
+      font-size: 14px;
+    }
+    .review-row:last-child { border-bottom: none; }
+    .review-row span { color: #657786; }
+    .review-row strong { color: var(--usaa-navy); }
+
+    .warning-box {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 13px;
+      color: #5d4037;
+      margin: 16px 0;
+      line-height: 1.45;
+    }
+
+    .success-box { text-align: center; padding: 30px 10px; }
+    .success-icon {
+      width: 72px; height: 72px;
+      background: #f3e5f5;
+      color: var(--zelle-purple);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 34px;
+      margin: 0 auto 16px;
+    }
+
+    .activity-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .activity-item:last-child { border-bottom: none; }
+
+    .step { display: none; }
+    .step.active { display: block; }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .action-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 12px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .action-card i {
+      font-size: 26px;
+      color: var(--zelle-purple);
+      margin-bottom: 8px;
+    }
+    .action-card span {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--usaa-navy);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+    <div class="zelle-logo">
+      <i class="fa-solid fa-z"></i> Zelle®
+    </div>
+  </div>
+
+  <!-- ===================== HOME ===================== -->
+  <div id="step-home" class="step active">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('send')">Send</div>
+      <div class="tab" onclick="switchTab('request')">Request</div>
+      <div class="tab" onclick="switchTab('activity')">Activity</div>
+      <div class="tab" onclick="switchTab('manage')">Manage</div>
+    </div>
+
+    <div class="container">
+      <!-- SEND TAB -->
+      <div id="tab-send">
+        <div class="action-grid">
+          <div class="action-card" onclick="startSend()">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Send Money</span>
+          </div>
+          <div class="action-card" onclick="alert('Split a Bill coming soon')">
+            <i class="fa-solid fa-users"></i>
+            <span>Split a Bill</span>
+          </div>
+        </div>
+
+        <div class="section-title">Recent Recipients</div>
+        <div class="card" id="recentList"></div>
+      </div>
+
+      <!-- REQUEST TAB -->
+      <div id="tab-request" style="display:none;">
+        <div class="card" style="text-align:center;padding:30px 20px;">
+          <i class="fa-solid fa-hand-holding-dollar" style="font-size:40px;color:var(--zelle-purple);margin-bottom:12px;"></i>
+          <h3 style="color:var(--usaa-navy);margin-bottom:8px;">Request Money</h3>
+          <p style="font-size:14px;color:#657786;margin-bottom:20px;">Ask someone to send you money with Zelle®</p>
+          <button class="btn" onclick="startRequest()">Request Money</button>
+        </div>
+      </div>
+
+      <!-- ACTIVITY TAB -->
+      <div id="tab-activity" style="display:none;">
+        <div class="section-title">Recent Activity</div>
+        <div class="card" id="activityList">
+          <div class="activity-item">
+            <div>
+              <div style="font-weight:700;">Michael Davis</div>
+              <div style="font-size:12px;color:#657786;">Jul 28 • Sent</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:700;color:#333;">-$250.00</div>
+              <div style="font-size:11px;color:#2e7d32;">Delivered</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div>
+              <div style="font-weight:700;">Emily Johnson</div>
+              <div style="font-size:12px;color:#657786;">Jul 25 • Sent</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:700;">-$85.00</div>
+              <div style="font-size:11px;color:#2e7d32;">Delivered</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div>
+              <div style="font-weight:700;">David Brown</div>
+              <div style="font-size:12px;color:#657786;">Jul 22 • Received</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:700;color:#2e7d32;">+$120.00</div>
+              <div style="font-size:11px;color:#2e7d32;">Received</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANAGE TAB -->
+      <div id="tab-manage" style="display:none;">
+        <div class="section-title">Manage Recipients</div>
+        <div class="card" id="manageList"></div>
+        <button class="btn" onclick="showAddRecipient()">+ Add New Recipient</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SELECT RECIPIENT ===================== -->
+  <div id="step-recipient" class="step">
+    <div class="container">
+      <div class="section-title">Select Recipient</div>
+      <div class="card" id="allRecipients"></div>
+      <button class="btn btn-secondary" onclick="showAddRecipient()">+ Add New Recipient</button>
+      <button class="btn btn-secondary" onclick="goHome()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ===================== ADD RECIPIENT ===================== -->
+  <div id="step-add" class="step">
+    <div class="container">
+      <div class="section-title">Add New Recipient</div>
+      <div class="card">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="newName" placeholder="e.g. Michael Davis">
+        </div>
+        <div class="form-group">
+          <label>Mobile Number or Email</label>
+          <input type="text" id="newContact" placeholder="(555) 234-7789 or email@example.com">
+        </div>
+        <button class="btn" onclick="saveRecipient()">Save Recipient</button>
+        <button class="btn btn-secondary" onclick="goHome()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== AMOUNT ===================== -->
+  <div id="step-amount" class="step">
+    <div class="container">
+      <div class="card" style="text-align:center;margin-bottom:20px;">
+        <div class="avatar" id="amountAvatar" style="margin:0 auto 10px;"></div>
+        <div style="font-weight:700;font-size:17px;" id="amountName">—</div>
+        <div style="font-size:13px;color:#657786;" id="amountContact">—</div>
+      </div>
+
+      <div class="form-group">
+        <label>Amount</label>
+        <input type="number" id="zelleAmount" placeholder="0.00" step="0.01" style="font-size:24px;text-align:center;">
+      </div>
+
+      <div class="form-group">
+        <label>What’s it for? (Optional)</label>
+        <input type="text" id="zelleMemo" placeholder="Rent, Dinner, Birthday Gift...">
+      </div>
+
+      <div class="form-group">
+        <label>From Account</label>
+        <select id="zelleFrom"></select>
+      </div>
+
+      <button class="btn" onclick="goToReview()">Continue</button>
+      <button class="btn btn-secondary" onclick="goHome()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ===================== REVIEW ===================== -->
+  <div id="step-review" class="step">
+    <div class="container">
+      <div class="section-title">Review Transfer</div>
+      <div class="card">
+        <div class="review-row"><span>From</span><strong id="revFrom">—</strong></div>
+        <div class="review-row"><span>To</span><strong id="revTo">—</strong></div>
+        <div class="review-row"><span>Amount</span><strong id="revAmount">$0.00</strong></div>
+        <div class="review-row"><span>Memo</span><strong id="revMemo">—</strong></div>
+        <div class="review-row"><span>Delivery</span><strong>Usually within minutes</strong></div>
+        <div class="review-row"><span>Fee</span><strong>$0.00</strong></div>
+      </div>
+
+      <div class="warning-box">
+        <strong>Important:</strong> Money sent with Zelle® should only be sent to people you know and trust. Payments may not be reversible once accepted.
+      </div>
+
+      <button class="btn" onclick="goToPin()">Send Money</button>
+      <button class="btn btn-secondary" onclick="goToAmount()">Edit</button>
+    </div>
+  </div>
+
+  <!-- ===================== PIN ===================== -->
+  <div id="step-pin" class="step">
+    <div class="container">
+      <div class="section-title" style="text-align:center;">Security Verification</div>
+      <p style="text-align:center;color:#657786;margin-bottom:24px;font-size:14px;">Enter your 4-digit PIN to authorize this Zelle® payment.</p>
+      <div class="form-group">
+        <input type="password" id="zellePin" maxlength="4" placeholder="••••" style="text-align:center;font-size:28px;letter-spacing:12px;">
+      </div>
+      <button class="btn" id="pinBtn" onclick="submitZelle()">Authorize & Send</button>
+      <button class="btn btn-secondary" onclick="goToReview()">Back</button>
+    </div>
+  </div>
+
+  <!-- ===================== SUCCESS ===================== -->
+  <div id="step-success" class="step">
+    <div class="container">
+      <div class="success-box">
+        <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+        <h2 style="color:var(--zelle-purple);margin-bottom:6px;">Money Sent</h2>
+        <div style="font-size:28px;font-weight:800;margin-bottom:4px;" id="sucAmount">$0.00</div>
+        <p style="color:#657786;font-size:14px;">Delivered with Zelle®</p>
+      </div>
+
+      <div class="card">
+        <div class="review-row"><span>Recipient</span><strong id="sucTo">—</strong></div>
+        <div class="review-row"><span>From</span><strong id="sucFrom">—</strong></div>
+        <div class="review-row"><span>Status</span><strong style="color:#2e7d32;">Delivered</strong></div>
+        <div class="review-row"><span>Confirmation #</span><strong id="sucConf">—</strong></div>
+        <div class="review-row"><span>Date</span><strong id="sucDate">—</strong></div>
+      </div>
+
+      <button class="btn" onclick="goHome()">Done</button>
+      <button class="btn btn-secondary" onclick="startSend()">Send Another Payment</button>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+    let userAccounts = [];
+    let selectedRecipient = null;
+    let zelleAmount = 0;
+
+    // Sample recipients
+    let recipients = [
+      { id: 1, name: "Emily Johnson", contact: "(555) 123-4567", enrolled: true },
+      { id: 2, name: "Michael Davis", contact: "(555) 234-7789", enrolled: true },
+      { id: 3, name: "Sarah Williams", contact: "sarah.w@email.com", enrolled: true },
+      { id: 4, name: "David Brown", contact: "(555) 987-6543", enrolled: true },
+      { id: 5, name: "Jennifer Miller", contact: "(555) 456-7890", enrolled: true }
+    ];
+
+    async function init() {
+      const { data: { user } } = await client.auth.getUser();
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+      currentUser = user;
+
+      const { data: accounts } = await client.from('accounts').select('*').eq('user_id', user.id);
+      userAccounts = accounts || [];
+
+      const select = document.getElementById('zelleFrom');
+      select.innerHTML = '';
+      userAccounts.forEach(acc => {
+        const opt = document.createElement('option');
+        opt.value = acc.id;
+        opt.textContent = `${acc.account_name} (••••${acc.account_number_last4 || '0000'}) - $${parseFloat(acc.balance||0).toFixed(2)}`;
+        select.appendChild(opt);
+      });
+
+      renderRecipients();
+    }
+
+    function renderRecipients() {
+      const recent = document.getElementById('recentList');
+      const all = document.getElementById('allRecipients');
+      const manage = document.getElementById('manageList');
+
+      const html = recipients.map(r => `
+        <div class="recipient-row" onclick="selectRecipient(${r.id})">
+          <div class="avatar">${r.name.split(' ').map(n => n[0]).join('').substring(0,2)}</div>
+          <div class="rec-info">
+            <div class="rec-name">${r.name}</div>
+            <div class="rec-detail">${r.contact}</div>
+            ${r.enrolled ? '<div class="enrolled">Enrolled with Zelle ✓</div>' : ''}
+          </div>
+          <i class="fa-solid fa-chevron-right" style="color:#ccc;"></i>
+        </div>
+      `).join('');
+
+      recent.innerHTML = html;
+      all.innerHTML = html;
+      manage.innerHTML = html;
+    }
+
+    function startSend() {
+      showStep('recipient');
+    }
+
+    function startRequest() {
+      alert("Request Money feature is ready for future expansion.");
+    }
+
+    function selectRecipient(id) {
+      selectedRecipient = recipients.find(r => r.id === id);
+      if (!selectedRecipient) return;
+
+      document.getElementById('amountAvatar').textContent = selectedRecipient.name.split(' ').map(n => n[0]).join('').substring(0,2);
+      document.getElementById('amountName').textContent = selectedRecipient.name;
+      document.getElementById('amountContact').textContent = selectedRecipient.contact;
+
+      showStep('amount');
+    }
+
+    function showAddRecipient() {
+      showStep('add');
+    }
+
+    function saveRecipient() {
+      const name = document.getElementById('newName').value.trim();
+      const contact = document.getElementById('newContact').value.trim();
+      if (!name || !contact) {
+        alert("Please fill in both fields.");
+        return;
+      }
+      const newId = recipients.length + 1;
+      recipients.push({ id: newId, name, contact, enrolled: true });
+      renderRecipients();
+      selectRecipient(newId);
+    }
+
+    function goToAmount() {
+      showStep('amount');
+    }
+
+    function goToReview() {
+      const amt = parseFloat(document.getElementById('zelleAmount').value);
+      if (!amt || amt <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+      }
+      zelleAmount = amt;
+
+      const accId = document.getElementById('zelleFrom').value;
+      const acc = userAccounts.find(a => a.id === accId);
+      const memo = document.getElementById('zelleMemo').value.trim() || '—';
+
+      document.getElementById('revFrom').textContent = acc ? acc.account_name : '—';
+      document.getElementById('revTo').textContent = selectedRecipient.name;
+      document.getElementById('revAmount').textContent = `$${amt.toFixed(2)}`;
+      document.getElementById('revMemo').textContent = memo;
+
+      showStep('review');
+    }
+
+    function goToPin() {
+      showStep('pin');
+    }
+
+    function goHome() {
+      showStep('home');
+      document.getElementById('zelleAmount').value = '';
+      document.getElementById('zelleMemo').value = '';
+    }
+
+    async function submitZelle() {
+      const pin = document.getElementById('zellePin').value;
+      const savedPin = localStorage.getItem('usaa_user_pin');
+      const btn = document.getElementById('pinBtn');
+
+      if (pin.length !== 4 || isNaN(pin)) {
+        alert("Please enter a valid 4-digit PIN.");
+        return;
+      }
+      if (savedPin && savedPin !== pin) {
+        alert("Incorrect PIN.");
+        return;
+      }
+      if (!savedPin) localStorage.setItem('usaa_user_pin', pin);
+
+      btn.disabled = true;
+      btn.textContent = "Sending...";
+
+      try {
+        const accId = document.getElementById('zelleFrom').value;
+        const acc = userAccounts.find(a => a.id === accId);
+
+        if ((acc.balance || 0) < zelleAmount) {
+          alert("Insufficient funds.");
+          btn.disabled = false;
+          btn.textContent = "Authorize & Send";
+          return;
+        }
+
+        // Deduct balance
+        const newBalance = acc.balance - zelleAmount;
+        await client.from('accounts').update({ balance: newBalance }).eq('id', accId);
+
+        // Log transaction
+        await client.from('transactions').insert([{
+          user_id: currentUser.id,
+          account_id: accId,
+          merchant_name: selectedRecipient.name,
+          amount: -zelleAmount,
+          transaction_date: new Date().toISOString(),
+          description: `Zelle® to ${selectedRecipient.name} | ${document.getElementById('zelleMemo').value || 'Payment'}`,
+          recipient_name: selectedRecipient.name,
+          type: 'zelle'
+        }]);
+
+        // Success
+        const conf = "ZL-" + Math.floor(10000000 + Math.random() * 90000000);
+        document.getElementById('sucAmount').textContent = `$${zelleAmount.toFixed(2)}`;
+        document.getElementById('sucTo').textContent = selectedRecipient.name;
+        document.getElementById('sucFrom').textContent = acc.account_name;
+        document.getElementById('sucConf').textContent = conf;
+        document.getElementById('sucDate').textContent = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+        showStep('success');
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Authorize & Send";
+      }
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
+
+      const tabs = document.querySelectorAll('.tab');
+      if (tab === 'send') {
+        tabs[0].classList.add('active');
+        document.getElementById('tab-send').style.display = 'block';
+      } else if (tab === 'request') {
+        tabs[1].classList.add('active');
+        document.getElementById('tab-request').style.display = 'block';
+      } else if (tab === 'activity') {
+        tabs[2].classList.add('active');
+        document.getElementById('tab-activity').style.display = 'block';
+      } else {
+        tabs[3].classList.add('active');
+        document.getElementById('tab-manage').style.display = 'block';
+      }
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step-' + step).classList.add('active');
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
