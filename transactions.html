@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>USAA - All Transactions</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      color: #333333;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .header {
+      background: linear-gradient(180deg, #002244 0%, #003366 100%);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-btn {
+      color: white;
+      text-decoration: none;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .transactions-card {
+      background: #ffffff;
+      margin: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border: 1px solid #e1e8ed;
+      overflow: hidden;
+    }
+
+    .tx-row {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid #f0f4f8;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .tx-row:hover {
+      background-color: #f9fbfd;
+    }
+
+    .tx-row:last-child {
+      border-bottom: none;
+    }
+
+    .tx-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .tx-icon.shopping { background-color: #e8f4fd; color: #1da1f2; }
+    .tx-icon.gas { background-color: #e6f8ee; color: #17bf63; }
+    .tx-icon.deposit { background-color: #e8f4fd; color: #002244; }
+    .tx-icon.transfer { background-color: #fbf0e6; color: #d97706; }
+
+    .tx-info {
+      flex: 1;
+    }
+
+    .tx-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #002244;
+    }
+
+    .tx-date {
+      font-size: 12px;
+      color: #657786;
+      margin-top: 2px;
+    }
+
+    .tx-amount {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .tx-amount.negative { color: #333333; }
+    .tx-amount.positive { color: #2e7d32; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+    <h1>All Transactions</h1>
+  </div>
+
+  <div class="transactions-card" id="transactions-container">
+    <div style="padding: 20px; text-align: center; color: #666;">Loading all transactions...</div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let loadedTransactions = [];
+
+    async function loadAllTransactions() {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const { data: transactions, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('transaction_date', { ascending: false });
+
+      const txContainer = document.getElementById('transactions-container');
+
+      if (error) {
+        txContainer.innerHTML = `<div style="padding: 16px; text-align: center; color: #666;">Unable to load transactions.</div>`;
+        return;
+      }
+
+      if (!transactions || transactions.length === 0) {
+        txContainer.innerHTML = `
+          <div class="tx-row">
+            <div class="tx-icon shopping"><i class="fa-solid fa-cart-shopping"></i></div>
+            <div class="tx-info">
+              <div class="tx-title">No transactions yet</div>
+              <div class="tx-date">Activity will show here</div>
+            </div>
+            <div class="tx-amount negative">$0.00</div>
+          </div>
+        `;
+        return;
+      }
+
+      loadedTransactions = transactions;
+
+      txContainer.innerHTML = transactions.map((tx, index) => {
+        const isPositive = (tx.amount > 0);
+        const amountClass = isPositive ? 'positive' : 'negative';
+        const formattedAmount = `${isPositive ? '+' : '-'}${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(tx.amount || 0))}`;
+
+        let iconBg = 'transfer';
+        let iconName = 'fa-arrow-right-arrow-left';
+
+        if (isPositive) { iconBg = 'deposit'; iconName = 'fa-arrow-down'; }
+
+        const txDate = tx.transaction_date ? new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent activity';
+
+        return `
+          <div class="tx-row" onclick="viewReceipt(${index})">
+            <div class="tx-icon ${iconBg}"><i class="fa-solid ${iconName}"></i></div>
+            <div class="tx-info">
+              <div class="tx-title">${tx.merchant_name || 'Transaction'}</div>
+              <div class="tx-date">${txDate}</div>
+            </div>
+            <div class="tx-amount ${amountClass}">${formattedAmount} <i class="fa-solid fa-chevron-right" style="font-size: 10px; color: #ccc;"></i></div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.viewReceipt = function(index) {
+      const tx = loadedTransactions[index];
+      if (tx) {
+        sessionStorage.setItem('selectedTransaction', JSON.stringify(tx));
+        window.location.href = 'receipt.html';
+      }
+    };
+
+    loadAllTransactions();
+  </script>
+</body>
+</html>
