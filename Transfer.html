@@ -321,6 +321,11 @@
             </div>
 
             <div class="form-group">
+                <label for="recipientName">Recipient Full Name</label>
+                <input type="text" id="recipientName" placeholder="Full name of the person receiving the money">
+            </div>
+
+            <div class="form-group">
                 <label for="accountNum">Recipient Account Number / IBAN</label>
                 <input type="text" id="accountNum" placeholder="Enter account or routing number">
             </div>
@@ -356,6 +361,7 @@
                     <span class="doc-type">Transfer Pre-Review</span>
                 </div>
                 <div class="receipt-row"><span>From Account:</span><strong id="revFrom">--</strong></div>
+                <div class="receipt-row"><span>Recipient Name:</span><strong id="revName">--</strong></div>
                 <div class="receipt-row"><span>Destination Bank:</span><strong id="revBank">--</strong></div>
                 <div class="receipt-row"><span>Account / IBAN:</span><strong id="revAcc">--</strong></div>
                 <div class="receipt-row"><span>Transfer Amount:</span><strong id="revAmount">$0.00</strong></div>
@@ -397,6 +403,7 @@
                 <div class="receipt-row"><span>Confirmation #:</span><strong id="recConf">--</strong></div>
                 <div class="receipt-row"><span>Date & Time:</span><strong id="recTime">--</strong></div>
                 <div class="receipt-row"><span>From Account:</span><strong id="recFrom">--</strong></div>
+                <div class="receipt-row"><span>Recipient Name:</span><strong id="recName">--</strong></div>
                 <div class="receipt-row"><span>Destination:</span><strong id="recBank">--</strong></div>
                 <div class="receipt-row"><span>Recipient Account:</span><strong id="recAccNum">--</strong></div>
                 <div class="receipt-row"><span>Amount Sent:</span><strong id="recAmount">$0.00</strong></div>
@@ -508,17 +515,18 @@
             if (amt === 0) {
                 calculatedFeeValue = 0;
             } else if (country === "USA") {
-                calculatedFeeValue = 0.00;
+                // Domestic: free under $1,000 → then 0.25% of amount
+                calculatedFeeValue = amt <= 1000 ? 0 : +(amt * 0.0025).toFixed(2);
             } else if (country === "CANADA") {
-                calculatedFeeValue = 35.00;
+                calculatedFeeValue = +(25 + (amt * 0.005)).toFixed(2);
             } else if (country === "UK") {
-                calculatedFeeValue = 40.00;
+                calculatedFeeValue = +(30 + (amt * 0.006)).toFixed(2);
             } else if (country === "AUSTRALIA") {
-                calculatedFeeValue = 45.00;
+                calculatedFeeValue = +(35 + (amt * 0.006)).toFixed(2);
             } else if (country === "MEXICO") {
-                calculatedFeeValue = 30.00;
+                calculatedFeeValue = +(20 + (amt * 0.005)).toFixed(2);
             } else {
-                calculatedFeeValue = 25.00;
+                calculatedFeeValue = +(20 + (amt * 0.007)).toFixed(2);
             }
 
             document.getElementById('feeDisplay').textContent = `$${calculatedFeeValue.toFixed(2)}`;
@@ -539,9 +547,15 @@
             if (stepNum === 2) {
                 const amt = parseFloat(document.getElementById('amount').value);
                 const accNum = document.getElementById('accountNum').value.trim();
+                const recipName = document.getElementById('recipientName').value.trim();
 
                 if (!amt || amt <= 0) {
                     alert("Please enter a valid transfer amount.");
+                    return;
+                }
+
+                if (!recipName) {
+                    alert("Please enter the recipient's full name.");
                     return;
                 }
 
@@ -561,6 +575,7 @@
                 }
 
                 document.getElementById('revFrom').textContent = fromAcc ? fromAcc.account_name : "--";
+                document.getElementById('revName').textContent = recipName;
                 document.getElementById('revBank').textContent = bank;
                 document.getElementById('revAcc').textContent = accNum;
                 document.getElementById('revAmount').textContent = `$${amt.toFixed(2)}`;
@@ -595,6 +610,7 @@
             const bank = document.getElementById('countrySelect').value === "MANUAL" ? 
                          document.getElementById('manualBankName').value.trim() : document.getElementById('toBank').value;
             const recipientAccNum = document.getElementById('accountNum').value.trim() || 'N/A';
+            const recipientFullName = document.getElementById('recipientName').value.trim();
 
             authBtn.disabled = true;
             authBtn.textContent = "Processing Transaction...";
@@ -637,16 +653,16 @@
                         return;
                     }
 
-                    // Direct transaction log fallback – NOW MATCHES YOUR TABLE SCHEMA
+                    // Direct transaction log fallback – NOW INCLUDES RECIPIENT NAME
                     const { error: txError } = await client.from('transactions').insert([
                         {
                             user_id: currentUser.id,
                             account_id: fromAccId,
-                            merchant_name: `Transfer to ${bank}`,
+                            merchant_name: recipientFullName,
                             amount: -amt,
                             transaction_date: new Date().toISOString(),
-                            description: `Transfer to ${bank} | Account: ${recipientAccNum}`,
-                            recipient_name: bank,
+                            description: `Transfer to ${recipientFullName} via ${bank} | Account: ${recipientAccNum}`,
+                            recipient_name: recipientFullName,
                             type: 'transfer'
                         }
                     ]);
@@ -656,7 +672,7 @@
                         alert("Balance updated but transaction record failed: " + txError.message);
                     }
 
-                    // Also log the fee as a separate transaction (optional but clean)
+                    // Also log the fee as a separate transaction
                     if (calculatedFeeValue > 0) {
                         await client.from('transactions').insert([
                             {
@@ -665,8 +681,8 @@
                                 merchant_name: 'Transfer Fee',
                                 amount: -calculatedFeeValue,
                                 transaction_date: new Date().toISOString(),
-                                description: `Fee for transfer to ${bank}`,
-                                recipient_name: bank,
+                                description: `Fee for transfer to ${recipientFullName} (${bank})`,
+                                recipient_name: recipientFullName,
                                 type: 'fee'
                             }
                         ]);
@@ -681,12 +697,13 @@
                 document.getElementById('recConf').textContent = confNum;
                 document.getElementById('recTime').textContent = timeStr;
                 document.getElementById('recFrom').textContent = selectedAcc ? selectedAcc.account_name : 'USAA Account';
+                document.getElementById('recName').textContent = recipientFullName;
                 document.getElementById('recBank').textContent = bank;
                 document.getElementById('recAccNum').textContent = recipientAccNum;
                 document.getElementById('recAmount').textContent = `$${amt.toFixed(2)}`;
                 document.getElementById('recFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
 
-                const receiptSummary = `USAA Transfer Receipt%0AConf: ${confNum}%0AAmount: $${amt.toFixed(2)}%0AFee: $${calculatedFeeValue.toFixed(2)}%0ATo: ${bank}%0ADate: ${timeStr}`;
+                const receiptSummary = `USAA Transfer Receipt%0AConf: ${confNum}%0ATo: ${recipientFullName}%0AAmount: $${amt.toFixed(2)}%0AFee: $${calculatedFeeValue.toFixed(2)}%0ABank: ${bank}%0ADate: ${timeStr}`;
                 document.getElementById('waShareBtn').href = `https://api.whatsapp.com/send?text=${receiptSummary}`;
                 document.getElementById('emailShareBtn').href = `mailto:?subject=USAA Transfer Receipt&body=${receiptSummary}`;
                 document.getElementById('smsShareBtn').href = `sms:?body=${receiptSummary}`;
