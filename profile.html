@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>USAA - Profile</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      color: #333;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    .header {
+      background: linear-gradient(180deg, #002244 0%, #003366 100%);
+      color: white;
+      padding: 16px 20px 28px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .back-btn {
+      color: white;
+      font-size: 20px;
+      text-decoration: none;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 3px solid rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .profile-info h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .profile-info p {
+      font-size: 13px;
+      color: #b0c4de;
+    }
+
+    .container {
+      padding: 16px;
+      margin-top: -12px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e1e8ed;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 16px 18px;
+      border-bottom: 1px solid #f0f4f8;
+      text-decoration: none;
+      color: #333;
+      transition: background 0.2s;
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .menu-item:hover {
+      background: #f9fbfd;
+    }
+
+    .menu-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #eef5fc;
+      color: #002244;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .menu-text {
+      flex: 1;
+    }
+
+    .menu-text .title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #002244;
+    }
+
+    .menu-text .subtitle {
+      font-size: 12px;
+      color: #657786;
+      margin-top: 2px;
+    }
+
+    .menu-arrow {
+      color: #c0c8d0;
+      font-size: 14px;
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #657786;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 4px 10px;
+    }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      background: white;
+      border: 1px solid #e1e8ed;
+      color: #d9534f;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .logout-btn:hover {
+      background: #fff5f5;
+    }
+
+    .member-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-top">
+      <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+      <h1>Profile</h1>
+    </div>
+
+    <div class="profile-header">
+      <div class="avatar" id="userAvatar">US</div>
+      <div class="profile-info">
+        <h2 id="userFullName">Loading...</h2>
+        <p id="userEmail">—</p>
+        <div class="member-badge" id="memberSince">Member since 2024</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Account & Security -->
+    <div class="section-label">Account & Security</div>
+    <div class="card">
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-user"></i></div>
+        <div class="menu-text">
+          <div class="title">Personal Information</div>
+          <div class="subtitle">Name, address, phone, email</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-lock"></i></div>
+        <div class="menu-text">
+          <div class="title">Security & Login</div>
+          <div class="subtitle">Password, PIN, biometrics</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="menu-text">
+          <div class="title">Security Center</div>
+          <div class="subtitle">Devices, alerts, activity</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-bell"></i></div>
+        <div class="menu-text">
+          <div class="title">Notifications</div>
+          <div class="subtitle">Push, email & SMS preferences</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+    </div>
+
+    <!-- Preferences -->
+    <div class="section-label">Preferences</div>
+    <div class="card">
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa- palet te"></i></div>
+        <div class="menu-text">
+          <div class="title">Appearance</div>
+          <div class="subtitle">Theme & display options</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-language"></i></div>
+        <div class="menu-text">
+          <div class="title">Language</div>
+          <div class="subtitle">English (United States)</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+        <div class="menu-text">
+          <div class="title">Linked Devices</div>
+          <div class="subtitle">Manage trusted devices</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+    </div>
+
+    <!-- Support -->
+    <div class="section-label">Support</div>
+    <div class="card">
+      <a href="livechat.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-comments"></i></div>
+        <div class="menu-text">
+          <div class="title">Live Chat</div>
+          <div class="subtitle">Chat with a USAA representative</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-phone"></i></div>
+        <div class="menu-text">
+          <div class="title">Contact Us</div>
+          <div class="subtitle">Phone, email & branch locator</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-circle-question"></i></div>
+        <div class="menu-text">
+          <div class="title">Help & FAQs</div>
+          <div class="subtitle">Guides and common questions</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+    </div>
+
+    <!-- LOGOUT (correct place) -->
+    <button class="logout-btn" onclick="logout()">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      Log Out
+    </button>
+
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function initProfile() {
+      const { data: { user }, error } = await supabase.auth.getUser();
+
+      if (error || !user) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Set email
+      document.getElementById('userEmail').textContent = user.email || '—';
+
+      // Get profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (profile && profile.full_name) {
+        document.getElementById('userFullName').textContent = profile.full_name;
+
+        // Avatar initials
+        const names = profile.full_name.trim().split(' ');
+        const initials = names.length >= 2 
+          ? (names[0][0] + names[names.length - 1][0]).toUpperCase()
+          : names[0].substring(0, 2).toUpperCase();
+        document.getElementById('userAvatar').textContent = initials;
+      } else {
+        document.getElementById('userFullName').textContent = 'USAA Member';
+        document.getElementById('userAvatar').textContent = 'US';
+      }
+    }
+
+    window.logout = async function() {
+      if (confirm('Are you sure you want to log out?')) {
+        await supabase.auth.signOut();
+        window.location.href = 'index.html';
+      }
+    };
+
+    initProfile();
+  </script>
+</body>
+</html>
