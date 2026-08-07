@@ -15,32 +15,40 @@
     }
 
     body {
-      background-color: #f4f6f8;
+      background-color: #f0f2f5;
       color: #333333;
-      padding-bottom: 75px;
+      padding-bottom: 80px;
       max-width: 480px;
       margin: 0 auto;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
       min-height: 100vh;
     }
 
     .header-container {
-      background: linear-gradient(180deg, #002244 0%, #003366 100%);
+      background: linear-gradient(165deg, #001a33 0%, #002244 40%, #003366 100%);
       color: #ffffff;
-      padding: 15px 20px 30px 20px;
+      padding: 18px 20px 32px;
+      border-radius: 0 0 24px 24px;
+      box-shadow: 0 8px 24px rgba(0, 34, 68, 0.25);
     }
 
     .top-nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .top-nav .bell-icon, .top-nav .user-icon {
       font-size: 22px;
       color: #ffffff;
       cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
     }
 
     .usaa-logo {
@@ -48,44 +56,45 @@
     }
 
     .usaa-logo i {
-      font-size: 28px;
+      font-size: 26px;
     }
 
     .usaa-logo span {
       display: block;
       font-weight: 800;
-      font-size: 14px;
-      letter-spacing: 1px;
-      margin-top: -2px;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      margin-top: -1px;
     }
 
     .greeting-section h1 {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 600;
       font-family: Georgia, 'Times New Roman', serif;
+      letter-spacing: -0.3px;
     }
 
     .greeting-section p {
       font-size: 13px;
-      color: #b0c4de;
-      margin-top: 3px;
+      color: #a8c0d8;
+      margin-top: 4px;
     }
 
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 15px 20px 10px 20px;
+      padding: 18px 20px 10px;
     }
 
     .section-header h2 {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       color: #002244;
     }
 
     .section-header a {
-      font-size: 14px;
+      font-size: 13px;
       color: #0056b3;
       text-decoration: none;
       font-weight: 600;
@@ -94,29 +103,34 @@
     .accounts-card {
       background: #ffffff;
       margin: 0 16px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      border: 1px solid #e1e8ed;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+      border: 1px solid #e8eef4;
       overflow: hidden;
-      margin-top: -15px;
+      margin-top: -18px;
     }
 
     .account-row {
       display: flex;
       align-items: center;
-      padding: 16px;
-      border-bottom: 1px solid #f0f4f8;
+      padding: 16px 18px;
+      border-bottom: 1px solid #f3f6f9;
+      transition: background 0.2s;
     }
 
     .account-row:last-child {
       border-bottom: none;
     }
 
+    .account-row:active {
+      background: #f8fafc;
+    }
+
     .account-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background-color: #002244;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #002244, #003d73);
       color: #ffffff;
       display: flex;
       justify-content: center;
@@ -124,6 +138,7 @@
       font-size: 18px;
       margin-right: 14px;
       flex-shrink: 0;
+      box-shadow: 0 3px 8px rgba(0,34,68,0.2);
     }
 
     .account-info {
@@ -131,15 +146,15 @@
     }
 
     .account-title {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #002244;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
 
     .account-sub {
       font-size: 12px;
-      color: #657786;
+      color: #7a8b9a;
       margin-top: 2px;
     }
 
@@ -155,26 +170,18 @@
 
     .balance-label {
       font-size: 11px;
-      color: #657786;
+      color: #7a8b9a;
       margin-top: 2px;
     }
 
-    .more-btn {
-      color: #8899a6;
-      margin-left: 10px;
-      padding: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
     .quick-actions-container {
-      padding: 10px 16px 20px 16px;
+      padding: 12px 16px 18px;
     }
 
     .quick-actions-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 12px;
       text-align: center;
     }
 
@@ -187,33 +194,38 @@
     }
 
     .action-icon-circle {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      background-color: #ffffff;
-      border: 1px solid #d1dbe5;
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid #e4ebf2;
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 20px;
       color: #002244;
       margin-bottom: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .action-btn:active .action-icon-circle {
+      transform: scale(0.94);
     }
 
     .action-label {
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 600;
       color: #002244;
-      line-height: 1.2;
+      line-height: 1.25;
     }
 
     .transactions-card {
       background: #ffffff;
       margin: 0 16px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      border: 1px solid #e1e8ed;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+      border: 1px solid #e8eef4;
       overflow: hidden;
     }
 
@@ -221,35 +233,35 @@
       display: flex;
       align-items: center;
       padding: 14px 16px;
-      border-bottom: 1px solid #f0f4f8;
+      border-bottom: 1px solid #f3f6f9;
       cursor: pointer;
       transition: background-color 0.2s ease;
-    }
-
-    .tx-row:hover {
-      background-color: #f9fbfd;
     }
 
     .tx-row:last-child {
       border-bottom: none;
     }
 
+    .tx-row:active {
+      background-color: #f8fafc;
+    }
+
     .tx-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 16px;
-      margin-right: 12px;
+      margin-right: 13px;
       flex-shrink: 0;
     }
 
     .tx-icon.shopping { background-color: #e8f4fd; color: #1da1f2; }
     .tx-icon.gas { background-color: #e6f8ee; color: #17bf63; }
-    .tx-icon.deposit { background-color: #e8f4fd; color: #002244; }
-    .tx-icon.transfer { background-color: #fbf0e6; color: #d97706; }
+    .tx-icon.deposit { background-color: #e8f0fe; color: #002244; }
+    .tx-icon.transfer { background-color: #fff4e6; color: #d97706; }
 
     .tx-info {
       flex: 1;
@@ -263,7 +275,7 @@
 
     .tx-date {
       font-size: 12px;
-      color: #657786;
+      color: #7a8b9a;
       margin-top: 2px;
     }
 
@@ -276,26 +288,27 @@
     .tx-amount.positive { color: #2e7d32; }
 
     .security-banner {
-      background: #eef5fc;
-      margin: 16px;
-      border-radius: 12px;
+      background: linear-gradient(135deg, #eef5fc, #f5f9fd);
+      margin: 18px 16px;
+      border-radius: 16px;
       padding: 16px;
       display: flex;
       align-items: center;
-      border: 1px solid #d0e3f7;
+      border: 1px solid #d6e6f5;
     }
 
     .sec-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #002244;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #002244, #003d73);
       color: #ffffff;
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 18px;
-      margin-right: 12px;
+      margin-right: 13px;
+      box-shadow: 0 3px 8px rgba(0,34,68,0.2);
     }
 
     .sec-text {
@@ -310,7 +323,7 @@
 
     .sec-text p {
       font-size: 12px;
-      color: #555;
+      color: #5a6a7a;
       margin-top: 2px;
     }
 
@@ -329,18 +342,19 @@
       width: 100%;
       max-width: 480px;
       background: #ffffff;
-      border-top: 1px solid #e1e8ed;
+      border-top: 1px solid #e4ebf2;
       display: flex;
       justify-content: space-around;
-      padding: 10px 0;
+      padding: 10px 0 12px;
       z-index: 1000;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.04);
     }
 
     .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: #657786;
+      color: #7a8b9a;
       text-decoration: none;
       font-size: 10px;
       font-weight: 600;
@@ -355,13 +369,13 @@
       color: #002244;
     }
 
-    /* LIVE CHAT FLOATING BUTTON */
+    /* LIVE CHAT with badge */
     .live-chat-btn {
       position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 56px;
-      height: 56px;
+      bottom: 95px;
+      right: 18px;
+      width: 58px;
+      height: 58px;
       background: linear-gradient(135deg, #002244, #005691);
       color: white;
       border-radius: 50%;
@@ -369,14 +383,34 @@
       align-items: center;
       justify-content: center;
       font-size: 24px;
-      box-shadow: 0 4px 16px rgba(0,34,68,0.35);
+      box-shadow: 0 6px 20px rgba(0,34,68,0.35);
       z-index: 999;
       cursor: pointer;
       text-decoration: none;
       transition: transform 0.2s;
     }
+
     .live-chat-btn:hover {
-      transform: scale(1.08);
+      transform: scale(1.07);
+    }
+
+    .chat-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #e53935;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+      border: 2px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
   </style>
 </head>
@@ -390,20 +424,20 @@
         <i class="fa-solid fa-building-columns"></i>
         <span>USAA</span>
       </div>
-      <a href="profile.html" class="user-icon" style="color:white;">
+      <a href="profile.html" class="user-icon" style="color:white; text-decoration:none;">
         <i class="fa-regular fa-circle-user"></i>
       </a>
     </div>
 
     <div class="greeting-section">
       <h1 id="user-greeting">Good morning</h1>
-      <p id="member-since">Member since 2024</p>
+      <p id="member-since">Member since 2019</p>
     </div>
   </div>
 
   <!-- ACCOUNTS CARD -->
   <div class="accounts-card" id="accounts-container">
-    <div style="padding: 20px; text-align: center; color: #666;">Loading account balances...</div>
+    <div style="padding: 24px; text-align: center; color: #666;">Loading account balances...</div>
   </div>
 
   <!-- QUICK ACTIONS -->
@@ -438,7 +472,7 @@
   </div>
 
   <div class="transactions-card" id="transactions-container">
-    <div style="padding: 20px; text-align: center; color: #666;">Loading transactions...</div>
+    <div style="padding: 24px; text-align: center; color: #666;">Loading transactions...</div>
   </div>
 
   <!-- SECURITY CENTER -->
@@ -451,9 +485,10 @@
     <a href="profile.html" class="sec-link">Get started <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i></a>
   </div>
 
-  <!-- LIVE CHAT FLOATING BUTTON -->
-  <a href="livechat.html" class="live-chat-btn" title="Live Chat">
+  <!-- LIVE CHAT FLOATING BUTTON + BADGE -->
+  <a href="livechat.html" class="live-chat-btn" title="Live Chat" id="liveChatBtn">
     <i class="fa-solid fa-comments"></i>
+    <span class="chat-badge" id="chatBadge">0</span>
   </a>
 
   <!-- BOTTOM NAVIGATION -->
@@ -490,6 +525,14 @@
     let currentUser = null;
     let loadedTransactions = [];
 
+    // Dynamic greeting based on time
+    function getGreeting() {
+      const hour = new Date().getHours();
+      if (hour < 12) return "Good morning";
+      if (hour < 17) return "Good afternoon";
+      return "Good evening";
+    }
+
     async function initDashboard() {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -506,19 +549,42 @@
         .eq('id', user.id)
         .single();
 
-      if (profile) {
-        const firstName = profile.full_name ? profile.full_name.split(' ')[0] : 'Member';
-        document.getElementById('user-greeting').innerText = `Good morning, ${firstName}`;
+      const greeting = getGreeting();
+      if (profile && profile.full_name) {
+        const firstName = profile.full_name.split(' ')[0];
+        document.getElementById('user-greeting').innerText = `${greeting}, ${firstName}`;
+      } else {
+        document.getElementById('user-greeting').innerText = greeting;
       }
 
       await loadAccounts(user.id);
       await loadTransactions(user.id);
+      await checkUnreadMessages(user.id);
 
+      // Realtime for accounts & transactions
       supabase
         .channel('schema-db-changes')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts', filter: `user_id=eq.${user.id}` }, () => loadAccounts(user.id))
         .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` }, () => loadTransactions(user.id))
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `user_id=eq.${user.id}` }, () => checkUnreadMessages(user.id))
         .subscribe();
+    }
+
+    async function checkUnreadMessages(userId) {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('sender_type', 'admin')
+        .eq('is_read', false);
+
+      const badge = document.getElementById('chatBadge');
+      if (data && data.length > 0) {
+        badge.style.display = 'flex';
+        badge.textContent = data.length > 9 ? '9+' : data.length;
+      } else {
+        badge.style.display = 'none';
+      }
     }
 
     async function loadAccounts(userId) {
@@ -560,7 +626,6 @@
               <div class="balance-amount">${formattedBalance}</div>
               <div class="balance-label">${labelClass}</div>
             </div>
-            <div class="more-btn"><i class="fa-solid fa-ellipsis-vertical"></i></div>
           </div>
         `;
       }).join('');
