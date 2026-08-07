@@ -1,787 +1,765 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USAA - Money Transfer</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --usaa-navy: #002244;
-            --usaa-blue: #005691;
-            --usaa-light-bg: #f4f6f8;
-            --usaa-red: #d9534f;
-            --usaa-green: #2e7d32;
-            --usaa-border: #d1dbe5;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USAA - Money Transfer</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --usaa-navy: #002244;
+      --usaa-blue: #005691;
+      --usaa-light-bg: #f4f6f8;
+      --usaa-red: #d9534f;
+      --usaa-green: #2e7d32;
+      --usaa-border: #d1dbe5;
+    }
 
-        * {
-            box-sizing: border-box;
-        }
+    * { box-sizing: border-box; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--usaa-light-bg);
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--usaa-light-bg);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
 
-        .header {
-            background-color: var(--usaa-navy);
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    .header {
+      background-color: var(--usaa-navy);
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-        .header h1 {
-            margin: 0;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-        }
+    .header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+    }
 
-        .back-btn {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
+    .back-btn {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
 
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
 
-        .step-panel {
-            display: none;
-        }
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
 
-        .step-panel.active {
-            display: block;
-        }
+    .form-group { margin-bottom: 20px; }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: var(--usaa-navy);
+    }
 
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: var(--usaa-navy);
-        }
+    select, input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: white;
+    }
 
-        select, input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
+    .btn {
+      width: 100%;
+      background-color: var(--usaa-blue);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
 
-        .btn {
-            width: 100%;
-            background-color: var(--usaa-blue);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+    .btn:hover { background-color: var(--usaa-navy); }
+    .btn:disabled { background-color: #a0a0a0; cursor: not-allowed; }
 
-        .btn:hover {
-            background-color: var(--usaa-navy);
-        }
+    /* Better looking select with icons */
+    .custom-select-wrapper {
+      position: relative;
+    }
 
-        .btn:disabled {
-            background-color: #a0a0a0;
-            cursor: not-allowed;
-        }
+    .option-with-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .btn-danger {
-            background-color: var(--usaa-red);
-        }
+    .logo-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
 
-        /* DIGITAL RECEIPT CARD VIEW */
-        .receipt-card {
-            border: 1px solid var(--usaa-border);
-            padding: 24px;
-            background: #ffffff;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
+    .receipt-card {
+      border: 1px solid var(--usaa-border);
+      padding: 24px;
+      background: #ffffff;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
 
-        .receipt-header-branding {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--usaa-navy);
-            padding-bottom: 12px;
-            margin-bottom: 20px;
-        }
+    .receipt-header-branding {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--usaa-navy);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
 
-        .receipt-header-branding .brand-title {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--usaa-navy);
-            letter-spacing: 1px;
-        }
+    .receipt-header-branding .brand-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--usaa-navy);
+      letter-spacing: 1px;
+    }
 
-        .receipt-header-branding .doc-type {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: #666;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
+    .receipt-header-branding .doc-type {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #666;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
 
-        .receipt-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-            border-bottom: 1px dashed #e5e5e5;
-            padding-bottom: 8px;
-        }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      border-bottom: 1px dashed #e5e5e5;
+      padding-bottom: 8px;
+    }
 
-        .receipt-row:last-child {
-            border-bottom: none;
-        }
+    .receipt-row:last-child { border-bottom: none; }
+    .receipt-row span { color: #555; }
+    .receipt-row strong { color: var(--usaa-navy); }
 
-        .receipt-row span {
-            color: #555;
-        }
+    .share-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
 
-        .receipt-row strong {
-            color: var(--usaa-navy);
-        }
+    .share-btn {
+      padding: 12px;
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 8px;
+      text-align: center;
+      text-decoration: none;
+      color: #333;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
 
-        .share-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-        }
+    .share-btn:hover { background-color: #f8f9fa; }
 
-        .share-btn {
-            padding: 12px;
-            border: 1px solid #ccc;
-            background: white;
-            border-radius: 4px;
-            text-align: center;
-            text-decoration: none;
-            color: #333;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+    .alert-box {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #f5c6cb;
+      margin-bottom: 15px;
+      display: none;
+    }
 
-        .share-btn:hover {
-            background-color: #f8f9fa;
-        }
+    .watermark-footer {
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #777;
+    }
 
-        .alert-box {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 4px;
-            border: 1px solid #f5c6cb;
-            margin-bottom: 15px;
-            display: none;
-        }
-
-        .watermark-footer {
-            margin-top: 25px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-            text-align: center;
-            font-size: 0.75rem;
-            color: #777;
-        }
-
-        /* PRINT STYLES FOR HIGH QUALITY PAPER USAA RECEIPT */
-        @media print {
-            body {
-                background-color: #ffffff !important;
-                color: #000000 !important;
-            }
-
-            .header, 
-            .back-btn, 
-            .btn, 
-            .share-grid, 
-            .no-print, 
-            h3:has(+ .share-grid) {
-                display: none !important;
-            }
-
-            .container {
-                max-width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                box-shadow: none !important;
-                border: none !important;
-            }
-
-            .step-panel {
-                display: none !important;
-            }
-
-            .step-panel.active {
-                display: block !important;
-            }
-
-            .receipt-card {
-                border: 2px solid #002244 !important;
-                padding: 30px !important;
-                margin: 20px 0 !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
-                background: #ffffff !important;
-            }
-
-            .receipt-header-branding {
-                border-bottom: 3px solid #002244 !important;
-            }
-
-            .receipt-row {
-                border-bottom: 1px solid #ccc !important;
-                padding: 10px 0 !important;
-                font-size: 11pt !important;
-            }
-
-            .watermark-footer {
-                display: block !important;
-                font-size: 9pt !important;
-                color: #333 !important;
-                margin-top: 40px !important;
-            }
-        }
-    </style>
+    @media print {
+      body { background-color: #ffffff !important; color: #000000 !important; }
+      .header, .back-btn, .btn, .share-grid, .no-print, h3:has(+ .share-grid) { display: none !important; }
+      .container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
+      .step-panel { display: none !important; }
+      .step-panel.active { display: block !important; }
+      .receipt-card { border: 2px solid #002244 !important; padding: 30px !important; margin: 20px 0 !important; border-radius: 0 !important; box-shadow: none !important; background: #ffffff !important; }
+      .receipt-header-branding { border-bottom: 3px solid #002244 !important; }
+      .receipt-row { border-bottom: 1px solid #ccc !important; padding: 10px 0 !important; font-size: 11pt !important; }
+      .watermark-footer { display: block !important; font-size: 9pt !important; color: #333 !important; margin-top: 40px !important; }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="header">
-        <a href="dashboard.html" class="back-btn">&larr; Back to Dashboard</a>
-        <h1>USAA TRANSFER</h1>
+  <div class="header">
+    <a href="dashboard.html" class="back-btn">&larr; Back to Dashboard</a>
+    <h1>USAA TRANSFER</h1>
+  </div>
+
+  <div class="container">
+    
+    <div id="freezeAlert" class="alert-box">
+      <strong>SECURITY NOTICE:</strong> Your account has been temporarily <strong>FROZEN</strong> due to a transaction policy violation (Limit > $100,000). Please contact USAA Fraud Support.
     </div>
 
-    <div class="container">
+    <!-- STEP 1: TRANSFER DETAILS -->
+    <div id="step1" class="step-panel active">
+      <h2 style="margin-bottom:20px;color:var(--usaa-navy);">Initiate Funds Transfer</h2>
+
+      <div class="form-group">
+        <label for="fromAccount">From Account</label>
+        <select id="fromAccount"></select>
+      </div>
+
+      <div class="form-group">
+        <label for="countrySelect">Destination Region</label>
+        <select id="countrySelect" onchange="updateBankList()">
+          <option value="USA">🇺🇸 United States (Domestic)</option>
+          <option value="CANADA">🇨🇦 Canada</option>
+          <option value="UK">🇬🇧 United Kingdom</option>
+          <option value="AUSTRALIA">🇦🇺 Australia</option>
+          <option value="MEXICO">🇲🇽 Mexico</option>
+          <option value="MANUAL">🌍 Other / Add Manually</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="toBank">Destination Bank</label>
+        <select id="toBank" onchange="calculateFee()"></select>
+      </div>
+
+      <div id="manualBankGroup" class="form-group" style="display: none;">
+        <label for="manualBankName">Enter Bank Name</label>
+        <input type="text" id="manualBankName" placeholder="e.g. Deutsche Bank">
+      </div>
+
+      <div class="form-group">
+        <label for="recipientName">Recipient Full Name</label>
+        <input type="text" id="recipientName" placeholder="Full name of the person receiving the money">
+      </div>
+
+      <div class="form-group">
+        <label for="accountNum">Recipient Account Number / IBAN</label>
+        <input type="text" id="accountNum" placeholder="Enter account or routing number">
+      </div>
+
+      <div class="form-group">
+        <label for="amount">Amount ($ USD)</label>
+        <input type="number" id="amount" placeholder="0.00" oninput="calculateFee()">
+      </div>
+
+      <div class="form-group">
+        <label for="transferDate">Transfer Date</label>
+        <select id="transferDate">
+          <option value="Today">Today (Immediate)</option>
+          <option value="Tomorrow">Tomorrow</option>
+          <option value="Future">Scheduled Future Date</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Estimated Transfer Fee:</label>
+        <strong id="feeDisplay" style="font-size: 1.2rem; color: var(--usaa-navy);">$0.00</strong>
+      </div>
+
+      <button class="btn" onclick="goToStep(2)">Continue to Review</button>
+    </div>
+
+    <!-- STEP 2: REVIEW SCREEN -->
+    <div id="step2" class="step-panel">
+      <h2 style="margin-bottom:16px;color:var(--usaa-navy);">Review Transfer</h2>
+      <div class="receipt-card">
+        <div class="receipt-header-branding">
+          <span class="brand-title">USAA FINANCIAL</span>
+          <span class="doc-type">Transfer Pre-Review</span>
+        </div>
+        <div class="receipt-row"><span>From Account:</span><strong id="revFrom">--</strong></div>
+        <div class="receipt-row"><span>Recipient Name:</span><strong id="revName">--</strong></div>
+        <div class="receipt-row"><span>Destination Bank:</span><strong id="revBank">--</strong></div>
+        <div class="receipt-row"><span>Account / IBAN:</span><strong id="revAcc">--</strong></div>
+        <div class="receipt-row"><span>Transfer Amount:</span><strong id="revAmount">$0.00</strong></div>
+        <div class="receipt-row"><span>Calculated Bank Fee:</span><strong id="revFee">$0.00</strong></div>
+        <div class="receipt-row"><span>Execution Date:</span><strong id="revDate">--</strong></div>
+      </div>
+      <button class="btn" onclick="goToStep(3)">Confirm & Proceed to PIN</button>
+      <button class="btn" style="background:#6c757d; margin-top:5px;" onclick="goToStep(1)">Edit Details</button>
+    </div>
+
+    <!-- STEP 3: SECURITY PIN -->
+    <div id="step3" class="step-panel">
+      <h2 id="pinTitle" style="color:var(--usaa-navy);">Security Authentication</h2>
+      <p id="pinSubtext" style="color:#657786;margin-bottom:20px;">Enter your 4-digit transfer PIN to authorize this transaction.</p>
+      
+      <div class="form-group">
+        <input type="password" id="pinInput" maxlength="4" placeholder="••••" style="text-align: center; font-size: 1.8rem; letter-spacing: 8px;">
+      </div>
+
+      <button class="btn" id="authBtn" onclick="verifyAndExecuteTransfer()">Authorize Transfer</button>
+    </div>
+
+    <!-- STEP 4: SUCCESS & OFFICIAL PRINTABLE RECEIPT -->
+    <div id="step4" class="step-panel">
+      <h2 class="no-print" style="color: var(--usaa-green);">✓ Transfer Complete</h2>
+      <p class="no-print">Your funds have been successfully processed.</p>
+
+      <div class="receipt-card" id="printableReceipt">
+        <div class="receipt-header-branding">
+          <div>
+            <div class="brand-title">USAA FEDERAL SAVINGS BANK</div>
+            <div style="font-size:0.7rem; color:#666; margin-top:2px;">Official Transaction Record</div>
+          </div>
+          <div style="text-align: right;">
+            <span class="doc-type" style="color: var(--usaa-green); font-size: 0.85rem;">COMPLETED</span>
+          </div>
+        </div>
+
+        <div class="receipt-row"><span>Confirmation #:</span><strong id="recConf">--</strong></div>
+        <div class="receipt-row"><span>Date & Time:</span><strong id="recTime">--</strong></div>
+        <div class="receipt-row"><span>From Account:</span><strong id="recFrom">--</strong></div>
+        <div class="receipt-row"><span>Recipient Name:</span><strong id="recName">--</strong></div>
+        <div class="receipt-row"><span>Destination:</span><strong id="recBank">--</strong></div>
+        <div class="receipt-row"><span>Recipient Account:</span><strong id="recAccNum">--</strong></div>
+        <div class="receipt-row"><span>Amount Sent:</span><strong id="recAmount">$0.00</strong></div>
+        <div class="receipt-row"><span>Transfer Fee:</span><strong id="recFee">$0.00</strong></div>
+        <div class="receipt-row"><span>Status:</span><strong style="color:var(--usaa-green);">SUCCESSFUL / PROCESSED</strong></div>
+
+        <div class="watermark-footer">
+          <p><strong>USAA Official Customer Paper Receipt</strong></p>
+          <p style="margin-top: 3px;">Member FDIC. Equal Housing Lender. © 2026 USAA. All rights reserved.</p>
+        </div>
+      </div>
+
+      <h3 class="no-print">Share / Download Receipt</h3>
+      <div class="share-grid no-print">
+        <button class="share-btn" onclick="downloadReceiptImage()"><i class="fa-solid fa-download"></i> Download Receipt</button>
+        <button class="share-btn" onclick="shareReceiptImage('whatsapp')"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+        <button class="share-btn" onclick="shareReceiptImage('email')"><i class="fa-solid fa-envelope"></i> Email</button>
+        <button class="share-btn" onclick="shareReceiptImage('sms')"><i class="fa-solid fa-comment-sms"></i> Phone (SMS)</button>
+      </div>
+
+      <button class="btn no-print" style="margin-top: 20px;" onclick="window.location.href='dashboard.html'">Return to Dashboard</button>
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let userAccounts = [];
+    let calculatedFeeValue = 0;
+    let currentUser = null;
+    let senderFullName = "USAA Member";
+    let lastReceiptData = null;
+
+    // Banks with brand colors
+    const bankData = {
+      USA: [
+        { name: "JPMorgan Chase", color: "#117aca", short: "JC" },
+        { name: "Bank of America", color: "#e31837", short: "BA" },
+        { name: "Wells Fargo", color: "#d71e28", short: "WF" },
+        { name: "Citigroup", color: "#003b70", short: "CI" },
+        { name: "Capital One", color: "#004977", short: "CO" }
+      ],
+      CANADA: [
+        { name: "RBC Royal Bank", color: "#0051a5", short: "RB" },
+        { name: "TD Bank", color: "#34a853", short: "TD" },
+        { name: "Scotiabank", color: "#ec111a", short: "SB" },
+        { name: "BMO", color: "#0079c1", short: "BM" },
+        { name: "CIBC", color: "#c41f3e", short: "CB" }
+      ],
+      UK: [
+        { name: "HSBC UK", color: "#db0011", short: "HS" },
+        { name: "Barclays", color: "#00aeea", short: "BA" },
+        { name: "Lloyds Bank", color: "#006666", short: "LL" },
+        { name: "NatWest", color: "#5a287d", short: "NW" },
+        { name: "Standard Chartered", color: "#0072aa", short: "SC" }
+      ],
+      AUSTRALIA: [
+        { name: "Commonwealth Bank", color: "#ffcc00", short: "CB" },
+        { name: "ANZ Bank", color: "#007dba", short: "AN" },
+        { name: "NAB", color: "#c2002f", short: "NA" },
+        { name: "Westpac", color: "#d5002b", short: "WP" }
+      ],
+      MEXICO: [
+        { name: "BBVA Mexico", color: "#072146", short: "BB" },
+        { name: "Banorte", color: "#eb0029", short: "BN" },
+        { name: "Santander Mexico", color: "#ec0000", short: "SA" },
+        { name: "Citibanamex", color: "#003b70", short: "CI" }
+      ]
+    };
+
+    async function initTransferPage() {
+      const { data: { user } } = await client.auth.getUser();
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+      currentUser = user;
+
+      const { data: profile } = await client
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+
+      if (profile && profile.full_name) {
+        senderFullName = profile.full_name;
+      }
+
+      const { data: accounts, error } = await client.from('accounts').select('*').eq('user_id', user.id);
+      if (error) {
+        alert("Error loading accounts: " + error.message);
+        return;
+      }
+
+      userAccounts = accounts || [];
+
+      const fromSelect = document.getElementById('fromAccount');
+      fromSelect.innerHTML = "";
+      
+      if (userAccounts.length === 0) {
+        let opt = document.createElement('option');
+        opt.textContent = "No active accounts found";
+        fromSelect.appendChild(opt);
+        return;
+      }
+
+      userAccounts.forEach(acc => {
+        let icon = "💰";
+        if (acc.account_type === 'checking') icon = "💳";
+        if (acc.account_type === 'savings') icon = "🏦";
+        if (acc.account_type === 'card') icon = "💳";
+        if (acc.account_type === 'loan') icon = "🚗";
+
+        let opt = document.createElement('option');
+        opt.value = acc.id;
+        opt.textContent = `${icon} ${acc.account_name || 'Checking Account'} (••••${acc.account_number_last4 || '0000'}) - $${parseFloat(acc.balance || 0).toFixed(2)}`;
+        fromSelect.appendChild(opt);
+      });
+
+      updateBankList();
+      checkPinSetup();
+    }
+
+    function updateBankList() {
+      const country = document.getElementById('countrySelect').value;
+      const bankSelect = document.getElementById('toBank');
+      const manualGroup = document.getElementById('manualBankGroup');
+      
+      bankSelect.innerHTML = "";
+
+      if (country === "MANUAL") {
+        manualGroup.style.display = "block";
+        let opt = document.createElement('option');
+        opt.value = "Custom External Bank";
+        opt.textContent = "🌍 Custom External Bank";
+        bankSelect.appendChild(opt);
+      } else {
+        manualGroup.style.display = "none";
+        bankData[country].forEach(b => {
+          let opt = document.createElement('option');
+          opt.value = b.name;
+          opt.textContent = `${b.short}  ${b.name}`;
+          bankSelect.appendChild(opt);
+        });
+      }
+      calculateFee();
+    }
+
+    function calculateFee() {
+      const country = document.getElementById('countrySelect').value;
+      const amt = parseFloat(document.getElementById('amount').value) || 0;
+      
+      if (amt === 0) {
+        calculatedFeeValue = 0;
+      } else if (country === "USA") {
+        calculatedFeeValue = amt <= 1000 ? 0 : +(amt * 0.0025).toFixed(2);
+      } else if (country === "CANADA") {
+        calculatedFeeValue = +(25 + (amt * 0.005)).toFixed(2);
+      } else if (country === "UK") {
+        calculatedFeeValue = +(30 + (amt * 0.006)).toFixed(2);
+      } else if (country === "AUSTRALIA") {
+        calculatedFeeValue = +(35 + (amt * 0.006)).toFixed(2);
+      } else if (country === "MEXICO") {
+        calculatedFeeValue = +(20 + (amt * 0.005)).toFixed(2);
+      } else {
+        calculatedFeeValue = +(20 + (amt * 0.007)).toFixed(2);
+      }
+
+      document.getElementById('feeDisplay').textContent = `$${calculatedFeeValue.toFixed(2)}`;
+    }
+
+    function checkPinSetup() {
+      const savedPin = localStorage.getItem('usaa_user_pin');
+      if (!savedPin) {
+        document.getElementById('pinTitle').textContent = "Create Security PIN";
+        document.getElementById('pinSubtext').textContent = "Set a 4-digit transfer PIN for first-time account authorization.";
+      } else {
+        document.getElementById('pinTitle').textContent = "Security Authentication";
+        document.getElementById('pinSubtext').textContent = "Enter your 4-digit transfer PIN to authorize this transaction.";
+      }
+    }
+
+    function goToStep(stepNum) {
+      if (stepNum === 2) {
+        const amt = parseFloat(document.getElementById('amount').value);
+        const accNum = document.getElementById('accountNum').value.trim();
+        const recipName = document.getElementById('recipientName').value.trim();
+
+        if (!amt || amt <= 0) {
+          alert("Please enter a valid transfer amount.");
+          return;
+        }
+
+        if (!recipName) {
+          alert("Please enter the recipient's full name.");
+          return;
+        }
+
+        if (!accNum) {
+          alert("Please enter the recipient's account number or IBAN.");
+          return;
+        }
         
-        <div id="freezeAlert" class="alert-box">
-            <strong>SECURITY NOTICE:</strong> Your account has been temporarily <strong>FROZEN</strong> due to a transaction policy violation (Limit > $100,000). Please contact USAA Fraud Support.
-        </div>
+        const selectedAccId = document.getElementById('fromAccount').value;
+        const fromAcc = userAccounts.find(a => a.id === selectedAccId);
+        const bank = document.getElementById('countrySelect').value === "MANUAL" ? 
+                     document.getElementById('manualBankName').value.trim() : document.getElementById('toBank').value;
 
-        <!-- STEP 1: TRANSFER DETAILS -->
-        <div id="step1" class="step-panel active">
-            <h2>Initiate Funds Transfer</h2>
+        if (!bank) {
+          alert("Please specify a valid bank name.");
+          return;
+        }
 
-            <div class="form-group">
-                <label for="fromAccount">From Account</label>
-                <select id="fromAccount"></select>
-            </div>
+        document.getElementById('revFrom').textContent = senderFullName;
+        document.getElementById('revName').textContent = recipName;
+        document.getElementById('revBank').textContent = bank;
+        document.getElementById('revAcc').textContent = accNum;
+        document.getElementById('revAmount').textContent = `$${amt.toFixed(2)}`;
+        document.getElementById('revFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
+        document.getElementById('revDate').textContent = document.getElementById('transferDate').value;
+      }
 
-            <div class="form-group">
-                <label for="countrySelect">Destination Region</label>
-                <select id="countrySelect" onchange="updateBankList()">
-                    <option value="USA">United States (Domestic)</option>
-                    <option value="CANADA">Canada</option>
-                    <option value="UK">United Kingdom</option>
-                    <option value="AUSTRALIA">Australia</option>
-                    <option value="MEXICO">Mexico</option>
-                    <option value="MANUAL">Other / Add Manually</option>
-                </select>
-            </div>
+      document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(`step${stepNum}`).classList.add('active');
+    }
 
-            <div class="form-group">
-                <label for="toBank">Destination Bank</label>
-                <select id="toBank" onchange="calculateFee()"></select>
-            </div>
+    async function verifyAndExecuteTransfer() {
+      const inputPin = document.getElementById('pinInput').value;
+      const savedPin = localStorage.getItem('usaa_user_pin');
+      const authBtn = document.getElementById('authBtn');
 
-            <div id="manualBankGroup" class="form-group" style="display: none;">
-                <label for="manualBankName">Enter Bank Name</label>
-                <input type="text" id="manualBankName" placeholder="e.g. Deutsche Bank">
-            </div>
+      if (inputPin.length !== 4 || isNaN(inputPin)) {
+        alert("Please enter a valid 4-digit numerical PIN.");
+        return;
+      }
 
-            <div class="form-group">
-                <label for="recipientName">Recipient Full Name</label>
-                <input type="text" id="recipientName" placeholder="Full name of the person receiving the money">
-            </div>
+      if (!savedPin) {
+        localStorage.setItem('usaa_user_pin', inputPin);
+        alert("PIN Created Successfully!");
+      } else if (savedPin !== inputPin) {
+        alert("Incorrect PIN. Please try again.");
+        return;
+      }
 
-            <div class="form-group">
-                <label for="accountNum">Recipient Account Number / IBAN</label>
-                <input type="text" id="accountNum" placeholder="Enter account or routing number">
-            </div>
+      const fromAccId = document.getElementById('fromAccount').value;
+      const amt = parseFloat(document.getElementById('amount').value);
+      const bank = document.getElementById('countrySelect').value === "MANUAL" ? 
+                   document.getElementById('manualBankName').value.trim() : document.getElementById('toBank').value;
+      const recipientAccNum = document.getElementById('accountNum').value.trim() || 'N/A';
+      const recipientFullName = document.getElementById('recipientName').value.trim();
 
-            <div class="form-group">
-                <label for="amount">Amount ($ USD)</label>
-                <input type="number" id="amount" placeholder="0.00" oninput="calculateFee()">
-            </div>
+      authBtn.disabled = true;
+      authBtn.textContent = "Processing Transaction...";
 
-            <div class="form-group">
-                <label for="transferDate">Transfer Date</label>
-                <select id="transferDate">
-                    <option value="Today">Today (Immediate)</option>
-                    <option value="Tomorrow">Tomorrow</option>
-                    <option value="Future">Scheduled Future Date</option>
-                </select>
-            </div>
+      try {
+        const { data, error } = await client.rpc('execute_transfer', {
+          p_from_account_id: fromAccId,
+          p_recipient_bank: bank,
+          p_recipient_account: recipientAccNum,
+          p_amount: amt,
+          p_fee: calculatedFeeValue
+        });
 
-            <div class="form-group">
-                <label>Estimated Transfer Fee:</label>
-                <strong id="feeDisplay" style="font-size: 1.1rem; color: var(--usaa-navy);">$0.00</strong>
-            </div>
+        if (error) {
+          console.warn("RPC call failed, executing fallback update:", error.message);
+          
+          const selectedAcc = userAccounts.find(a => a.id === fromAccId);
+          const totalDeduction = amt + calculatedFeeValue;
 
-            <button class="btn" onclick="goToStep(2)">Continue to Review</button>
-        </div>
+          if ((selectedAcc.balance || 0) < totalDeduction) {
+            alert("Insufficient funds to cover this transfer.");
+            authBtn.disabled = false;
+            authBtn.textContent = "Authorize Transfer";
+            return;
+          }
 
-        <!-- STEP 2: REVIEW SCREEN -->
-        <div id="step2" class="step-panel">
-            <h2>Review Transfer</h2>
-            <div class="receipt-card">
-                <div class="receipt-header-branding">
-                    <span class="brand-title">USAA FINANCIAL</span>
-                    <span class="doc-type">Transfer Pre-Review</span>
-                </div>
-                <div class="receipt-row"><span>From Account:</span><strong id="revFrom">--</strong></div>
-                <div class="receipt-row"><span>Recipient Name:</span><strong id="revName">--</strong></div>
-                <div class="receipt-row"><span>Destination Bank:</span><strong id="revBank">--</strong></div>
-                <div class="receipt-row"><span>Account / IBAN:</span><strong id="revAcc">--</strong></div>
-                <div class="receipt-row"><span>Transfer Amount:</span><strong id="revAmount">$0.00</strong></div>
-                <div class="receipt-row"><span>Calculated Bank Fee:</span><strong id="revFee">$0.00</strong></div>
-                <div class="receipt-row"><span>Execution Date:</span><strong id="revDate">--</strong></div>
-            </div>
-            <button class="btn" onclick="goToStep(3)">Confirm & Proceed to PIN</button>
-            <button class="btn" style="background:#6c757d; margin-top:5px;" onclick="goToStep(1)">Edit Details</button>
-        </div>
+          const newBalance = selectedAcc.balance - totalDeduction;
+          const { error: updateError } = await client
+            .from('accounts')
+            .update({ balance: newBalance })
+            .eq('id', fromAccId);
 
-        <!-- STEP 3: SECURITY PIN -->
-        <div id="step3" class="step-panel">
-            <h2 id="pinTitle">Security Authentication</h2>
-            <p id="pinSubtext">Enter your 4-digit transfer PIN to authorize this transaction.</p>
-            
-            <div class="form-group">
-                <input type="password" id="pinInput" maxlength="4" placeholder="••••" style="text-align: center; font-size: 1.8rem; letter-spacing: 8px;">
-            </div>
+          if (updateError) {
+            alert("Transfer Error: " + updateError.message);
+            authBtn.disabled = false;
+            authBtn.textContent = "Authorize Transfer";
+            return;
+          }
 
-            <button class="btn" id="authBtn" onclick="verifyAndExecuteTransfer()">Authorize Transfer</button>
-        </div>
+          const { error: txError } = await client.from('transactions').insert([
+            {
+              user_id: currentUser.id,
+              account_id: fromAccId,
+              merchant_name: bank,
+              amount: -amt,
+              transaction_date: new Date().toISOString(),
+              description: `Transfer to ${recipientFullName} via ${bank} | Account: ${recipientAccNum}`,
+              recipient_name: recipientFullName,
+              type: 'transfer'
+            }
+          ]);
 
-        <!-- STEP 4: SUCCESS & OFFICIAL PRINTABLE RECEIPT -->
-        <div id="step4" class="step-panel">
-            <h2 class="no-print" style="color: var(--usaa-green);">✓ Transfer Complete</h2>
-            <p class="no-print">Your funds have been successfully processed.</p>
+          if (txError) {
+            console.error("Transaction insert failed:", txError);
+            alert("Balance updated but transaction record failed: " + txError.message);
+          }
 
-            <div class="receipt-card" id="printableReceipt">
-                <div class="receipt-header-branding">
-                    <div>
-                        <div class="brand-title">USAA FEDERAL SAVINGS BANK</div>
-                        <div style="font-size:0.7rem; color:#666; margin-top:2px;">Official Transaction Record</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <span class="doc-type" style="color: var(--usaa-green); font-size: 0.85rem;">COMPLETED</span>
-                    </div>
-                </div>
+          if (calculatedFeeValue > 0) {
+            await client.from('transactions').insert([
+              {
+                user_id: currentUser.id,
+                account_id: fromAccId,
+                merchant_name: 'Transfer Fee',
+                amount: -calculatedFeeValue,
+                transaction_date: new Date().toISOString(),
+                description: `Fee for transfer to ${recipientFullName} (${bank})`,
+                recipient_name: recipientFullName,
+                type: 'fee'
+              }
+            ]);
+          }
+        }
 
-                <div class="receipt-row"><span>Confirmation #:</span><strong id="recConf">--</strong></div>
-                <div class="receipt-row"><span>Date & Time:</span><strong id="recTime">--</strong></div>
-                <div class="receipt-row"><span>From Account:</span><strong id="recFrom">--</strong></div>
-                <div class="receipt-row"><span>Recipient Name:</span><strong id="recName">--</strong></div>
-                <div class="receipt-row"><span>Destination:</span><strong id="recBank">--</strong></div>
-                <div class="receipt-row"><span>Recipient Account:</span><strong id="recAccNum">--</strong></div>
-                <div class="receipt-row"><span>Amount Sent:</span><strong id="recAmount">$0.00</strong></div>
-                <div class="receipt-row"><span>Transfer Fee:</span><strong id="recFee">$0.00</strong></div>
-                <div class="receipt-row"><span>Status:</span><strong style="color:var(--usaa-green);">SUCCESSFUL / PROCESSED</strong></div>
+        // Render Receipt
+        const confNum = "USAA-" + Math.floor(10000000 + Math.random() * 90000000);
+        const timeStr = new Date().toLocaleString();
 
-                <div class="watermark-footer">
-                    <p><strong>USAA Official Customer Paper Receipt</strong></p>
-                    <p style="margin-top: 3px;">Member FDIC. Equal Housing Lender. © 2026 USAA. All rights reserved.</p>
-                </div>
-            </div>
+        document.getElementById('recConf').textContent = confNum;
+        document.getElementById('recTime').textContent = timeStr;
+        document.getElementById('recFrom').textContent = senderFullName;
+        document.getElementById('recName').textContent = recipientFullName;
+        document.getElementById('recBank').textContent = bank;
+        document.getElementById('recAccNum').textContent = recipientAccNum;
+        document.getElementById('recAmount').textContent = `$${amt.toFixed(2)}`;
+        document.getElementById('recFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
 
-            <h3 class="no-print">Share / Download Receipt</h3>
-            <div class="share-grid no-print">
-                <button class="share-btn" onclick="downloadReceiptImage()"><i class="fa-solid fa-download"></i> Download Receipt</button>
-                <button class="share-btn" onclick="shareReceiptImage('whatsapp')"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
-                <button class="share-btn" onclick="shareReceiptImage('email')"><i class="fa-solid fa-envelope"></i> Email</button>
-                <button class="share-btn" onclick="shareReceiptImage('sms')"><i class="fa-solid fa-comment-sms"></i> Phone (SMS)</button>
-            </div>
-
-            <button class="btn no-print" style="margin-top: 20px;" onclick="window.location.href='dashboard.html'">Return to Dashboard</button>
-        </div>
-
-    </div>
-
-    <script>
-        const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
-        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        let userAccounts = [];
-        let calculatedFeeValue = 0;
-        let currentUser = null;
-        let senderFullName = "USAA Member";
-        let lastReceiptData = null;
-
-        const bankData = {
-            USA: ["JPMorgan Chase", "Bank of America", "Wells Fargo", "Citigroup", "Capital One"],
-            CANADA: ["RBC Royal Bank", "TD Bank", "Scotiabank", "BMO", "CIBC"],
-            UK: ["HSBC UK", "Barclays", "Lloyds Bank", "NatWest", "Standard Chartered"],
-            AUSTRALIA: ["Commonwealth Bank", "ANZ Bank", "NAB", "Westpac"],
-            MEXICO: ["BBVA Mexico", "Banorte", "Santander Mexico", "Citibanamex"]
+        lastReceiptData = {
+          conf: confNum,
+          time: timeStr,
+          from: senderFullName,
+          name: recipientFullName,
+          bank: bank,
+          acc: recipientAccNum,
+          amount: amt.toFixed(2),
+          fee: calculatedFeeValue.toFixed(2)
         };
 
-        async function initTransferPage() {
-            const { data: { user } } = await client.auth.getUser();
-            if (!user) {
-                window.location.href = "index.html";
-                return;
-            }
-            currentUser = user;
+        goToStep(4);
+      } catch (err) {
+        alert("An unexpected error occurred: " + err.message);
+      } finally {
+        authBtn.disabled = false;
+        authBtn.textContent = "Authorize Transfer";
+      }
+    }
 
-            // Get sender full name from profiles
-            const { data: profile } = await client
-                .from('profiles')
-                .select('full_name')
-                .eq('id', user.id)
-                .single();
+    async function generateReceiptImage() {
+      const element = document.getElementById('printableReceipt');
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true
+      });
+      return canvas;
+    }
 
-            if (profile && profile.full_name) {
-                senderFullName = profile.full_name;
-            }
+    async function downloadReceiptImage() {
+      const canvas = await generateReceiptImage();
+      const link = document.createElement('a');
+      link.download = `USAA_Receipt_${lastReceiptData.conf}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
 
-            const { data: accounts, error } = await client.from('accounts').select('*').eq('user_id', user.id);
-            if (error) {
-                alert("Error loading accounts: " + error.message);
-                return;
-            }
+    async function shareReceiptImage(type) {
+      const canvas = await generateReceiptImage();
+      
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], `USAA_Receipt_${lastReceiptData.conf}.png`, { type: 'image/png' });
+        const textSummary = `USAA Transfer Receipt\nConf: ${lastReceiptData.conf}\nFrom: ${lastReceiptData.from}\nTo: ${lastReceiptData.name}\nBank: ${lastReceiptData.bank}\nAmount: $${lastReceiptData.amount}\nFee: $${lastReceiptData.fee}\nDate: ${lastReceiptData.time}`;
 
-            userAccounts = accounts || [];
-
-            const fromSelect = document.getElementById('fromAccount');
-            fromSelect.innerHTML = "";
-            
-            if (userAccounts.length === 0) {
-                let opt = document.createElement('option');
-                opt.textContent = "No active accounts found";
-                fromSelect.appendChild(opt);
-                return;
-            }
-
-            userAccounts.forEach(acc => {
-                let opt = document.createElement('option');
-                opt.value = acc.id;
-                opt.textContent = `${acc.account_name || 'Checking Account'} (••••${acc.account_number_last4 || '0000'}) - $${parseFloat(acc.balance || 0).toFixed(2)}`;
-                fromSelect.appendChild(opt);
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'USAA Transfer Receipt',
+              text: textSummary
             });
-
-            updateBankList();
-            checkPinSetup();
+            return;
+          } catch (err) {
+            console.log('Share cancelled or failed', err);
+          }
         }
 
-        function updateBankList() {
-            const country = document.getElementById('countrySelect').value;
-            const bankSelect = document.getElementById('toBank');
-            const manualGroup = document.getElementById('manualBankGroup');
-            
-            bankSelect.innerHTML = "";
-
-            if (country === "MANUAL") {
-                manualGroup.style.display = "block";
-                let opt = document.createElement('option');
-                opt.value = "Custom External Bank";
-                opt.textContent = "Custom External Bank";
-                bankSelect.appendChild(opt);
-            } else {
-                manualGroup.style.display = "none";
-                bankData[country].forEach(b => {
-                    let opt = document.createElement('option');
-                    opt.value = b;
-                    opt.textContent = b;
-                    bankSelect.appendChild(opt);
-                });
-            }
-            calculateFee();
+        if (type === 'whatsapp') {
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textSummary)}`, '_blank');
+        } else if (type === 'email') {
+          window.location.href = `mailto:?subject=USAA Transfer Receipt&body=${encodeURIComponent(textSummary)}`;
+        } else if (type === 'sms') {
+          window.location.href = `sms:?body=${encodeURIComponent(textSummary)}`;
         }
+      }, 'image/png');
+    }
 
-        function calculateFee() {
-            const country = document.getElementById('countrySelect').value;
-            const amt = parseFloat(document.getElementById('amount').value) || 0;
-            
-            if (amt === 0) {
-                calculatedFeeValue = 0;
-            } else if (country === "USA") {
-                calculatedFeeValue = amt <= 1000 ? 0 : +(amt * 0.0025).toFixed(2);
-            } else if (country === "CANADA") {
-                calculatedFeeValue = +(25 + (amt * 0.005)).toFixed(2);
-            } else if (country === "UK") {
-                calculatedFeeValue = +(30 + (amt * 0.006)).toFixed(2);
-            } else if (country === "AUSTRALIA") {
-                calculatedFeeValue = +(35 + (amt * 0.006)).toFixed(2);
-            } else if (country === "MEXICO") {
-                calculatedFeeValue = +(20 + (amt * 0.005)).toFixed(2);
-            } else {
-                calculatedFeeValue = +(20 + (amt * 0.007)).toFixed(2);
-            }
-
-            document.getElementById('feeDisplay').textContent = `$${calculatedFeeValue.toFixed(2)}`;
-        }
-
-        function checkPinSetup() {
-            const savedPin = localStorage.getItem('usaa_user_pin');
-            if (!savedPin) {
-                document.getElementById('pinTitle').textContent = "Create Security PIN";
-                document.getElementById('pinSubtext').textContent = "Set a 4-digit transfer PIN for first-time account authorization.";
-            } else {
-                document.getElementById('pinTitle').textContent = "Security Authentication";
-                document.getElementById('pinSubtext').textContent = "Enter your 4-digit transfer PIN to authorize this transaction.";
-            }
-        }
-
-        function goToStep(stepNum) {
-            if (stepNum === 2) {
-                const amt = parseFloat(document.getElementById('amount').value);
-                const accNum = document.getElementById('accountNum').value.trim();
-                const recipName = document.getElementById('recipientName').value.trim();
-
-                if (!amt || amt <= 0) {
-                    alert("Please enter a valid transfer amount.");
-                    return;
-                }
-
-                if (!recipName) {
-                    alert("Please enter the recipient's full name.");
-                    return;
-                }
-
-                if (!accNum) {
-                    alert("Please enter the recipient's account number or IBAN.");
-                    return;
-                }
-                
-                const selectedAccId = document.getElementById('fromAccount').value;
-                const fromAcc = userAccounts.find(a => a.id === selectedAccId);
-                const bank = document.getElementById('countrySelect').value === "MANUAL" ? 
-                             document.getElementById('manualBankName').value.trim() : document.getElementById('toBank').value;
-
-                if (!bank) {
-                    alert("Please specify a valid bank name.");
-                    return;
-                }
-
-                document.getElementById('revFrom').textContent = senderFullName;
-                document.getElementById('revName').textContent = recipName;
-                document.getElementById('revBank').textContent = bank;
-                document.getElementById('revAcc').textContent = accNum;
-                document.getElementById('revAmount').textContent = `$${amt.toFixed(2)}`;
-                document.getElementById('revFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
-                document.getElementById('revDate').textContent = document.getElementById('transferDate').value;
-            }
-
-            document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-            document.getElementById(`step${stepNum}`).classList.add('active');
-        }
-
-        async function verifyAndExecuteTransfer() {
-            const inputPin = document.getElementById('pinInput').value;
-            const savedPin = localStorage.getItem('usaa_user_pin');
-            const authBtn = document.getElementById('authBtn');
-
-            if (inputPin.length !== 4 || isNaN(inputPin)) {
-                alert("Please enter a valid 4-digit numerical PIN.");
-                return;
-            }
-
-            if (!savedPin) {
-                localStorage.setItem('usaa_user_pin', inputPin);
-                alert("PIN Created Successfully!");
-            } else if (savedPin !== inputPin) {
-                alert("Incorrect PIN. Please try again.");
-                return;
-            }
-
-            const fromAccId = document.getElementById('fromAccount').value;
-            const amt = parseFloat(document.getElementById('amount').value);
-            const bank = document.getElementById('countrySelect').value === "MANUAL" ? 
-                         document.getElementById('manualBankName').value.trim() : document.getElementById('toBank').value;
-            const recipientAccNum = document.getElementById('accountNum').value.trim() || 'N/A';
-            const recipientFullName = document.getElementById('recipientName').value.trim();
-
-            authBtn.disabled = true;
-            authBtn.textContent = "Processing Transaction...";
-
-            try {
-                const { data, error } = await client.rpc('execute_transfer', {
-                    p_from_account_id: fromAccId,
-                    p_recipient_bank: bank,
-                    p_recipient_account: recipientAccNum,
-                    p_amount: amt,
-                    p_fee: calculatedFeeValue
-                });
-
-                if (error) {
-                    console.warn("RPC call failed, executing fallback update:", error.message);
-                    
-                    const selectedAcc = userAccounts.find(a => a.id === fromAccId);
-                    const totalDeduction = amt + calculatedFeeValue;
-
-                    if ((selectedAcc.balance || 0) < totalDeduction) {
-                        alert("Insufficient funds to cover this transfer.");
-                        authBtn.disabled = false;
-                        authBtn.textContent = "Authorize Transfer";
-                        return;
-                    }
-
-                    const newBalance = selectedAcc.balance - totalDeduction;
-                    const { error: updateError } = await client
-                        .from('accounts')
-                        .update({ balance: newBalance })
-                        .eq('id', fromAccId);
-
-                    if (updateError) {
-                        alert("Transfer Error: " + updateError.message);
-                        authBtn.disabled = false;
-                        authBtn.textContent = "Authorize Transfer";
-                        return;
-                    }
-
-                    const { error: txError } = await client.from('transactions').insert([
-                        {
-                            user_id: currentUser.id,
-                            account_id: fromAccId,
-                            merchant_name: bank,
-                            amount: -amt,
-                            transaction_date: new Date().toISOString(),
-                            description: `Transfer to ${recipientFullName} via ${bank} | Account: ${recipientAccNum}`,
-                            recipient_name: recipientFullName,
-                            type: 'transfer'
-                        }
-                    ]);
-
-                    if (txError) {
-                        console.error("Transaction insert failed:", txError);
-                        alert("Balance updated but transaction record failed: " + txError.message);
-                    }
-
-                    if (calculatedFeeValue > 0) {
-                        await client.from('transactions').insert([
-                            {
-                                user_id: currentUser.id,
-                                account_id: fromAccId,
-                                merchant_name: 'Transfer Fee',
-                                amount: -calculatedFeeValue,
-                                transaction_date: new Date().toISOString(),
-                                description: `Fee for transfer to ${recipientFullName} (${bank})`,
-                                recipient_name: recipientFullName,
-                                type: 'fee'
-                            }
-                        ]);
-                    }
-                }
-
-                // Render Receipt
-                const confNum = "USAA-" + Math.floor(10000000 + Math.random() * 90000000);
-                const timeStr = new Date().toLocaleString();
-                const selectedAcc = userAccounts.find(a => a.id === fromAccId);
-
-                document.getElementById('recConf').textContent = confNum;
-                document.getElementById('recTime').textContent = timeStr;
-                document.getElementById('recFrom').textContent = senderFullName;
-                document.getElementById('recName').textContent = recipientFullName;
-                document.getElementById('recBank').textContent = bank;
-                document.getElementById('recAccNum').textContent = recipientAccNum;
-                document.getElementById('recAmount').textContent = `$${amt.toFixed(2)}`;
-                document.getElementById('recFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
-
-                lastReceiptData = {
-                    conf: confNum,
-                    time: timeStr,
-                    from: senderFullName,
-                    name: recipientFullName,
-                    bank: bank,
-                    acc: recipientAccNum,
-                    amount: amt.toFixed(2),
-                    fee: calculatedFeeValue.toFixed(2)
-                };
-
-                goToStep(4);
-            } catch (err) {
-                alert("An unexpected error occurred: " + err.message);
-            } finally {
-                authBtn.disabled = false;
-                authBtn.textContent = "Authorize Transfer";
-            }
-        }
-
-        // Generate high quality receipt image
-        async function generateReceiptImage() {
-            const element = document.getElementById('printableReceipt');
-            const canvas = await html2canvas(element, {
-                scale: 2,
-                backgroundColor: '#ffffff',
-                useCORS: true
-            });
-            return canvas;
-        }
-
-        async function downloadReceiptImage() {
-            const canvas = await generateReceiptImage();
-            const link = document.createElement('a');
-            link.download = `USAA_Receipt_${lastReceiptData.conf}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
-
-        async function shareReceiptImage(type) {
-            const canvas = await generateReceiptImage();
-            
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], `USAA_Receipt_${lastReceiptData.conf}.png`, { type: 'image/png' });
-                const textSummary = `USAA Transfer Receipt\nConf: ${lastReceiptData.conf}\nFrom: ${lastReceiptData.from}\nTo: ${lastReceiptData.name}\nBank: ${lastReceiptData.bank}\nAmount: $${lastReceiptData.amount}\nFee: $${lastReceiptData.fee}\nDate: ${lastReceiptData.time}`;
-
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            files: [file],
-                            title: 'USAA Transfer Receipt',
-                            text: textSummary
-                        });
-                        return;
-                    } catch (err) {
-                        console.log('Share cancelled or failed', err);
-                    }
-                }
-
-                // Fallbacks
-                if (type === 'whatsapp') {
-                    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textSummary)}`, '_blank');
-                } else if (type === 'email') {
-                    window.location.href = `mailto:?subject=USAA Transfer Receipt&body=${encodeURIComponent(textSummary)}`;
-                } else if (type === 'sms') {
-                    window.location.href = `sms:?body=${encodeURIComponent(textSummary)}`;
-                }
-            }, 'image/png');
-        }
-
-        window.onload = initTransferPage;
-    </script>
+    window.onload = initTransferPage;
+  </script>
 </body>
 </html>
