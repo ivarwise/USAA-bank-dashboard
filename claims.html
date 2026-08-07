@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>USAA - Claims</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      color: #333;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    .header {
+      background: linear-gradient(180deg, #002244 0%, #003366 100%);
+      color: white;
+      padding: 16px 20px 24px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .back-btn {
+      color: white;
+      font-size: 20px;
+      text-decoration: none;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .container {
+      padding: 16px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #002244;
+      margin: 8px 0 12px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e1e8ed;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    /* Big File Claim Button */
+    .file-claim-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: linear-gradient(135deg, #002244, #005691);
+      color: white;
+      text-decoration: none;
+      padding: 18px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,34,68,0.25);
+    }
+
+    .file-claim-btn i {
+      font-size: 20px;
+    }
+
+    /* Claim Status Cards */
+    .claim-item {
+      padding: 16px;
+      border-bottom: 1px solid #f0f4f8;
+    }
+
+    .claim-item:last-child {
+      border-bottom: none;
+    }
+
+    .claim-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .claim-type {
+      font-size: 15px;
+      font-weight: 700;
+      color: #002244;
+    }
+
+    .claim-status {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    .status-open {
+      background: #fff3e0;
+      color: #ef6c00;
+    }
+
+    .status-closed {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .status-review {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .claim-detail {
+      font-size: 13px;
+      color: #657786;
+      margin-bottom: 4px;
+    }
+
+    .claim-date {
+      font-size: 12px;
+      color: #90a4ae;
+    }
+
+    /* Action Grid */
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .action-card {
+      background: white;
+      border: 1px solid #e1e8ed;
+      border-radius: 12px;
+      padding: 20px 12px;
+      text-align: center;
+      text-decoration: none;
+      color: #002244;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .action-card i {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: #002244;
+    }
+
+    .action-card span {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Menu Items */
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 16px;
+      border-bottom: 1px solid #f0f4f8;
+      text-decoration: none;
+      color: #333;
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .menu-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: #eef5fc;
+      color: #002244;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      margin-right: 14px;
+    }
+
+    .menu-text {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 600;
+      color: #002244;
+    }
+
+    .menu-arrow {
+      color: #c0c8d0;
+      font-size: 13px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 30px 20px;
+      color: #657786;
+    }
+
+    .empty-state i {
+      font-size: 40px;
+      margin-bottom: 12px;
+      color: #cfd8dc;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-top: 1px solid #e1e8ed;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 1000;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #657786;
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+      color: #002244;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-top">
+      <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+      <h1>Claims</h1>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Primary Action -->
+    <a href="#" class="file-claim-btn" onclick="alert('Claim filing flow coming soon. This would open the guided claim form.')">
+      <i class="fa-solid fa-plus"></i>
+      File a New Claim
+    </a>
+
+    <!-- Quick Actions -->
+    <div class="section-title">Quick Actions</div>
+    <div class="action-grid">
+      <a href="#" class="action-card">
+        <i class="fa-solid fa-car-burst"></i>
+        <span>Auto Claim</span>
+      </a>
+      <a href="#" class="action-card">
+        <i class="fa-solid fa-house-chimney-crack"></i>
+        <span>Property Claim</span>
+      </a>
+      <a href="#" class="action-card">
+        <i class="fa-solid fa-camera"></i>
+        <span>Upload Photos</span>
+      </a>
+      <a href="#" class="action-card">
+        <i class="fa-solid fa-file-invoice"></i>
+        <span>Claim Status</span>
+      </a>
+    </div>
+
+    <!-- Recent Claims -->
+    <div class="section-title">Recent Claims</div>
+    <div class="card">
+      <div class="claim-item">
+        <div class="claim-header">
+          <div class="claim-type">Auto – Collision</div>
+          <div class="claim-status status-review">Under Review</div>
+        </div>
+        <div class="claim-detail">Claim #CLM-928471</div>
+        <div class="claim-detail">Vehicle: 2022 Honda Accord</div>
+        <div class="claim-date">Filed: July 18, 2026</div>
+      </div>
+
+      <div class="claim-item">
+        <div class="claim-header">
+          <div class="claim-type">Home – Water Damage</div>
+          <div class="claim-status status-closed">Closed</div>
+        </div>
+        <div class="claim-detail">Claim #CLM-771203</div>
+        <div class="claim-detail">Location: Primary Residence</div>
+        <div class="claim-date">Filed: May 02, 2026 • Settled</div>
+      </div>
+
+      <div class="claim-item">
+        <div class="claim-header">
+          <div class="claim-type">Auto – Comprehensive</div>
+          <div class="claim-status status-closed">Closed</div>
+        </div>
+        <div class="claim-detail">Claim #CLM-554891</div>
+        <div class="claim-detail">Vehicle: 2019 Toyota Camry</div>
+        <div class="claim-date">Filed: January 14, 2026 • Settled</div>
+      </div>
+    </div>
+
+    <!-- Help & Resources -->
+    <div class="section-title">Help & Resources</div>
+    <div class="card">
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-circle-question"></i></div>
+        <div class="menu-text">How Claims Work</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-phone"></i></div>
+        <div class="menu-text">Claims Hotline</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="livechat.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-comments"></i></div>
+        <div class="menu-text">Chat with Claims Team</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-file-pdf"></i></div>
+        <div class="menu-text">Download Claim Forms</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </a>
+    <a href="banking.html" class="nav-item">
+      <i class="fa-solid fa-credit-card"></i>
+      <span>Banking</span>
+    </a>
+    <a href="insurance.html" class="nav-item">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>Insurance</span>
+    </a>
+    <a href="claims.html" class="nav-item active">
+      <i class="fa-solid fa-file-invoice-dollar"></i>
+      <span>Claims</span>
+    </a>
+    <a href="more.html" class="nav-item">
+      <i class="fa-solid fa-bars"></i>
+      <span>More</span>
+    </a>
+  </div>
+
+</body>
+</html>
