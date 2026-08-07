@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>USAA - More</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      color: #333;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    .header {
+      background: linear-gradient(180deg, #002244 0%, #003366 100%);
+      color: white;
+      padding: 16px 20px 24px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .back-btn {
+      color: white;
+      font-size: 20px;
+      text-decoration: none;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .container {
+      padding: 16px;
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #657786;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 8px 4px 10px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e1e8ed;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 16px;
+      border-bottom: 1px solid #f0f4f8;
+      text-decoration: none;
+      color: #333;
+      transition: background 0.2s;
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .menu-item:hover {
+      background: #f9fbfd;
+    }
+
+    .menu-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #eef5fc;
+      color: #002244;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .menu-text {
+      flex: 1;
+    }
+
+    .menu-text .title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #002244;
+    }
+
+    .menu-text .subtitle {
+      font-size: 12px;
+      color: #657786;
+      margin-top: 2px;
+    }
+
+    .menu-arrow {
+      color: #c0c8d0;
+      font-size: 13px;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-top: 1px solid #e1e8ed;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 1000;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #657786;
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+      color: #002244;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-top">
+      <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+      <h1>More</h1>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Banking Tools -->
+    <div class="section-label">Banking</div>
+    <div class="card">
+      <a href="banking.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-building-columns"></i></div>
+        <div class="menu-text">
+          <div class="title">Accounts & Balances</div>
+          <div class="subtitle">View all accounts in detail</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="Transfer.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-right-left"></i></div>
+        <div class="menu-text">
+          <div class="title">Transfer Money</div>
+          <div class="subtitle">Between accounts or external</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="zelle.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-italic"></i></div>
+        <div class="menu-text">
+          <div class="title">Send Money with Zelle®</div>
+          <div class="subtitle">Fast person-to-person payments</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="pay-bills.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div class="menu-text">
+          <div class="title">Pay Bills</div>
+          <div class="subtitle">Manage and schedule payments</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="deposit.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-money-check"></i></div>
+        <div class="menu-text">
+          <div class="title">Mobile Check Deposit</div>
+          <div class="subtitle">Deposit checks with your camera</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="transactions.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-list"></i></div>
+        <div class="menu-text">
+          <div class="title">Transaction History</div>
+          <div class="subtitle">View all past activity</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+    </div>
+
+    <!-- Insurance & Claims -->
+    <div class="section-label">Insurance & Claims</div>
+    <div class="card">
+      <a href="insurance.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="menu-text">
+          <div class="title">My Insurance</div>
+          <div class="subtitle">Auto, home, life & more</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="claims.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-file-medical"></i></div>
+        <div class="menu-text">
+          <div class="title">Claims</div>
+          <div class="subtitle">File or track a claim</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-car"></i></div>
+        <div class="menu-text">
+          <div class="title">Get a Quote</div>
+          <div class="subtitle">Auto, home, renters insurance</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+    </div>
+
+    <!-- Account & Profile -->
+    <div class="section-label">Account</div>
+    <div class="card">
+      <a href="profile.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-user"></i></div>
+        <div class="menu-text">
+          <div class="title">Profile & Settings</div>
+          <div class="subtitle">Personal info, security, preferences</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="livechat.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-comments"></i></div>
+        <div class="menu-text">
+          <div class="title">Live Chat Support</div>
+          <div class="subtitle">Chat with a USAA representative</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-phone"></i></div>
+        <div class="menu-text">
+          <div class="title">Contact Us</div>
+          <div class="subtitle">Phone numbers & branch locator</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-circle-question"></i></div>
+        <div class="menu-text">
+          <div class="title">Help & FAQs</div>
+          <div class="subtitle">Guides and common questions</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+    </div>
+
+    <!-- Legal -->
+    <div class="section-label">Legal</div>
+    <div class="card">
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-file-contract"></i></div>
+        <div class="menu-text">
+          <div class="title">Terms & Conditions</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-user-shield"></i></div>
+        <div class="menu-text">
+          <div class="title">Privacy Policy</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-info-circle"></i></div>
+        <div class="menu-text">
+          <div class="title">About USAA</div>
+        </div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </a>
+    <a href="banking.html" class="nav-item">
+      <i class="fa-solid fa-credit-card"></i>
+      <span>Banking</span>
+    </a>
+    <a href="insurance.html" class="nav-item">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>Insurance</span>
+    </a>
+    <a href="claims.html" class="nav-item">
+      <i class="fa-solid fa-file-invoice-dollar"></i>
+      <span>Claims</span>
+    </a>
+    <a href="more.html" class="nav-item active">
+      <i class="fa-solid fa-bars"></i>
+      <span>More</span>
+    </a>
+  </div>
+
+</body>
+</html>
