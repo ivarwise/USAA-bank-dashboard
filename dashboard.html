@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>USAA - Mobile Banking</title>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
@@ -25,11 +24,10 @@
       min-height: 100vh;
     }
 
-    /* TOP HEADER & BLUE SECTION */
     .header-container {
       background: linear-gradient(180deg, #002244 0%, #003366 100%);
       color: #ffffff;
-      padding: 15px 20px 35px 20px;
+      padding: 15px 20px 30px 20px;
     }
 
     .top-nav {
@@ -73,7 +71,6 @@
       margin-top: 3px;
     }
 
-    /* SECTION HEADERS */
     .section-header {
       display: flex;
       justify-content: space-between;
@@ -81,19 +78,10 @@
       padding: 15px 20px 10px 20px;
     }
 
-    .section-header.header-overlay {
-      margin-top: -25px;
-      padding-top: 0;
-    }
-
     .section-header h2 {
       font-size: 18px;
       font-weight: 700;
       color: #002244;
-    }
-
-    .section-header.header-overlay h2 {
-      color: #ffffff;
     }
 
     .section-header a {
@@ -103,11 +91,6 @@
       font-weight: 600;
     }
 
-    .section-header.header-overlay a {
-      color: #ffffff;
-    }
-
-    /* ACCOUNTS SECTION */
     .accounts-card {
       background: #ffffff;
       margin: 0 16px;
@@ -115,6 +98,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       border: 1px solid #e1e8ed;
       overflow: hidden;
+      margin-top: -15px;
     }
 
     .account-row {
@@ -183,7 +167,6 @@
       cursor: pointer;
     }
 
-    /* QUICK ACTIONS */
     .quick-actions-container {
       padding: 10px 16px 20px 16px;
     }
@@ -225,7 +208,6 @@
       line-height: 1.2;
     }
 
-    /* TRANSACTIONS SECTION */
     .transactions-card {
       background: #ffffff;
       margin: 0 16px;
@@ -293,7 +275,6 @@
     .tx-amount.negative { color: #333333; }
     .tx-amount.positive { color: #2e7d32; }
 
-    /* SECURITY BANNER */
     .security-banner {
       background: #eef5fc;
       margin: 16px;
@@ -340,7 +321,6 @@
       text-decoration: none;
     }
 
-    /* BOTTOM NAV BAR */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -374,6 +354,30 @@
     .nav-item.active {
       color: #002244;
     }
+
+    /* LIVE CHAT FLOATING BUTTON */
+    .live-chat-btn {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #002244, #005691);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 16px rgba(0,34,68,0.35);
+      z-index: 999;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+    .live-chat-btn:hover {
+      transform: scale(1.08);
+    }
   </style>
 </head>
 <body>
@@ -386,19 +390,15 @@
         <i class="fa-solid fa-building-columns"></i>
         <span>USAA</span>
       </div>
-      <i class="fa-regular fa-circle-user user-icon" onclick="logout()"></i>
+      <a href="profile.html" class="user-icon" style="color:white;">
+        <i class="fa-regular fa-circle-user"></i>
+      </a>
     </div>
 
     <div class="greeting-section">
       <h1 id="user-greeting">Good morning</h1>
       <p id="member-since">Member since 2024</p>
     </div>
-  </div>
-
-  <!-- ACCOUNTS HEADER -->
-  <div class="section-header header-overlay">
-    <h2>Accounts</h2>
-    <a href="#">View all <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i></a>
   </div>
 
   <!-- ACCOUNTS CARD -->
@@ -448,46 +448,48 @@
       <h4>Security Center</h4>
       <p>Review your security settings and recent activity.</p>
     </div>
-    <a href="#" class="sec-link">Get started <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i></a>
+    <a href="profile.html" class="sec-link">Get started <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i></a>
   </div>
+
+  <!-- LIVE CHAT FLOATING BUTTON -->
+  <a href="livechat.html" class="live-chat-btn" title="Live Chat">
+    <i class="fa-solid fa-comments"></i>
+  </a>
 
   <!-- BOTTOM NAVIGATION -->
   <div class="bottom-nav">
-    <a href="#" class="nav-item active">
+    <a href="dashboard.html" class="nav-item active">
       <i class="fa-solid fa-house"></i>
       <span>Home</span>
     </a>
-    <a href="#" class="nav-item">
+    <a href="banking.html" class="nav-item">
       <i class="fa-solid fa-credit-card"></i>
       <span>Banking</span>
     </a>
-    <a href="#" class="nav-item">
+    <a href="insurance.html" class="nav-item">
       <i class="fa-solid fa-shield-halved"></i>
       <span>Insurance</span>
     </a>
-    <a href="#" class="nav-item">
+    <a href="claims.html" class="nav-item">
       <i class="fa-solid fa-file-invoice-dollar"></i>
       <span>Claims</span>
     </a>
-    <a href="#" class="nav-item">
+    <a href="more.html" class="nav-item">
       <i class="fa-solid fa-bars"></i>
       <span>More</span>
     </a>
   </div>
 
-  <!-- SUPABASE JS SCRIPT -->
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
-
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
     let loadedTransactions = [];
 
-    // Load User Data & Account Balances
     async function initDashboard() {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -498,7 +500,6 @@
 
       currentUser = user;
 
-      // 1. Fetch Profile Name
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
@@ -510,23 +511,13 @@
         document.getElementById('user-greeting').innerText = `Good morning, ${firstName}`;
       }
 
-      // 2. Fetch Accounts & Transactions
       await loadAccounts(user.id);
       await loadTransactions(user.id);
 
-      // 3. Subscribe to Realtime Updates
       supabase
         .channel('schema-db-changes')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'accounts', filter: `user_id=eq.${user.id}` },
-          () => loadAccounts(user.id)
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` },
-          () => loadTransactions(user.id)
-        )
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts', filter: `user_id=eq.${user.id}` }, () => loadAccounts(user.id))
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` }, () => loadTransactions(user.id))
         .subscribe();
     }
 
@@ -544,7 +535,6 @@
         return loadAccounts(userId);
       }
 
-      // Render Accounts
       accountsContainer.innerHTML = accounts.map(acc => {
         let iconClass = "fa-wallet";
         let labelClass = "Available balance";
@@ -615,7 +605,6 @@
 
         let iconBg = 'transfer';
         let iconName = 'fa-arrow-right-arrow-left';
-
         if (isPositive) { iconBg = 'deposit'; iconName = 'fa-arrow-down'; }
 
         const txDate = tx.transaction_date ? new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent activity';
@@ -648,14 +637,8 @@
         { user_id: userId, account_name: 'USAA REWARDS™ VISA SIGNATURE®', account_number_last4: '9012', balance: 0.00, account_type: 'card' },
         { user_id: userId, account_name: 'VEHICLE LOAN', account_number_last4: '3456', balance: 0.00, account_type: 'loan' }
       ];
-
       await supabase.from('accounts').insert(defaults);
     }
-
-    window.logout = async function() {
-      await supabase.auth.signOut();
-      window.location.href = 'index.html';
-    };
 
     initDashboard();
   </script>
