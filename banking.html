@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>USAA - Banking</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      color: #333;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    .header {
+      background: linear-gradient(180deg, #002244 0%, #003366 100%);
+      color: white;
+      padding: 16px 20px 24px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 6px;
+    }
+
+    .back-btn {
+      color: white;
+      font-size: 20px;
+      text-decoration: none;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .container {
+      padding: 16px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #002244;
+      margin: 8px 0 12px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e1e8ed;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .account-row {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid #f0f4f8;
+    }
+
+    .account-row:last-child {
+      border-bottom: none;
+    }
+
+    .account-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #002244;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .account-info {
+      flex: 1;
+    }
+
+    .account-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #002244;
+    }
+
+    .account-sub {
+      font-size: 12px;
+      color: #657786;
+      margin-top: 2px;
+    }
+
+    .account-balance {
+      text-align: right;
+    }
+
+    .balance-amount {
+      font-size: 16px;
+      font-weight: 700;
+      color: #002244;
+    }
+
+    .balance-label {
+      font-size: 11px;
+      color: #657786;
+      margin-top: 2px;
+    }
+
+    /* Quick Tools Grid */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .tool-card {
+      background: white;
+      border: 1px solid #e1e8ed;
+      border-radius: 12px;
+      padding: 18px 14px;
+      text-align: center;
+      text-decoration: none;
+      color: #002244;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      transition: transform 0.15s;
+    }
+
+    .tool-card:active {
+      transform: scale(0.97);
+    }
+
+    .tool-card i {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: #002244;
+    }
+
+    .tool-card span {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Menu style links */
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 16px;
+      border-bottom: 1px solid #f0f4f8;
+      text-decoration: none;
+      color: #333;
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .menu-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: #eef5fc;
+      color: #002244;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      margin-right: 14px;
+    }
+
+    .menu-text {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 600;
+      color: #002244;
+    }
+
+    .menu-arrow {
+      color: #c0c8d0;
+      font-size: 13px;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-top: 1px solid #e1e8ed;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 1000;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #657786;
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+      color: #002244;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-top">
+      <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+      <h1>Banking</h1>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Your Accounts -->
+    <div class="section-title">Your Accounts</div>
+    <div class="card" id="accountsList">
+      <div style="padding: 20px; text-align: center; color: #666;">Loading accounts...</div>
+    </div>
+
+    <!-- Quick Banking Tools -->
+    <div class="section-title">Quick Tools</div>
+    <div class="tools-grid">
+      <a href="Transfer.html" class="tool-card">
+        <i class="fa-solid fa-right-left"></i>
+        <span>Transfer</span>
+      </a>
+      <a href="pay-bills.html" class="tool-card">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        <span>Pay Bills</span>
+      </a>
+      <a href="deposit.html" class="tool-card">
+        <i class="fa-solid fa-money-check"></i>
+        <span>Deposit Check</span>
+      </a>
+      <a href="zelle.html" class="tool-card">
+        <i class="fa-solid fa-italic"></i>
+        <span>Zelle®</span>
+      </a>
+    </div>
+
+    <!-- More Banking Options -->
+    <div class="section-title">More Services</div>
+    <div class="card">
+      <a href="transactions.html" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-list"></i></div>
+        <div class="menu-text">Transaction History</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-credit-card"></i></div>
+        <div class="menu-text">Manage Cards</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-university"></i></div>
+        <div class="menu-text">Direct Deposit</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="menu-text">Statements & Documents</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+        <div class="menu-text">Savings Goals</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div class="menu-text">Loans & Credit</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </a>
+    <a href="banking.html" class="nav-item active">
+      <i class="fa-solid fa-credit-card"></i>
+      <span>Banking</span>
+    </a>
+    <a href="insurance.html" class="nav-item">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>Insurance</span>
+    </a>
+    <a href="claims.html" class="nav-item">
+      <i class="fa-solid fa-file-invoice-dollar"></i>
+      <span>Claims</span>
+    </a>
+    <a href="more.html" class="nav-item">
+      <i class="fa-solid fa-bars"></i>
+      <span>More</span>
+    </a>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadAccounts() {
+      const { data: { user } } = await client.auth.getUser();
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const { data: accounts } = await client
+        .from('accounts')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('account_type', { ascending: true });
+
+      const container = document.getElementById('accountsList');
+
+      if (!accounts || accounts.length === 0) {
+        container.innerHTML = `<div style="padding:20px;text-align:center;color:#666;">No accounts found</div>`;
+        return;
+      }
+
+      container.innerHTML = accounts.map(acc => {
+        let icon = "fa-wallet";
+        let label = "Available balance";
+
+        if (acc.account_type === 'savings') icon = "fa-piggy-bank";
+        if (acc.account_type === 'card') { icon = "fa-credit-card"; label = "Current balance"; }
+        if (acc.account_type === 'loan') { icon = "fa-car"; label = "Current balance"; }
+
+        const balance = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD'
+        }).format(acc.balance || 0);
+
+        return `
+          <div class="account-row">
+            <div class="account-icon"><i class="fa-solid ${icon}"></i></div>
+            <div class="account-info">
+              <div class="account-title">${acc.account_name}</div>
+              <div class="account-sub">•••• ${acc.account_number_last4 || '0000'}</div>
+            </div>
+            <div class="account-balance">
+              <div class="balance-amount">${balance}</div>
+              <div class="balance-label">${label}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    loadAccounts();
+  </script>
+</body>
+</html>
