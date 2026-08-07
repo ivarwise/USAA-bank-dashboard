@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>USAA - Insurance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      color: #333;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    .header {
+      background: linear-gradient(180deg, #002244 0%, #003366 100%);
+      color: white;
+      padding: 16px 20px 24px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .back-btn {
+      color: white;
+      font-size: 20px;
+      text-decoration: none;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .container {
+      padding: 16px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #002244;
+      margin: 8px 0 12px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e1e8ed;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    /* Policy Cards */
+    .policy-card {
+      padding: 18px 16px;
+      border-bottom: 1px solid #f0f4f8;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .policy-card:last-child {
+      border-bottom: none;
+    }
+
+    .policy-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .policy-icon.auto { background: #002244; }
+    .policy-icon.home { background: #2e7d32; }
+    .policy-icon.life { background: #5c6bc0; }
+    .policy-icon.renters { background: #00897b; }
+
+    .policy-info {
+      flex: 1;
+    }
+
+    .policy-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #002244;
+    }
+
+    .policy-detail {
+      font-size: 12px;
+      color: #657786;
+      margin-top: 3px;
+    }
+
+    .policy-status {
+      font-size: 12px;
+      font-weight: 600;
+      color: #2e7d32;
+      background: #e8f5e9;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    /* Action Grid */
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .action-card {
+      background: white;
+      border: 1px solid #e1e8ed;
+      border-radius: 12px;
+      padding: 20px 14px;
+      text-align: center;
+      text-decoration: none;
+      color: #002244;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .action-card i {
+      font-size: 26px;
+      margin-bottom: 8px;
+      color: #002244;
+    }
+
+    .action-card span {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Menu Items */
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 16px;
+      border-bottom: 1px solid #f0f4f8;
+      text-decoration: none;
+      color: #333;
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .menu-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: #eef5fc;
+      color: #002244;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      margin-right: 14px;
+    }
+
+    .menu-text {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 600;
+      color: #002244;
+    }
+
+    .menu-arrow {
+      color: #c0c8d0;
+      font-size: 13px;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-top: 1px solid #e1e8ed;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 1000;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #657786;
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+      color: #002244;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-top">
+      <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+      <h1>Insurance</h1>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Active Policies -->
+    <div class="section-title">Your Policies</div>
+    <div class="card">
+      <div class="policy-card">
+        <div class="policy-icon auto"><i class="fa-solid fa-car"></i></div>
+        <div class="policy-info">
+          <div class="policy-name">Auto Insurance</div>
+          <div class="policy-detail">Policy #USAA-4829173 • Full Coverage</div>
+        </div>
+        <div class="policy-status">Active</div>
+      </div>
+
+      <div class="policy-card">
+        <div class="policy-icon home"><i class="fa-solid fa-house"></i></div>
+        <div class="policy-info">
+          <div class="policy-name">Homeowners Insurance</div>
+          <div class="policy-detail">Policy #USAA-7712048 • Dwelling + Liability</div>
+        </div>
+        <div class="policy-status">Active</div>
+      </div>
+
+      <div class="policy-card">
+        <div class="policy-icon life"><i class="fa-solid fa-heart-pulse"></i></div>
+        <div class="policy-info">
+          <div class="policy-name">Life Insurance</div>
+          <div class="policy-detail">Policy #USAA-3391845 • Term Life</div>
+        </div>
+        <div class="policy-status">Active</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-title">Quick Actions</div>
+    <div class="action-grid">
+      <a href="claims.html" class="action-card">
+        <i class="fa-solid fa-file-medical"></i>
+        <span>File a Claim</span>
+      </a>
+      <a href="#" class="action-card">
+        <i class="fa-solid fa-file-invoice"></i>
+        <span>View ID Cards</span>
+      </a>
+      <a href="#" class="action-card">
+        <i class="fa-solid fa-calculator"></i>
+        <span>Get a Quote</span>
+      </a>
+      <a href="#" class="action-card">
+        <i class="fa-solid fa-plus"></i>
+        <span>Add Coverage</span>
+      </a>
+    </div>
+
+    <!-- More Options -->
+    <div class="section-title">Manage Insurance</div>
+    <div class="card">
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-car"></i></div>
+        <div class="menu-text">Auto Policy Details</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-house"></i></div>
+        <div class="menu-text">Home Policy Details</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+        <div class="menu-text">Life Policy Details</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div class="menu-text">Billing & Payments</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="menu-text">Coverage Summary</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+      <a href="#" class="menu-item">
+        <div class="menu-icon"><i class="fa-solid fa-user-plus"></i></div>
+        <div class="menu-text">Add Driver / Vehicle</div>
+        <i class="fa-solid fa-chevron-right menu-arrow"></i>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </a>
+    <a href="banking.html" class="nav-item">
+      <i class="fa-solid fa-credit-card"></i>
+      <span>Banking</span>
+    </a>
+    <a href="insurance.html" class="nav-item active">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>Insurance</span>
+    </a>
+    <a href="claims.html" class="nav-item">
+      <i class="fa-solid fa-file-invoice-dollar"></i>
+      <span>Claims</span>
+    </a>
+    <a href="more.html" class="nav-item">
+      <i class="fa-solid fa-bars"></i>
+      <span>More</span>
+    </a>
+  </div>
+
+</body>
+</html>
