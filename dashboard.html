@@ -15,253 +15,274 @@
     }
 
     body {
-      background-color: #f0f2f5;
-      color: #333333;
-      padding-bottom: 80px;
-      max-width: 480px;
+      background-color: #f4f6f8;
+      color: #333;
+      max-width: 430px;
       margin: 0 auto;
       min-height: 100vh;
+      padding-bottom: 85px;
     }
 
-    .header-container {
-      background: linear-gradient(165deg, #001a33 0%, #002244 40%, #003366 100%);
-      color: #ffffff;
-      padding: 18px 20px 32px;
-      border-radius: 0 0 24px 24px;
-      box-shadow: 0 8px 24px rgba(0, 34, 68, 0.25);
+    /* ===== HEADER ===== */
+    .header {
+      background: #002244;
+      color: white;
+      padding: 14px 20px 28px;
+      position: relative;
     }
 
-    .top-nav {
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
 
-    .top-nav .bell-icon, .top-nav .user-icon {
-      font-size: 22px;
-      color: #ffffff;
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
+    .top-bar i {
+      font-size: 20px;
+      color: white;
+    }
+
+    .logo {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
+      line-height: 1;
     }
 
-    .usaa-logo {
-      text-align: center;
+    .logo-icon {
+      font-size: 22px;
+      margin-bottom: 1px;
     }
 
-    .usaa-logo i {
-      font-size: 26px;
-    }
-
-    .usaa-logo span {
-      display: block;
+    .logo-text {
+      font-size: 11px;
       font-weight: 800;
-      font-size: 13px;
       letter-spacing: 1.5px;
-      margin-top: -1px;
     }
 
-    .greeting-section h1 {
-      font-size: 24px;
-      font-weight: 600;
-      font-family: Georgia, 'Times New Roman', serif;
-      letter-spacing: -0.3px;
+    .greeting h1 {
+      font-size: 26px;
+      font-weight: 500;
+      font-family: Georgia, "Times New Roman", serif;
+      margin-bottom: 2px;
     }
 
-    .greeting-section p {
+    .greeting p {
       font-size: 13px;
       color: #a8c0d8;
-      margin-top: 4px;
     }
 
-    .section-header {
+    /* ===== ACCOUNTS SECTION ===== */
+    .accounts-section {
+      margin: -16px 16px 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .accounts-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 18px 20px 10px;
+      margin-bottom: 10px;
+      padding: 0 4px;
     }
 
-    .section-header h2 {
-      font-size: 17px;
+    .accounts-header h2 {
+      font-size: 16px;
       font-weight: 700;
-      color: #002244;
+      color: white;
     }
 
-    .section-header a {
+    .accounts-header a {
       font-size: 13px;
-      color: #0056b3;
+      color: #a8c0d8;
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 500;
     }
 
     .accounts-card {
-      background: #ffffff;
-      margin: 0 16px;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-      border: 1px solid #e8eef4;
+      background: white;
+      border-radius: 14px;
       overflow: hidden;
-      margin-top: -18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
 
     .account-row {
       display: flex;
       align-items: center;
-      padding: 16px 18px;
-      border-bottom: 1px solid #f3f6f9;
-      transition: background 0.2s;
+      padding: 15px 16px;
+      border-bottom: 1px solid #f0f2f5;
     }
 
     .account-row:last-child {
       border-bottom: none;
     }
 
-    .account-row:active {
-      background: #f8fafc;
-    }
-
-    .account-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #002244, #003d73);
-      color: #ffffff;
+    .acc-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #002244;
+      color: white;
       display: flex;
-      justify-content: center;
       align-items: center;
-      font-size: 18px;
+      justify-content: center;
+      font-size: 17px;
       margin-right: 14px;
       flex-shrink: 0;
-      box-shadow: 0 3px 8px rgba(0,34,68,0.2);
     }
 
-    .account-info {
+    .acc-info {
       flex: 1;
+      min-width: 0;
     }
 
-    .account-title {
+    .acc-name {
       font-size: 13.5px;
       font-weight: 700;
       color: #002244;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
     }
 
-    .account-sub {
+    .acc-number {
       font-size: 12px;
-      color: #7a8b9a;
-      margin-top: 2px;
+      color: #657786;
+      margin-top: 1px;
     }
 
-    .account-balance {
+    .acc-balance {
       text-align: right;
+      margin-right: 8px;
     }
 
-    .balance-amount {
+    .acc-amount {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #002244;
+    }
+
+    .acc-label {
+      font-size: 11px;
+      color: #657786;
+      margin-top: 1px;
+    }
+
+    .acc-more {
+      color: #b0b8c1;
+      font-size: 16px;
+      padding: 4px;
+    }
+
+    /* ===== QUICK ACTIONS ===== */
+    .quick-section {
+      padding: 22px 16px 8px;
+    }
+
+    .quick-section h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #002244;
+      margin-bottom: 16px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+
+    .quick-btn {
+      text-decoration: none;
+      color: #002244;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .quick-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 1.5px solid #d1dbe5;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #002244;
+      margin-bottom: 8px;
+    }
+
+    .quick-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      line-height: 1.25;
+      color: #002244;
+    }
+
+    /* ===== TRANSACTIONS ===== */
+    .tx-section {
+      padding: 16px 16px 8px;
+    }
+
+    .tx-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .tx-header h2 {
       font-size: 16px;
       font-weight: 700;
       color: #002244;
     }
 
-    .balance-label {
-      font-size: 11px;
-      color: #7a8b9a;
-      margin-top: 2px;
-    }
-
-    .quick-actions-container {
-      padding: 12px 16px 18px;
-    }
-
-    .quick-actions-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      text-align: center;
-    }
-
-    .action-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
+    .tx-header a {
+      font-size: 13px;
+      color: #0056b3;
       text-decoration: none;
-    }
-
-    .action-icon-circle {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
-      background: #ffffff;
-      border: 1px solid #e4ebf2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 20px;
-      color: #002244;
-      margin-bottom: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-
-    .action-btn:active .action-icon-circle {
-      transform: scale(0.94);
-    }
-
-    .action-label {
-      font-size: 11.5px;
       font-weight: 600;
-      color: #002244;
-      line-height: 1.25;
     }
 
-    .transactions-card {
-      background: #ffffff;
-      margin: 0 16px;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-      border: 1px solid #e8eef4;
+    .tx-card {
+      background: white;
+      border-radius: 14px;
       overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      border: 1px solid #e8eef4;
     }
 
     .tx-row {
       display: flex;
       align-items: center;
       padding: 14px 16px;
-      border-bottom: 1px solid #f3f6f9;
+      border-bottom: 1px solid #f0f2f5;
       cursor: pointer;
-      transition: background-color 0.2s ease;
     }
 
     .tx-row:last-child {
       border-bottom: none;
     }
 
-    .tx-row:active {
-      background-color: #f8fafc;
-    }
-
     .tx-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
       display: flex;
-      justify-content: center;
       align-items: center;
-      font-size: 16px;
+      justify-content: center;
+      font-size: 15px;
       margin-right: 13px;
       flex-shrink: 0;
     }
 
-    .tx-icon.shopping { background-color: #e8f4fd; color: #1da1f2; }
-    .tx-icon.gas { background-color: #e6f8ee; color: #17bf63; }
-    .tx-icon.deposit { background-color: #e8f0fe; color: #002244; }
-    .tx-icon.transfer { background-color: #fff4e6; color: #d97706; }
+    .tx-icon.shopping { background: #e8f4fd; color: #1da1f2; }
+    .tx-icon.gas { background: #e6f8ee; color: #17bf63; }
+    .tx-icon.deposit { background: #e8f0fe; color: #002244; }
+    .tx-icon.transfer { background: #fff4e6; color: #d97706; }
 
     .tx-info {
       flex: 1;
@@ -275,40 +296,47 @@
 
     .tx-date {
       font-size: 12px;
-      color: #7a8b9a;
+      color: #657786;
       margin-top: 2px;
     }
 
     .tx-amount {
       font-size: 14px;
       font-weight: 700;
+      margin-right: 6px;
     }
 
-    .tx-amount.negative { color: #333333; }
+    .tx-amount.negative { color: #333; }
     .tx-amount.positive { color: #2e7d32; }
 
+    .tx-arrow {
+      color: #c0c8d0;
+      font-size: 12px;
+    }
+
+    /* ===== SECURITY BANNER ===== */
     .security-banner {
-      background: linear-gradient(135deg, #eef5fc, #f5f9fd);
-      margin: 18px 16px;
-      border-radius: 16px;
-      padding: 16px;
+      margin: 16px;
+      background: #eef5fc;
+      border-radius: 14px;
+      padding: 14px 16px;
       display: flex;
       align-items: center;
-      border: 1px solid #d6e6f5;
+      border: 1px solid #d0e3f7;
     }
 
     .sec-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #002244, #003d73);
-      color: #ffffff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #002244;
+      color: white;
       display: flex;
-      justify-content: center;
       align-items: center;
-      font-size: 18px;
-      margin-right: 13px;
-      box-shadow: 0 3px 8px rgba(0,34,68,0.2);
+      justify-content: center;
+      font-size: 16px;
+      margin-right: 12px;
+      flex-shrink: 0;
     }
 
     .sec-text {
@@ -324,7 +352,7 @@
     .sec-text p {
       font-size: 12px;
       color: #5a6a7a;
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
     .sec-link {
@@ -332,147 +360,144 @@
       font-weight: 700;
       color: #002244;
       text-decoration: none;
+      white-space: nowrap;
     }
 
+    /* ===== BOTTOM NAV ===== */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      max-width: 480px;
-      background: #ffffff;
+      max-width: 430px;
+      background: white;
       border-top: 1px solid #e4ebf2;
       display: flex;
       justify-content: space-around;
-      padding: 10px 0 12px;
+      padding: 10px 0 14px;
       z-index: 1000;
-      box-shadow: 0 -4px 16px rgba(0,0,0,0.04);
     }
 
     .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: #7a8b9a;
       text-decoration: none;
+      color: #7a8b9a;
       font-size: 10px;
       font-weight: 600;
     }
 
     .nav-item i {
       font-size: 20px;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .nav-item.active {
       color: #002244;
     }
 
-    /* LIVE CHAT with badge */
+    /* ===== LIVE CHAT ===== */
     .live-chat-btn {
       position: fixed;
       bottom: 95px;
-      right: 18px;
-      width: 58px;
-      height: 58px;
+      right: 16px;
+      width: 56px;
+      height: 56px;
       background: linear-gradient(135deg, #002244, #005691);
       color: white;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 6px 20px rgba(0,34,68,0.35);
+      font-size: 22px;
+      box-shadow: 0 4px 16px rgba(0,34,68,0.35);
       z-index: 999;
-      cursor: pointer;
       text-decoration: none;
-      transition: transform 0.2s;
-    }
-
-    .live-chat-btn:hover {
-      transform: scale(1.07);
     }
 
     .chat-badge {
       position: absolute;
-      top: -4px;
-      right: -4px;
+      top: -3px;
+      right: -3px;
       background: #e53935;
       color: white;
       font-size: 11px;
       font-weight: 700;
-      min-width: 20px;
-      height: 20px;
-      border-radius: 10px;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 0 5px;
+      padding: 0 4px;
       border: 2px solid white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
 
   <!-- HEADER -->
-  <div class="header-container">
-    <div class="top-nav">
-      <i class="fa-regular fa-bell bell-icon"></i>
-      <div class="usaa-logo">
-        <i class="fa-solid fa-building-columns"></i>
-        <span>USAA</span>
+  <div class="header">
+    <div class="top-bar">
+      <i class="fa-regular fa-bell"></i>
+      <div class="logo">
+        <div class="logo-icon"><i class="fa-solid fa-building-columns"></i></div>
+        <div class="logo-text">USAA</div>
       </div>
-      <a href="profile.html" class="user-icon" style="color:white; text-decoration:none;">
-        <i class="fa-regular fa-circle-user"></i>
-      </a>
+      <a href="profile.html" style="color:white;"><i class="fa-regular fa-circle-user"></i></a>
     </div>
 
-    <div class="greeting-section">
+    <div class="greeting">
       <h1 id="user-greeting">Good morning</h1>
       <p id="member-since">Member since 2019</p>
     </div>
   </div>
 
-  <!-- ACCOUNTS CARD -->
-  <div class="accounts-card" id="accounts-container">
-    <div style="padding: 24px; text-align: center; color: #666;">Loading account balances...</div>
+  <!-- ACCOUNTS -->
+  <div class="accounts-section">
+    <div class="accounts-header">
+      <h2>Accounts</h2>
+      <a href="banking.html">View all ›</a>
+    </div>
+    <div class="accounts-card" id="accounts-container">
+      <div style="padding:24px;text-align:center;color:#666;">Loading accounts...</div>
+    </div>
   </div>
 
   <!-- QUICK ACTIONS -->
-  <div class="quick-actions-container">
-    <div class="section-header" style="padding-left: 0; padding-right: 0;">
-      <h2>Quick actions</h2>
-    </div>
-    <div class="quick-actions-grid">
-      <a href="Transfer.html" class="action-btn">
-        <div class="action-icon-circle"><i class="fa-solid fa-right-left"></i></div>
-        <span class="action-label">Transfer<br>Money</span>
+  <div class="quick-section">
+    <h2>Quick actions</h2>
+    <div class="quick-grid">
+      <a href="Transfer.html" class="quick-btn">
+        <div class="quick-icon"><i class="fa-solid fa-right-left"></i></div>
+        <div class="quick-label">Transfer<br>Money</div>
       </a>
-      <a href="pay-bills.html" class="action-btn">
-        <div class="action-icon-circle"><i class="fa-solid fa-money-bill-transfer"></i></div>
-        <span class="action-label">Pay<br>Bills</span>
+      <a href="pay-bills.html" class="quick-btn">
+        <div class="quick-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div class="quick-label">Pay<br>Bills</div>
       </a>
-      <a href="deposit.html" class="action-btn">
-        <div class="action-icon-circle"><i class="fa-solid fa-money-check"></i></div>
-        <span class="action-label">Deposit<br>Checks</span>
+      <a href="deposit.html" class="quick-btn">
+        <div class="quick-icon"><i class="fa-solid fa-money-check"></i></div>
+        <div class="quick-label">Deposit<br>Checks</div>
       </a>
-      <a href="zelle.html" class="action-btn">
-        <div class="action-icon-circle"><i class="fa-solid fa-italic"></i></div>
-        <span class="action-label">Send Money<br>with Zelle®</span>
+      <a href="zelle.html" class="quick-btn">
+        <div class="quick-icon"><i class="fa-solid fa-z"></i></div>
+        <div class="quick-label">Send Money<br>with Zelle®</div>
       </a>
     </div>
   </div>
 
   <!-- TRANSACTIONS -->
-  <div class="section-header">
-    <h2>Transactions</h2>
-    <a href="transactions.html">View all <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i></a>
-  </div>
-
-  <div class="transactions-card" id="transactions-container">
-    <div style="padding: 24px; text-align: center; color: #666;">Loading transactions...</div>
+  <div class="tx-section">
+    <div class="tx-header">
+      <h2>Transactions</h2>
+      <a href="transactions.html">View all ›</a>
+    </div>
+    <div class="tx-card" id="transactions-container">
+      <div style="padding:24px;text-align:center;color:#666;">Loading transactions...</div>
+    </div>
   </div>
 
   <!-- SECURITY CENTER -->
@@ -482,16 +507,16 @@
       <h4>Security Center</h4>
       <p>Review your security settings and recent activity.</p>
     </div>
-    <a href="profile.html" class="sec-link">Get started <i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i></a>
+    <a href="profile.html" class="sec-link">Get started ›</a>
   </div>
 
-  <!-- LIVE CHAT FLOATING BUTTON + BADGE -->
-  <a href="livechat.html" class="live-chat-btn" title="Live Chat" id="liveChatBtn">
+  <!-- LIVE CHAT -->
+  <a href="livechat.html" class="live-chat-btn" id="liveChatBtn">
     <i class="fa-solid fa-comments"></i>
     <span class="chat-badge" id="chatBadge">0</span>
   </a>
 
-  <!-- BOTTOM NAVIGATION -->
+  <!-- BOTTOM NAV -->
   <div class="bottom-nav">
     <a href="dashboard.html" class="nav-item active">
       <i class="fa-solid fa-house"></i>
@@ -525,7 +550,6 @@
     let currentUser = null;
     let loadedTransactions = [];
 
-    // Dynamic greeting based on time
     function getGreeting() {
       const hour = new Date().getHours();
       if (hour < 12) return "Good morning";
@@ -534,13 +558,11 @@
     }
 
     async function initDashboard() {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-      if (authError || !user) {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
         window.location.href = 'index.html';
         return;
       }
-
       currentUser = user;
 
       const { data: profile } = await supabase
@@ -557,13 +579,15 @@
         document.getElementById('user-greeting').innerText = greeting;
       }
 
+      // Member since stays 2019 as requested
+      document.getElementById('member-since').innerText = "Member since 2019";
+
       await loadAccounts(user.id);
       await loadTransactions(user.id);
       await checkUnreadMessages(user.id);
 
-      // Realtime for accounts & transactions
       supabase
-        .channel('schema-db-changes')
+        .channel('dashboard-realtime')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts', filter: `user_id=eq.${user.id}` }, () => loadAccounts(user.id))
         .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` }, () => loadTransactions(user.id))
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `user_id=eq.${user.id}` }, () => checkUnreadMessages(user.id))
@@ -571,7 +595,7 @@
     }
 
     async function checkUnreadMessages(userId) {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('chat_messages')
         .select('id')
         .eq('user_id', userId)
@@ -588,66 +612,60 @@
     }
 
     async function loadAccounts(userId) {
-      const { data: accounts, error } = await supabase
+      const { data: accounts } = await supabase
         .from('accounts')
         .select('*')
         .eq('user_id', userId)
         .order('account_type', { ascending: true });
 
-      const accountsContainer = document.getElementById('accounts-container');
+      const container = document.getElementById('accounts-container');
 
       if (!accounts || accounts.length === 0) {
         await createDefaultAccounts(userId);
         return loadAccounts(userId);
       }
 
-      accountsContainer.innerHTML = accounts.map(acc => {
-        let iconClass = "fa-wallet";
-        let labelClass = "Available balance";
+      container.innerHTML = accounts.map(acc => {
+        let icon = "fa-wallet";
+        let label = "Available balance";
 
-        if (acc.account_type === 'checking') iconClass = "fa-wallet";
-        if (acc.account_type === 'savings') iconClass = "fa-piggy-bank";
-        if (acc.account_type === 'card') { iconClass = "fa-credit-card"; labelClass = "Current balance"; }
-        if (acc.account_type === 'loan') { iconClass = "fa-car"; labelClass = "Current balance"; }
+        if (acc.account_type === 'savings') icon = "fa-piggy-bank";
+        if (acc.account_type === 'card') { icon = "fa-credit-card"; label = "Current balance"; }
+        if (acc.account_type === 'loan') { icon = "fa-car"; label = "Current balance"; }
 
-        const formattedBalance = new Intl.NumberFormat('en-US', {
+        const balance = new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD'
         }).format(acc.balance || 0);
 
         return `
           <div class="account-row">
-            <div class="account-icon"><i class="fa-solid ${iconClass}"></i></div>
-            <div class="account-info">
-              <div class="account-title">${acc.account_name.toUpperCase()}</div>
-              <div class="account-sub">•••• ${acc.account_number_last4 || '1234'}</div>
+            <div class="acc-icon"><i class="fa-solid ${icon}"></i></div>
+            <div class="acc-info">
+              <div class="acc-name">${acc.account_name.toUpperCase()}</div>
+              <div class="acc-number">•••• ${acc.account_number_last4 || '0000'}</div>
             </div>
-            <div class="account-balance">
-              <div class="balance-amount">${formattedBalance}</div>
-              <div class="balance-label">${labelClass}</div>
+            <div class="acc-balance">
+              <div class="acc-amount">${balance}</div>
+              <div class="acc-label">${label}</div>
             </div>
+            <div class="acc-more"><i class="fa-solid fa-ellipsis-vertical"></i></div>
           </div>
         `;
       }).join('');
     }
 
     async function loadTransactions(userId) {
-      const { data: transactions, error } = await supabase
+      const { data: transactions } = await supabase
         .from('transactions')
         .select('*')
         .eq('user_id', userId)
         .order('transaction_date', { ascending: false });
 
-      const txContainer = document.getElementById('transactions-container');
-
-      if (error) {
-        console.error('Error fetching transactions:', error);
-        txContainer.innerHTML = `<div style="padding: 16px; text-align: center; color: #666;">Unable to load transactions.</div>`;
-        return;
-      }
+      const container = document.getElementById('transactions-container');
 
       if (!transactions || transactions.length === 0) {
-        txContainer.innerHTML = `
+        container.innerHTML = `
           <div class="tx-row">
             <div class="tx-icon shopping"><i class="fa-solid fa-cart-shopping"></i></div>
             <div class="tx-info">
@@ -660,28 +678,31 @@
         return;
       }
 
-      const recentTransactions = transactions.slice(0, 3);
-      loadedTransactions = recentTransactions;
+      const recent = transactions.slice(0, 3);
+      loadedTransactions = recent;
 
-      txContainer.innerHTML = recentTransactions.map((tx, index) => {
-        const isPositive = (tx.amount > 0);
+      container.innerHTML = recent.map((tx, index) => {
+        const isPositive = tx.amount > 0;
         const amountClass = isPositive ? 'positive' : 'negative';
-        const formattedAmount = `${isPositive ? '+' : '-'}${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(tx.amount || 0))}`;
+        const formatted = `${isPositive ? '+' : '-'}${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(tx.amount || 0))}`;
 
         let iconBg = 'transfer';
         let iconName = 'fa-arrow-right-arrow-left';
         if (isPositive) { iconBg = 'deposit'; iconName = 'fa-arrow-down'; }
 
-        const txDate = tx.transaction_date ? new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent activity';
+        const date = tx.transaction_date 
+          ? new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) 
+          : 'Recent';
 
         return `
           <div class="tx-row" onclick="viewReceipt(${index})">
             <div class="tx-icon ${iconBg}"><i class="fa-solid ${iconName}"></i></div>
             <div class="tx-info">
               <div class="tx-title">${tx.merchant_name || 'Transaction'}</div>
-              <div class="tx-date">${txDate}</div>
+              <div class="tx-date">${date}</div>
             </div>
-            <div class="tx-amount ${amountClass}">${formattedAmount} <i class="fa-solid fa-chevron-right" style="font-size: 10px; color: #ccc;"></i></div>
+            <div class="tx-amount ${amountClass}">${formatted}</div>
+            <i class="fa-solid fa-chevron-right tx-arrow"></i>
           </div>
         `;
       }).join('');
