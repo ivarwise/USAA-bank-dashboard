@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>USAA - Access Your Account</title>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
@@ -15,7 +14,7 @@
     }
 
     body {
-      background-color: #002649; /* USAA Navy */
+      background-color: #002649;
       color: #ffffff;
       display: flex;
       justify-content: center;
@@ -123,6 +122,19 @@
       cursor: not-allowed;
     }
 
+    .btn-secondary {
+      width: 100%;
+      padding: 12px;
+      background: white;
+      color: #002649;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
     .alert {
       padding: 12px;
       border-radius: 6px;
@@ -145,6 +157,22 @@
       border: 1px solid #4ade80;
       display: block;
     }
+
+    .otp-info {
+      text-align: center;
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 18px;
+      line-height: 1.45;
+    }
+
+    .otp-info strong {
+      color: #002649;
+    }
+
+    #otp-form {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -155,16 +183,15 @@
       <h1>USAA</h1>
     </div>
 
-    <!-- Navigation Tabs -->
-    <div class="tabs">
+    <!-- Tabs (hidden when OTP is showing) -->
+    <div class="tabs" id="tabs">
       <button id="login-tab" class="tab-btn active">Log In</button>
       <button id="register-tab" class="tab-btn">Register</button>
     </div>
 
-    <!-- Alert Message Box -->
     <div id="alert-box" class="alert"></div>
 
-    <!-- LOGIN FORM -->
+    <!-- LOGIN FORM (Step 1) -->
     <form id="login-form">
       <div class="form-group">
         <label>Email Address</label>
@@ -175,6 +202,20 @@
         <input type="password" id="login-password" placeholder="••••••••" required />
       </div>
       <button type="submit" class="btn-submit" id="login-btn">Log In</button>
+    </form>
+
+    <!-- OTP FORM (Step 2) -->
+    <form id="otp-form">
+      <div class="otp-info">
+        A 6-digit verification code has been sent to<br>
+        <strong id="otp-email-display">your email</strong>
+      </div>
+      <div class="form-group">
+        <label>Enter 6-digit Code</label>
+        <input type="text" id="otp-code" placeholder="000000" maxlength="6" inputmode="numeric" required style="text-align:center; font-size:22px; letter-spacing:8px;" />
+      </div>
+      <button type="submit" class="btn-submit" id="otp-btn">Verify & Login</button>
+      <button type="button" class="btn-secondary" id="back-to-login">← Back to Login</button>
     </form>
 
     <!-- REGISTRATION FORM -->
@@ -199,23 +240,39 @@
     </form>
   </div>
 
-  <!-- JavaScript Module -->
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     const SUPABASE_URL = "https://hzajoriyzowufebetpzv.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
-
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Tab Switching Functionality
+    let pendingEmail = "";
+
+    // Elements
     const loginTab = document.getElementById('login-tab');
     const registerTab = document.getElementById('register-tab');
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
+    const otpForm = document.getElementById('otp-form');
+    const tabs = document.getElementById('tabs');
+
+    function showAlert(msg, type = 'error') {
+      const box = document.getElementById('alert-box');
+      if (!msg) {
+        box.style.display = 'none';
+        return;
+      }
+      box.className = `alert ${type}`;
+      box.innerText = msg;
+      box.style.display = 'block';
+    }
 
     function switchTab(tab) {
       showAlert('');
+      otpForm.style.display = 'none';
+      tabs.style.display = 'flex';
+
       if (tab === 'login') {
         loginForm.style.display = 'block';
         registerForm.style.display = 'none';
@@ -232,17 +289,96 @@
     loginTab.addEventListener('click', () => switchTab('login'));
     registerTab.addEventListener('click', () => switchTab('register'));
 
-    function showAlert(msg, type = 'error') {
-      const box = document.getElementById('alert-box');
-      if (!msg) {
-        box.style.display = 'none';
-        return;
-      }
-      box.className = `alert ${type}`;
-      box.innerText = msg;
-    }
+    document.getElementById('back-to-login').addEventListener('click', () => {
+      switchTab('login');
+    });
 
-    // REGISTRATION HANDLER
+    // ===================== LOGIN (Step 1 - Password) =====================
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const loginBtn = document.getElementById('login-btn');
+      loginBtn.disabled = true;
+      loginBtn.innerText = "Verifying...";
+      showAlert('');
+
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      try {
+        // First check if password is correct
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (error) throw error;
+
+        // Password is correct → now send OTP to the same email
+        // We sign out immediately so the user is not fully logged in yet
+        await supabase.auth.signOut();
+
+        const { error: otpError } = await supabase.auth.signInWithOtp({
+          email: email,
+          options: {
+            shouldCreateUser: false // important: only for existing users
+          }
+        });
+
+        if (otpError) throw otpError;
+
+        // Show OTP screen
+        pendingEmail = email;
+        document.getElementById('otp-email-display').textContent = email;
+        loginForm.style.display = 'none';
+        tabs.style.display = 'none';
+        otpForm.style.display = 'block';
+        showAlert('A 6-digit code has been sent to your email.', 'success');
+
+      } catch (err) {
+        console.error(err);
+        showAlert(err.message || "Invalid email or password.", 'error');
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerText = "Log In";
+      }
+    });
+
+    // ===================== OTP VERIFICATION (Step 2) =====================
+    otpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const otpBtn = document.getElementById('otp-btn');
+      otpBtn.disabled = true;
+      otpBtn.innerText = "Verifying Code...";
+      showAlert('');
+
+      const code = document.getElementById('otp-code').value.trim();
+
+      try {
+        const { data, error } = await supabase.auth.verifyOtp({
+          email: pendingEmail,
+          token: code,
+          type: 'email'
+        });
+
+        if (error) throw error;
+
+        showAlert('Login successful! Redirecting...', 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1000);
+
+      } catch (err) {
+        console.error(err);
+        showAlert(err.message || "Invalid or expired code. Please try again.", 'error');
+      } finally {
+        otpBtn.disabled = false;
+        otpBtn.innerText = "Verify & Login";
+      }
+    });
+
+    // ===================== REGISTRATION =====================
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -255,12 +391,9 @@
       const email = document.getElementById('reg-email').value.trim();
       const phone = document.getElementById('reg-phone').value.trim();
       const password = document.getElementById('reg-password').value;
-
-      // Generate unique username to satisfy table constraints
       const username = email.split('@')[0] + Math.floor(Math.random() * 10000);
 
       try {
-        // 1. Create Auth User
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: email,
           password: password,
@@ -275,67 +408,26 @@
 
         if (authError) throw authError;
 
-        // 2. Insert User into public.profiles
         if (authData?.user) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .upsert({
-              id: authData.user.id,
-              full_name: name,
-              username: username,
-              phone_number: phone,
-              email: email
-            });
-
-          if (profileError) {
-            console.error("Profiles Table Error:", profileError);
-          }
+          await supabase.from('profiles').upsert({
+            id: authData.user.id,
+            full_name: name,
+            username: username,
+            phone_number: phone,
+            email: email
+          });
         }
 
-        showAlert('Account created successfully! Switching to login...', 'success');
+        showAlert('Account created successfully! Please log in.', 'success');
         registerForm.reset();
         setTimeout(() => switchTab('login'), 1500);
 
       } catch (err) {
-        console.error("Registration failed:", err);
-        showAlert(err.message || "Could not register. Check credentials.", 'error');
+        console.error(err);
+        showAlert(err.message || "Could not register.", 'error');
       } finally {
         regBtn.disabled = false;
         regBtn.innerText = "Create Account";
-      }
-    });
-
-    // LOGIN HANDLER
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const loginBtn = document.getElementById('login-btn');
-      loginBtn.disabled = true;
-      loginBtn.innerText = "Logging in...";
-      showAlert('');
-
-      const email = document.getElementById('login-email').value.trim();
-      const password = document.getElementById('login-password').value;
-
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
-
-        if (error) throw error;
-
-        showAlert('Login successful! Redirecting to dashboard...', 'success');
-        setTimeout(() => {
-          window.location.href = 'dashboard.html';
-        }, 1000);
-
-      } catch (err) {
-        console.error("Login failed:", err);
-        showAlert(err.message || "Invalid email or password.", 'error');
-      } finally {
-        loginBtn.disabled = false;
-        loginBtn.innerText = "Log In";
       }
     });
   </script>
