@@ -23,11 +23,11 @@
       padding-bottom: 85px;
     }
 
-    /* ===== HEADER ===== */
+    /* ===== HEADER (extends under accounts card) ===== */
     .header {
       background: #002244;
       color: white;
-      padding: 14px 20px 28px;
+      padding: 14px 20px 90px;          /* extra bottom padding so blue goes under the card */
       position: relative;
     }
 
@@ -75,7 +75,7 @@
 
     /* ===== ACCOUNTS SECTION ===== */
     .accounts-section {
-      margin: -16px 16px 0;
+      margin: -70px 16px 0;            /* pulls the card up into the blue area */
       position: relative;
       z-index: 2;
     }
@@ -105,7 +105,7 @@
       background: white;
       border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     }
 
     .account-row {
@@ -455,7 +455,7 @@
     </div>
   </div>
 
-  <!-- ACCOUNTS -->
+  <!-- ACCOUNTS (sits on top of the dark blue) -->
   <div class="accounts-section">
     <div class="accounts-header">
       <h2>Accounts</h2>
@@ -579,7 +579,6 @@
         document.getElementById('user-greeting').innerText = greeting;
       }
 
-      // Member since stays 2019 as requested
       document.getElementById('member-since').innerText = "Member since 2019";
 
       await loadAccounts(user.id);
