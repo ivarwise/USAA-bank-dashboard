@@ -207,12 +207,12 @@
     <!-- OTP FORM (Step 2) -->
     <form id="otp-form">
       <div class="otp-info">
-        A 6-digit verification code has been sent to<br>
+        An 8-digit verification code has been sent to<br>
         <strong id="otp-email-display">your email</strong>
       </div>
       <div class="form-group">
-        <label>Enter 6-digit Code</label>
-        <input type="text" id="otp-code" placeholder="000000" maxlength="6" inputmode="numeric" required style="text-align:center; font-size:22px; letter-spacing:8px;" />
+        <label>Enter 8-digit Code</label>
+        <input type="text" id="otp-code" placeholder="00000000" maxlength="8" inputmode="numeric" required style="text-align:center; font-size:22px; letter-spacing:6px;" />
       </div>
       <button type="submit" class="btn-submit" id="otp-btn">Verify & Login</button>
       <button type="button" class="btn-secondary" id="back-to-login">← Back to Login</button>
@@ -315,13 +315,12 @@
         if (error) throw error;
 
         // Password is correct → now send OTP to the same email
-        // We sign out immediately so the user is not fully logged in yet
         await supabase.auth.signOut();
 
         const { error: otpError } = await supabase.auth.signInWithOtp({
           email: email,
           options: {
-            shouldCreateUser: false // important: only for existing users
+            shouldCreateUser: false
           }
         });
 
@@ -333,7 +332,7 @@
         loginForm.style.display = 'none';
         tabs.style.display = 'none';
         otpForm.style.display = 'block';
-        showAlert('A 6-digit code has been sent to your email.', 'success');
+        showAlert('An 8-digit code has been sent to your email.', 'success');
 
       } catch (err) {
         console.error(err);
