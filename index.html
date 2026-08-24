@@ -110,7 +110,6 @@
       font-weight: 600;
       cursor: pointer;
       margin-top: 10px;
-      transition: background-color 0.2s ease;
     }
 
     .btn-submit:hover {
@@ -166,12 +165,19 @@
       line-height: 1.45;
     }
 
-    .otp-info strong {
-      color: #002649;
+    #mfa-form, #enroll-form {
+      display: none;
     }
 
-    #otp-form {
-      display: none;
+    .qr-container {
+      text-align: center;
+      margin: 15px 0;
+    }
+
+    .qr-container img {
+      max-width: 200px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -183,7 +189,6 @@
       <h1>USAA</h1>
     </div>
 
-    <!-- Tabs (hidden when OTP is showing) -->
     <div class="tabs" id="tabs">
       <button id="login-tab" class="tab-btn active">Log In</button>
       <button id="register-tab" class="tab-btn">Register</button>
@@ -191,7 +196,7 @@
 
     <div id="alert-box" class="alert"></div>
 
-    <!-- LOGIN FORM (Step 1) -->
+    <!-- LOGIN FORM -->
     <form id="login-form">
       <div class="form-group">
         <label>Email Address</label>
@@ -204,18 +209,34 @@
       <button type="submit" class="btn-submit" id="login-btn">Log In</button>
     </form>
 
-    <!-- OTP FORM (Step 2) -->
-    <form id="otp-form">
+    <!-- MFA (Google Authenticator) FORM -->
+    <form id="mfa-form">
       <div class="otp-info">
-        An 8-digit verification code has been sent to<br>
-        <strong id="otp-email-display">your email</strong>
+        Open <strong>Google Authenticator</strong> and enter the 6-digit code
       </div>
       <div class="form-group">
-        <label>Enter 8-digit Code</label>
-        <input type="text" id="otp-code" placeholder="00000000" maxlength="8" inputmode="numeric" required style="text-align:center; font-size:22px; letter-spacing:6px;" />
+        <label>Authenticator Code</label>
+        <input type="text" id="mfa-code" placeholder="000000" maxlength="6" inputmode="numeric" required 
+               style="text-align:center; font-size:22px; letter-spacing:8px;" />
       </div>
-      <button type="submit" class="btn-submit" id="otp-btn">Verify & Login</button>
+      <button type="submit" class="btn-submit" id="mfa-btn">Verify & Login</button>
       <button type="button" class="btn-secondary" id="back-to-login">← Back to Login</button>
+    </form>
+
+    <!-- ENROLL FORM (First time setup) -->
+    <form id="enroll-form">
+      <div class="otp-info">
+        Scan this QR code with <strong>Google Authenticator</strong>
+      </div>
+      <div class="qr-container" id="qr-container">
+        <!-- QR will appear here -->
+      </div>
+      <div class="form-group">
+        <label>Enter the 6-digit code from the app</label>
+        <input type="text" id="enroll-code" placeholder="000000" maxlength="6" inputmode="numeric" required 
+               style="text-align:center; font-size:22px; letter-spacing:8px;" />
+      </div>
+      <button type="submit" class="btn-submit" id="enroll-btn">Activate Authenticator</button>
     </form>
 
     <!-- REGISTRATION FORM -->
@@ -247,14 +268,15 @@
     const SUPABASE_ANON_KEY = "sb_publishable_2VBan5zlHsacQ4fvsBiBPQ_78oaUVth";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let pendingEmail = "";
+    let currentFactorId = null;
+    let currentChallengeId = null;
 
-    // Elements
     const loginTab = document.getElementById('login-tab');
     const registerTab = document.getElementById('register-tab');
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
-    const otpForm = document.getElementById('otp-form');
+    const mfaForm = document.getElementById('mfa-form');
+    const enrollForm = document.getElementById('enroll-form');
     const tabs = document.getElementById('tabs');
 
     function showAlert(msg, type = 'error') {
@@ -270,7 +292,8 @@
 
     function switchTab(tab) {
       showAlert('');
-      otpForm.style.display = 'none';
+      mfaForm.style.display = 'none';
+      enrollForm.style.display = 'none';
       tabs.style.display = 'flex';
 
       if (tab === 'login') {
@@ -288,15 +311,11 @@
 
     loginTab.addEventListener('click', () => switchTab('login'));
     registerTab.addEventListener('click', () => switchTab('register'));
+    document.getElementById('back-to-login').addEventListener('click', () => switchTab('login'));
 
-    document.getElementById('back-to-login').addEventListener('click', () => {
-      switchTab('login');
-    });
-
-    // ===================== LOGIN (Step 1 - Password) =====================
+    // ===================== LOGIN =====================
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const loginBtn = document.getElementById('login-btn');
       loginBtn.disabled = true;
       loginBtn.innerText = "Verifying...";
@@ -306,59 +325,64 @@
       const password = document.getElementById('login-password').value;
 
       try {
-        // First check if password is correct
         const { data, error } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password
+          email,
+          password
         });
 
         if (error) throw error;
 
-        // Password is correct → now send OTP to the same email
-        await supabase.auth.signOut();
+        // Check if user has MFA enabled
+        const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+        if (factorsError) throw factorsError;
 
-        const { error: otpError } = await supabase.auth.signInWithOtp({
-          email: email,
-          options: {
-            shouldCreateUser: false
-          }
-        });
+        const totpFactor = factors?.totp?.[0];
 
-        if (otpError) throw otpError;
+        if (totpFactor && totpFactor.status === 'verified') {
+          // MFA is enabled → challenge the user
+          currentFactorId = totpFactor.id;
 
-        // Show OTP screen
-        pendingEmail = email;
-        document.getElementById('otp-email-display').textContent = email;
-        loginForm.style.display = 'none';
-        tabs.style.display = 'none';
-        otpForm.style.display = 'block';
-        showAlert('An 8-digit code has been sent to your email.', 'success');
+          const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
+            factorId: currentFactorId
+          });
+
+          if (challengeError) throw challengeError;
+          currentChallengeId = challenge.id;
+
+          // Show MFA form
+          loginForm.style.display = 'none';
+          tabs.style.display = 'none';
+          mfaForm.style.display = 'block';
+          showAlert('Enter the code from Google Authenticator', 'success');
+        } else {
+          // No MFA yet → force enrollment
+          await startEnrollment();
+        }
 
       } catch (err) {
         console.error(err);
-        showAlert(err.message || "Invalid email or password.", 'error');
+        showAlert(err.message || "Invalid email or password", 'error');
       } finally {
         loginBtn.disabled = false;
         loginBtn.innerText = "Log In";
       }
     });
 
-    // ===================== OTP VERIFICATION (Step 2) =====================
-    otpForm.addEventListener('submit', async (e) => {
+    // ===================== MFA VERIFY =====================
+    mfaForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      const otpBtn = document.getElementById('otp-btn');
-      otpBtn.disabled = true;
-      otpBtn.innerText = "Verifying Code...";
+      const mfaBtn = document.getElementById('mfa-btn');
+      mfaBtn.disabled = true;
+      mfaBtn.innerText = "Verifying...";
       showAlert('');
 
-      const code = document.getElementById('otp-code').value.trim();
+      const code = document.getElementById('mfa-code').value.trim();
 
       try {
-        const { data, error } = await supabase.auth.verifyOtp({
-          email: pendingEmail,
-          token: code,
-          type: 'email'
+        const { data, error } = await supabase.auth.mfa.verify({
+          factorId: currentFactorId,
+          challengeId: currentChallengeId,
+          code: code
         });
 
         if (error) throw error;
@@ -366,21 +390,91 @@
         showAlert('Login successful! Redirecting...', 'success');
         setTimeout(() => {
           window.location.href = 'dashboard.html';
-        }, 1000);
+        }, 800);
 
       } catch (err) {
         console.error(err);
-        showAlert(err.message || "Invalid or expired code. Please try again.", 'error');
+        showAlert(err.message || "Invalid authenticator code", 'error');
       } finally {
-        otpBtn.disabled = false;
-        otpBtn.innerText = "Verify & Login";
+        mfaBtn.disabled = false;
+        mfaBtn.innerText = "Verify & Login";
+      }
+    });
+
+    // ===================== ENROLLMENT (First time) =====================
+    async function startEnrollment() {
+      try {
+        const { data, error } = await supabase.auth.mfa.enroll({
+          factorType: 'totp',
+          friendlyName: 'USAA Authenticator'
+        });
+
+        if (error) throw error;
+
+        currentFactorId = data.id;
+
+        // Show QR code
+        document.getElementById('qr-container').innerHTML = `
+          <img src="${data.totp.qr_code}" alt="QR Code">
+          <p style="font-size:12px;margin-top:8px;color:#64748b;">
+            Or enter this code manually:<br>
+            <strong>${data.totp.secret}</strong>
+          </p>
+        `;
+
+        loginForm.style.display = 'none';
+        tabs.style.display = 'none';
+        enrollForm.style.display = 'block';
+        showAlert('Scan the QR code with Google Authenticator', 'success');
+
+      } catch (err) {
+        console.error(err);
+        showAlert(err.message || "Could not start authenticator setup", 'error');
+      }
+    }
+
+    enrollForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const enrollBtn = document.getElementById('enroll-btn');
+      enrollBtn.disabled = true;
+      enrollBtn.innerText = "Activating...";
+      showAlert('');
+
+      const code = document.getElementById('enroll-code').value.trim();
+
+      try {
+        // First create a challenge
+        const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
+          factorId: currentFactorId
+        });
+        if (challengeError) throw challengeError;
+
+        // Then verify
+        const { data, error } = await supabase.auth.mfa.verify({
+          factorId: currentFactorId,
+          challengeId: challenge.id,
+          code: code
+        });
+
+        if (error) throw error;
+
+        showAlert('Google Authenticator activated successfully! Redirecting...', 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1200);
+
+      } catch (err) {
+        console.error(err);
+        showAlert(err.message || "Invalid code. Please try again.", 'error');
+      } finally {
+        enrollBtn.disabled = false;
+        enrollBtn.innerText = "Activate Authenticator";
       }
     });
 
     // ===================== REGISTRATION =====================
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const regBtn = document.getElementById('reg-btn');
       regBtn.disabled = true;
       regBtn.innerText = "Creating Account...";
@@ -394,8 +488,8 @@
 
       try {
         const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: email,
-          password: password,
+          email,
+          password,
           options: {
             data: {
               full_name: name,
@@ -417,13 +511,13 @@
           });
         }
 
-        showAlert('Account created successfully! Please log in.', 'success');
+        showAlert('Account created! Please log in and set up Google Authenticator.', 'success');
         registerForm.reset();
-        setTimeout(() => switchTab('login'), 1500);
+        setTimeout(() => switchTab('login'), 1800);
 
       } catch (err) {
         console.error(err);
-        showAlert(err.message || "Could not register.", 'error');
+        showAlert(err.message || "Could not register", 'error');
       } finally {
         regBtn.disabled = false;
         regBtn.innerText = "Create Account";
