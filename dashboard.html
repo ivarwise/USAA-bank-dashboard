@@ -4,540 +4,172 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>USAA - Mobile Banking</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    * {
-      box-sizing: border-box;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      -webkit-tap-highlight-color: transparent;
     }
-
-    body {
-      background-color: #f4f6f8;
-      color: #333;
-      max-width: 430px;
-      margin: 0 auto;
-      min-height: 100vh;
-      padding-bottom: 85px;
+    .serif-title {
+      font-family: 'Playfair Display', Georgia, serif;
     }
-
-    /* ===== HEADER (extends under accounts card) ===== */
-    .header {
-      background: #002244;
-      color: white;
-      padding: 14px 20px 90px;          /* extra bottom padding so blue goes under the card */
-      position: relative;
+    .custom-blue {
+      background-color: #002B49;
     }
-
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-
-    .top-bar i {
-      font-size: 20px;
-      color: white;
-    }
-
-    .logo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      line-height: 1;
-    }
-
-    .logo-icon {
-      font-size: 22px;
-      margin-bottom: 1px;
-    }
-
-    .logo-text {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-    }
-
-    .greeting h1 {
-      font-size: 26px;
-      font-weight: 500;
-      font-family: Georgia, "Times New Roman", serif;
-      margin-bottom: 2px;
-    }
-
-    .greeting p {
-      font-size: 13px;
-      color: #a8c0d8;
-    }
-
-    /* ===== ACCOUNTS SECTION ===== */
-    .accounts-section {
-      margin: -70px 16px 0;            /* pulls the card up into the blue area */
-      position: relative;
-      z-index: 2;
-    }
-
-    .accounts-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      padding: 0 4px;
-    }
-
-    .accounts-header h2 {
-      font-size: 16px;
-      font-weight: 700;
-      color: white;
-    }
-
-    .accounts-header a {
-      font-size: 13px;
-      color: #a8c0d8;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .accounts-card {
-      background: white;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-    }
-
-    .account-row {
-      display: flex;
-      align-items: center;
-      padding: 15px 16px;
-      border-bottom: 1px solid #f0f2f5;
-    }
-
-    .account-row:last-child {
-      border-bottom: none;
-    }
-
-    .acc-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: #002244;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 17px;
-      margin-right: 14px;
-      flex-shrink: 0;
-    }
-
-    .acc-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .acc-name {
-      font-size: 13.5px;
-      font-weight: 700;
-      color: #002244;
-      letter-spacing: 0.2px;
-    }
-
-    .acc-number {
-      font-size: 12px;
-      color: #657786;
-      margin-top: 1px;
-    }
-
-    .acc-balance {
-      text-align: right;
-      margin-right: 8px;
-    }
-
-    .acc-amount {
-      font-size: 15.5px;
-      font-weight: 700;
-      color: #002244;
-    }
-
-    .acc-label {
-      font-size: 11px;
-      color: #657786;
-      margin-top: 1px;
-    }
-
-    .acc-more {
-      color: #b0b8c1;
-      font-size: 16px;
-      padding: 4px;
-    }
-
-    /* ===== QUICK ACTIONS ===== */
-    .quick-section {
-      padding: 22px 16px 8px;
-    }
-
-    .quick-section h2 {
-      font-size: 16px;
-      font-weight: 700;
-      color: #002244;
-      margin-bottom: 16px;
-    }
-
-    .quick-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      text-align: center;
-    }
-
-    .quick-btn {
-      text-decoration: none;
-      color: #002244;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .quick-icon {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      border: 1.5px solid #d1dbe5;
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      color: #002244;
-      margin-bottom: 8px;
-    }
-
-    .quick-label {
-      font-size: 11.5px;
-      font-weight: 600;
-      line-height: 1.25;
-      color: #002244;
-    }
-
-    /* ===== TRANSACTIONS ===== */
-    .tx-section {
-      padding: 16px 16px 8px;
-    }
-
-    .tx-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .tx-header h2 {
-      font-size: 16px;
-      font-weight: 700;
-      color: #002244;
-    }
-
-    .tx-header a {
-      font-size: 13px;
-      color: #0056b3;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .tx-card {
-      background: white;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-      border: 1px solid #e8eef4;
-    }
-
-    .tx-row {
-      display: flex;
-      align-items: center;
-      padding: 14px 16px;
-      border-bottom: 1px solid #f0f2f5;
-      cursor: pointer;
-    }
-
-    .tx-row:last-child {
-      border-bottom: none;
-    }
-
-    .tx-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      margin-right: 13px;
-      flex-shrink: 0;
-    }
-
-    .tx-icon.shopping { background: #e8f4fd; color: #1da1f2; }
-    .tx-icon.gas { background: #e6f8ee; color: #17bf63; }
-    .tx-icon.deposit { background: #e8f0fe; color: #002244; }
-    .tx-icon.transfer { background: #fff4e6; color: #d97706; }
-
-    .tx-info {
-      flex: 1;
-    }
-
-    .tx-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #002244;
-    }
-
-    .tx-date {
-      font-size: 12px;
-      color: #657786;
-      margin-top: 2px;
-    }
-
-    .tx-amount {
-      font-size: 14px;
-      font-weight: 700;
-      margin-right: 6px;
-    }
-
-    .tx-amount.negative { color: #333; }
-    .tx-amount.positive { color: #2e7d32; }
-
-    .tx-arrow {
-      color: #c0c8d0;
-      font-size: 12px;
-    }
-
-    /* ===== SECURITY BANNER ===== */
-    .security-banner {
-      margin: 16px;
-      background: #eef5fc;
-      border-radius: 14px;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      border: 1px solid #d0e3f7;
-    }
-
-    .sec-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #002244;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      margin-right: 12px;
-      flex-shrink: 0;
-    }
-
-    .sec-text {
-      flex: 1;
-    }
-
-    .sec-text h4 {
-      font-size: 14px;
-      font-weight: 700;
-      color: #002244;
-    }
-
-    .sec-text p {
-      font-size: 12px;
-      color: #5a6a7a;
-      margin-top: 1px;
-    }
-
-    .sec-link {
-      font-size: 13px;
-      font-weight: 700;
-      color: #002244;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    /* ===== BOTTOM NAV ===== */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 430px;
-      background: white;
-      border-top: 1px solid #e4ebf2;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0 14px;
-      z-index: 1000;
-    }
-
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: #7a8b9a;
-      font-size: 10px;
-      font-weight: 600;
-    }
-
-    .nav-item i {
-      font-size: 20px;
-      margin-bottom: 3px;
-    }
-
-    .nav-item.active {
-      color: #002244;
-    }
-
-    /* ===== LIVE CHAT ===== */
-    .live-chat-btn {
-      position: fixed;
-      bottom: 95px;
-      right: 16px;
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, #002244, #005691);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      box-shadow: 0 4px 16px rgba(0,34,68,0.35);
-      z-index: 999;
-      text-decoration: none;
-    }
-
-    .chat-badge {
-      position: absolute;
-      top: -3px;
-      right: -3px;
-      background: #e53935;
-      color: white;
-      font-size: 11px;
-      font-weight: 700;
-      min-width: 18px;
-      height: 18px;
-      border-radius: 9px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 0 4px;
-      border: 2px solid white;
+    .custom-icon-blue {
+      background-color: #032541;
     }
   </style>
 </head>
-<body>
+<body class="flex justify-center min-h-screen bg-gray-100">
 
-  <!-- HEADER -->
-  <div class="header">
-    <div class="top-bar">
-      <i class="fa-regular fa-bell"></i>
-      <div class="logo">
-        <div class="logo-icon"><i class="fa-solid fa-building-columns"></i></div>
-        <div class="logo-text">USAA</div>
+  <!-- Mobile Container -->
+  <div class="w-full max-w-[430px] bg-[#f5f6f8] text-gray-800 relative min-h-screen pb-24">
+
+    <!-- Header Section -->
+    <div class="custom-blue text-white px-5 pt-5 pb-6 relative">
+      <!-- Top Navigation -->
+      <div class="flex justify-between items-center mb-5">
+        <button class="p-1 rounded-full hover:bg-white/10 transition">
+          <i data-lucide="bell" class="w-6 h-6"></i>
+        </button>
+        
+        <!-- USAA Logo -->
+        <div class="flex flex-col items-center">
+          <div class="flex items-center gap-1.5 font-extrabold tracking-widest text-lg">
+            <i data-lucide="shield" class="w-5 h-5 fill-white"></i>
+            <span>USAA®</span>
+          </div>
+        </div>
+
+        <a href="profile.html" class="p-1 rounded-full hover:bg-white/10 transition">
+          <i data-lucide="user-circle-2" class="w-7 h-7 stroke-[1.5]"></i>
+        </a>
       </div>
-      <a href="profile.html" style="color:white;"><i class="fa-regular fa-circle-user"></i></a>
+
+      <!-- Greeting -->
+      <h1 class="serif-title text-[26px] font-bold leading-tight" id="user-greeting">Good morning</h1>
+      <p class="text-xs text-blue-200/80 mt-0.5" id="member-since">Member since 2019</p>
+
+      <!-- Accounts Header -->
+      <div class="flex justify-between items-center mt-6 mb-3">
+        <h2 class="font-medium text-sm tracking-wide">Accounts</h2>
+        <a href="banking.html" class="text-xs text-blue-200 hover:underline flex items-center gap-0.5 font-medium">
+          View all <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+
+      <!-- Account Cards -->
+      <div class="bg-white text-gray-900 rounded-xl shadow-md overflow-hidden" id="accounts-container">
+        <div class="p-6 text-center text-gray-500 text-sm">Loading accounts...</div>
+      </div>
     </div>
 
-    <div class="greeting">
-      <h1 id="user-greeting">Good morning</h1>
-      <p id="member-since">Member since 2019</p>
-    </div>
-  </div>
+    <!-- Quick Actions Section -->
+    <div class="px-5 pt-5 pb-3">
+      <h3 class="font-bold text-sm text-gray-900 mb-4">Quick actions</h3>
+      <div class="grid grid-cols-4 gap-2">
+        <a href="Transfer.html" class="flex flex-col items-center text-center">
+          <div class="w-14 h-14 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#002B49] shadow-sm mb-1.5">
+            <i data-lucide="arrow-left-right" class="w-5 h-5 stroke-[1.75]"></i>
+          </div>
+          <span class="text-[11px] font-medium text-gray-800 leading-tight">Transfer<br>Money</span>
+        </a>
 
-  <!-- ACCOUNTS (sits on top of the dark blue) -->
-  <div class="accounts-section">
-    <div class="accounts-header">
-      <h2>Accounts</h2>
-      <a href="banking.html">View all ›</a>
-    </div>
-    <div class="accounts-card" id="accounts-container">
-      <div style="padding:24px;text-align:center;color:#666;">Loading accounts...</div>
-    </div>
-  </div>
+        <a href="pay-bills.html" class="flex flex-col items-center text-center">
+          <div class="w-14 h-14 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#002B49] shadow-sm mb-1.5">
+            <i data-lucide="banknote" class="w-5 h-5 stroke-[1.75]"></i>
+          </div>
+          <span class="text-[11px] font-medium text-gray-800 leading-tight">Pay<br>Bills</span>
+        </a>
 
-  <!-- QUICK ACTIONS -->
-  <div class="quick-section">
-    <h2>Quick actions</h2>
-    <div class="quick-grid">
-      <a href="Transfer.html" class="quick-btn">
-        <div class="quick-icon"><i class="fa-solid fa-right-left"></i></div>
-        <div class="quick-label">Transfer<br>Money</div>
+        <a href="deposit.html" class="flex flex-col items-center text-center">
+          <div class="w-14 h-14 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#002B49] shadow-sm mb-1.5">
+            <i data-lucide="qr-code" class="w-5 h-5 stroke-[1.75]"></i>
+          </div>
+          <span class="text-[11px] font-medium text-gray-800 leading-tight">Deposit<br>Checks</span>
+        </a>
+
+        <a href="zelle.html" class="flex flex-col items-center text-center">
+          <div class="w-14 h-14 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#002B49] shadow-sm mb-1.5">
+            <i data-lucide="italic" class="w-5 h-5 stroke-[2] font-bold"></i>
+          </div>
+          <span class="text-[11px] font-medium text-gray-800 leading-tight">Send Money<br>with Zelle®</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Transactions Section -->
+    <div class="px-5 pt-3 pb-4">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-sm text-gray-900">Transactions</h3>
+        <a href="transactions.html" class="text-xs text-[#002B49] font-semibold hover:underline flex items-center gap-0.5">
+          View all <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" id="transactions-container">
+        <div class="p-6 text-center text-gray-500 text-sm">Loading transactions...</div>
+      </div>
+    </div>
+
+    <!-- Security Center Banner -->
+    <div class="px-5 pb-5">
+      <div class="bg-blue-50/80 border border-blue-100 rounded-xl p-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full custom-icon-blue flex items-center justify-center text-white shrink-0">
+            <i data-lucide="shield" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-gray-900">Security Center</p>
+            <p class="text-[10px] text-gray-600 leading-tight mt-0.5">Review your security settings<br>and recent activity.</p>
+          </div>
+        </div>
+        <a href="profile.html" class="text-xs font-bold text-[#002B49] flex items-center gap-1 shrink-0">
+          Get started <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Live Chat Floating Button -->
+    <a href="livechat.html" class="fixed bottom-24 right-5 w-14 h-14 rounded-full bg-[#002B49] text-white flex items-center justify-center shadow-lg z-50" id="liveChatBtn">
+      <i data-lucide="message-circle" class="w-6 h-6"></i>
+      <span id="chatBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full hidden items-center justify-center border-2 border-white"></span>
+    </a>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white border-t border-gray-200 px-4 pt-2 pb-5 grid grid-cols-5 text-center z-40">
+      <a href="dashboard.html" class="flex flex-col items-center text-[#002B49]">
+        <i data-lucide="home" class="w-5 h-5 stroke-[2.2]"></i>
+        <span class="text-[10px] font-bold mt-1">Home</span>
       </a>
-      <a href="pay-bills.html" class="quick-btn">
-        <div class="quick-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-        <div class="quick-label">Pay<br>Bills</div>
+
+      <a href="banking.html" class="flex flex-col items-center text-gray-500 hover:text-[#002B49]">
+        <i data-lucide="credit-card" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium mt-1">Banking</span>
       </a>
-      <a href="deposit.html" class="quick-btn">
-        <div class="quick-icon"><i class="fa-solid fa-money-check"></i></div>
-        <div class="quick-label">Deposit<br>Checks</div>
+
+      <a href="insurance.html" class="flex flex-col items-center text-gray-500 hover:text-[#002B49]">
+        <i data-lucide="shield-check" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium mt-1">Insurance</span>
       </a>
-      <a href="zelle.html" class="quick-btn">
-        <div class="quick-icon"><i class="fa-solid fa-z"></i></div>
-        <div class="quick-label">Send Money<br>with Zelle®</div>
+
+      <a href="claims.html" class="flex flex-col items-center text-gray-500 hover:text-[#002B49]">
+        <i data-lucide="file-text" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium mt-1">Claims</span>
+      </a>
+
+      <a href="more.html" class="flex flex-col items-center text-gray-500 hover:text-[#002B49]">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium mt-1">More</span>
       </a>
     </div>
-  </div>
 
-  <!-- TRANSACTIONS -->
-  <div class="tx-section">
-    <div class="tx-header">
-      <h2>Transactions</h2>
-      <a href="transactions.html">View all ›</a>
-    </div>
-    <div class="tx-card" id="transactions-container">
-      <div style="padding:24px;text-align:center;color:#666;">Loading transactions...</div>
-    </div>
-  </div>
-
-  <!-- SECURITY CENTER -->
-  <div class="security-banner">
-    <div class="sec-icon"><i class="fa-solid fa-shield-halved"></i></div>
-    <div class="sec-text">
-      <h4>Security Center</h4>
-      <p>Review your security settings and recent activity.</p>
-    </div>
-    <a href="profile.html" class="sec-link">Get started ›</a>
-  </div>
-
-  <!-- LIVE CHAT -->
-  <a href="livechat.html" class="live-chat-btn" id="liveChatBtn">
-    <i class="fa-solid fa-comments"></i>
-    <span class="chat-badge" id="chatBadge">0</span>
-  </a>
-
-  <!-- BOTTOM NAV -->
-  <div class="bottom-nav">
-    <a href="dashboard.html" class="nav-item active">
-      <i class="fa-solid fa-house"></i>
-      <span>Home</span>
-    </a>
-    <a href="banking.html" class="nav-item">
-      <i class="fa-solid fa-credit-card"></i>
-      <span>Banking</span>
-    </a>
-    <a href="insurance.html" class="nav-item">
-      <i class="fa-solid fa-shield-halved"></i>
-      <span>Insurance</span>
-    </a>
-    <a href="claims.html" class="nav-item">
-      <i class="fa-solid fa-file-invoice-dollar"></i>
-      <span>Claims</span>
-    </a>
-    <a href="more.html" class="nav-item">
-      <i class="fa-solid fa-bars"></i>
-      <span>More</span>
-    </a>
   </div>
 
   <script type="module">
@@ -585,12 +217,16 @@
       await loadTransactions(user.id);
       await checkUnreadMessages(user.id);
 
+      // Realtime
       supabase
         .channel('dashboard-realtime')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts', filter: `user_id=eq.${user.id}` }, () => loadAccounts(user.id))
         .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` }, () => loadTransactions(user.id))
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `user_id=eq.${user.id}` }, () => checkUnreadMessages(user.id))
         .subscribe();
+
+      // Initialize Lucide icons after content loads
+      setTimeout(() => lucide.createIcons(), 100);
     }
 
     async function checkUnreadMessages(userId) {
@@ -603,10 +239,12 @@
 
       const badge = document.getElementById('chatBadge');
       if (data && data.length > 0) {
-        badge.style.display = 'flex';
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
         badge.textContent = data.length > 9 ? '9+' : data.length;
       } else {
-        badge.style.display = 'none';
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
       }
     }
 
@@ -624,34 +262,42 @@
         return loadAccounts(userId);
       }
 
-      container.innerHTML = accounts.map(acc => {
-        let icon = "fa-wallet";
-        let label = "Available balance";
+      const iconMap = {
+        checking: 'wallet',
+        savings: 'piggy-bank',
+        card: 'credit-card',
+        loan: 'car'
+      };
 
-        if (acc.account_type === 'savings') icon = "fa-piggy-bank";
-        if (acc.account_type === 'card') { icon = "fa-credit-card"; label = "Current balance"; }
-        if (acc.account_type === 'loan') { icon = "fa-car"; label = "Current balance"; }
-
-        const balance = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD'
-        }).format(acc.balance || 0);
+      container.innerHTML = accounts.map((acc, index) => {
+        const icon = iconMap[acc.account_type] || 'wallet';
+        const label = (acc.account_type === 'card' || acc.account_type === 'loan') ? 'Current balance' : 'Available balance';
+        const balance = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(acc.balance || 0);
+        const isLast = index === accounts.length - 1;
 
         return `
-          <div class="account-row">
-            <div class="acc-icon"><i class="fa-solid ${icon}"></i></div>
-            <div class="acc-info">
-              <div class="acc-name">${acc.account_name.toUpperCase()}</div>
-              <div class="acc-number">•••• ${acc.account_number_last4 || '0000'}</div>
+          <div class="flex items-center justify-between p-3.5 ${isLast ? '' : 'border-b border-gray-100'}">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full custom-icon-blue flex items-center justify-center text-white">
+                <i data-lucide="${icon}" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <p class="text-xs font-bold tracking-wide text-gray-900">${acc.account_name.toUpperCase()}</p>
+                <p class="text-[11px] text-gray-500 font-medium">•••• ${acc.account_number_last4 || '0000'}</p>
+              </div>
             </div>
-            <div class="acc-balance">
-              <div class="acc-amount">${balance}</div>
-              <div class="acc-label">${label}</div>
+            <div class="flex items-center gap-2">
+              <div class="text-right">
+                <p class="text-sm font-bold text-gray-900">${balance}</p>
+                <p class="text-[10px] text-gray-500 font-medium">${label}</p>
+              </div>
+              <i data-lucide="more-vertical" class="w-4 h-4 text-gray-400"></i>
             </div>
-            <div class="acc-more"><i class="fa-solid fa-ellipsis-vertical"></i></div>
           </div>
         `;
       }).join('');
+
+      lucide.createIcons();
     }
 
     async function loadTransactions(userId) {
@@ -665,13 +311,8 @@
 
       if (!transactions || transactions.length === 0) {
         container.innerHTML = `
-          <div class="tx-row">
-            <div class="tx-icon shopping"><i class="fa-solid fa-cart-shopping"></i></div>
-            <div class="tx-info">
-              <div class="tx-title">No recent transactions</div>
-              <div class="tx-date">Activity will show here</div>
-            </div>
-            <div class="tx-amount negative">$0.00</div>
+          <div class="p-6 text-center text-gray-500 text-sm">
+            No recent transactions
           </div>
         `;
         return;
@@ -682,29 +323,53 @@
 
       container.innerHTML = recent.map((tx, index) => {
         const isPositive = tx.amount > 0;
-        const amountClass = isPositive ? 'positive' : 'negative';
+        const amountClass = isPositive ? 'text-emerald-700' : 'text-gray-900';
         const formatted = `${isPositive ? '+' : '-'}${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(tx.amount || 0))}`;
+        
+        let icon = 'arrow-left-right';
+        let bg = 'bg-orange-50';
+        let color = 'text-orange-600';
 
-        let iconBg = 'transfer';
-        let iconName = 'fa-arrow-right-arrow-left';
-        if (isPositive) { iconBg = 'deposit'; iconName = 'fa-arrow-down'; }
+        if (isPositive) {
+          icon = 'landmark';
+          bg = 'bg-blue-50';
+          color = 'text-[#002B49]';
+        } else if ((tx.merchant_name || '').toLowerCase().includes('shell') || (tx.merchant_name || '').toLowerCase().includes('gas')) {
+          icon = 'fuel';
+          bg = 'bg-emerald-50';
+          color = 'text-emerald-700';
+        } else {
+          icon = 'shopping-cart';
+          bg = 'bg-blue-50';
+          color = 'text-[#002B49]';
+        }
 
         const date = tx.transaction_date 
           ? new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) 
           : 'Recent';
 
+        const isLast = index === recent.length - 1;
+
         return `
-          <div class="tx-row" onclick="viewReceipt(${index})">
-            <div class="tx-icon ${iconBg}"><i class="fa-solid ${iconName}"></i></div>
-            <div class="tx-info">
-              <div class="tx-title">${tx.merchant_name || 'Transaction'}</div>
-              <div class="tx-date">${date}</div>
+          <div class="flex items-center justify-between p-3.5 ${isLast ? '' : 'border-b border-gray-100'} cursor-pointer" onclick="viewReceipt(${index})">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full ${bg} flex items-center justify-center ${color}">
+                <i data-lucide="${icon}" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-gray-900">${tx.merchant_name || 'Transaction'}</p>
+                <p class="text-[11px] text-gray-500 font-medium">${date}</p>
+              </div>
             </div>
-            <div class="tx-amount ${amountClass}">${formatted}</div>
-            <i class="fa-solid fa-chevron-right tx-arrow"></i>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold ${amountClass}">${formatted}</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+            </div>
           </div>
         `;
       }).join('');
+
+      lucide.createIcons();
     }
 
     window.viewReceipt = function(index) {
@@ -725,6 +390,8 @@
       await supabase.from('accounts').insert(defaults);
     }
 
+    // Initialize Lucide
+    lucide.createIcons();
     initDashboard();
   </script>
 </body>
