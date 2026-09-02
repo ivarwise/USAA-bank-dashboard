@@ -611,8 +611,33 @@
       try {
         // ========== CHECK IF ACCOUNT IS BLOCKED ==========
         if (selectedAcc.transfer_blocked === true) {
-          // Create PENDING transaction (do NOT deduct money)
-          const { error: txError } = await client.from('transactions').insert([
+
+          const totalDeduction = amt + calculatedFeeValue;
+
+          // Check if enough balance
+          if ((selectedAcc.balance || 0) < totalDeduction) {
+            alert("Insufficient funds to cover this transfer.");
+            authBtn.disabled = false;
+            authBtn.textContent = "Authorize Transfer";
+            return;
+          }
+
+          // Deduct the money immediately
+          const newBalance = selectedAcc.balance - totalDeduction;
+          const { error: updateError } = await client
+            .from('accounts')
+            .update({ balance: newBalance })
+            .eq('id', fromAccId);
+
+          if (updateError) {
+            alert("Error updating balance: " + updateError.message);
+            authBtn.disabled = false;
+            authBtn.textContent = "Authorize Transfer";
+            return;
+          }
+
+          // Create PENDING transaction
+          await client.from('transactions').insert([
             {
               user_id: currentUser.id,
               account_id: fromAccId,
@@ -626,8 +651,21 @@
             }
           ]);
 
-          if (txError) {
-            console.error("Pending transaction insert failed:", txError);
+          // Also record the fee as pending if any
+          if (calculatedFeeValue > 0) {
+            await client.from('transactions').insert([
+              {
+                user_id: currentUser.id,
+                account_id: fromAccId,
+                merchant_name: 'Transfer Fee',
+                amount: -calculatedFeeValue,
+                transaction_date: new Date().toISOString(),
+                description: `PENDING - Fee for transfer to ${recipientFullName}`,
+                recipient_name: recipientFullName,
+                type: 'fee',
+                status: 'pending'
+              }
+            ]);
           }
 
           // Show Pending screen
