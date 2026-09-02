@@ -96,30 +96,6 @@
     .btn:hover { background-color: var(--usaa-navy); }
     .btn:disabled { background-color: #a0a0a0; cursor: not-allowed; }
 
-    /* Better looking select with icons */
-    .custom-select-wrapper {
-      position: relative;
-    }
-
-    .option-with-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-circle {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      color: white;
-      flex-shrink: 0;
-    }
-
     .receipt-card {
       border: 1px solid var(--usaa-border);
       padding: 24px;
@@ -200,6 +176,16 @@
       border: 1px solid #f5c6cb;
       margin-bottom: 15px;
       display: none;
+    }
+
+    .pending-box {
+      background-color: #fff3cd;
+      color: #856404;
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid #ffeaa7;
+      margin-bottom: 20px;
+      text-align: center;
     }
 
     .watermark-footer {
@@ -332,10 +318,22 @@
       <button class="btn" id="authBtn" onclick="verifyAndExecuteTransfer()">Authorize Transfer</button>
     </div>
 
-    <!-- STEP 4: SUCCESS & OFFICIAL PRINTABLE RECEIPT -->
+    <!-- STEP 4: SUCCESS / PENDING -->
     <div id="step4" class="step-panel">
-      <h2 class="no-print" style="color: var(--usaa-green);">✓ Transfer Complete</h2>
-      <p class="no-print">Your funds have been successfully processed.</p>
+      <div id="successContent">
+        <h2 class="no-print" style="color: var(--usaa-green);">✓ Transfer Complete</h2>
+        <p class="no-print">Your funds have been successfully processed.</p>
+      </div>
+
+      <div id="pendingContent" style="display:none;">
+        <div class="pending-box">
+          <h2 style="margin:0 0 10px 0; color:#856404;">⏳ Transfer Under Review</h2>
+          <p style="margin:0; font-size:15px; line-height:1.5;">
+            For your security, this transfer has been placed on hold pending additional verification.<br><br>
+            <strong>Please contact USAA Member Service</strong> to complete this request.
+          </p>
+        </div>
+      </div>
 
       <div class="receipt-card" id="printableReceipt">
         <div class="receipt-header-branding">
@@ -344,7 +342,7 @@
             <div style="font-size:0.7rem; color:#666; margin-top:2px;">Official Transaction Record</div>
           </div>
           <div style="text-align: right;">
-            <span class="doc-type" style="color: var(--usaa-green); font-size: 0.85rem;">COMPLETED</span>
+            <span class="doc-type" id="recStatus" style="color: var(--usaa-green); font-size: 0.85rem;">COMPLETED</span>
           </div>
         </div>
 
@@ -356,7 +354,7 @@
         <div class="receipt-row"><span>Recipient Account:</span><strong id="recAccNum">--</strong></div>
         <div class="receipt-row"><span>Amount Sent:</span><strong id="recAmount">$0.00</strong></div>
         <div class="receipt-row"><span>Transfer Fee:</span><strong id="recFee">$0.00</strong></div>
-        <div class="receipt-row"><span>Status:</span><strong style="color:var(--usaa-green);">SUCCESSFUL / PROCESSED</strong></div>
+        <div class="receipt-row"><span>Status:</span><strong id="recStatusText" style="color:var(--usaa-green);">SUCCESSFUL / PROCESSED</strong></div>
 
         <div class="watermark-footer">
           <p><strong>USAA Official Customer Paper Receipt</strong></p>
@@ -364,8 +362,8 @@
         </div>
       </div>
 
-      <h3 class="no-print">Share / Download Receipt</h3>
-      <div class="share-grid no-print">
+      <h3 class="no-print" id="shareTitle">Share / Download Receipt</h3>
+      <div class="share-grid no-print" id="shareButtons">
         <button class="share-btn" onclick="downloadReceiptImage()"><i class="fa-solid fa-download"></i> Download Receipt</button>
         <button class="share-btn" onclick="shareReceiptImage('whatsapp')"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
         <button class="share-btn" onclick="shareReceiptImage('email')"><i class="fa-solid fa-envelope"></i> Email</button>
@@ -388,7 +386,6 @@
     let senderFullName = "USAA Member";
     let lastReceiptData = null;
 
-    // Banks with brand colors
     const bankData = {
       USA: [
         { name: "JPMorgan Chase", color: "#117aca", short: "JC" },
@@ -606,10 +603,60 @@
       const recipientAccNum = document.getElementById('accountNum').value.trim() || 'N/A';
       const recipientFullName = document.getElementById('recipientName').value.trim();
 
+      const selectedAcc = userAccounts.find(a => a.id === fromAccId);
+
       authBtn.disabled = true;
       authBtn.textContent = "Processing Transaction...";
 
       try {
+        // ========== CHECK IF ACCOUNT IS BLOCKED ==========
+        if (selectedAcc.transfer_blocked === true) {
+          // Create PENDING transaction (do NOT deduct money)
+          const { error: txError } = await client.from('transactions').insert([
+            {
+              user_id: currentUser.id,
+              account_id: fromAccId,
+              merchant_name: bank,
+              amount: -amt,
+              transaction_date: new Date().toISOString(),
+              description: `PENDING - Transfer to ${recipientFullName} via ${bank} | Account: ${recipientAccNum}`,
+              recipient_name: recipientFullName,
+              type: 'transfer',
+              status: 'pending'
+            }
+          ]);
+
+          if (txError) {
+            console.error("Pending transaction insert failed:", txError);
+          }
+
+          // Show Pending screen
+          const confNum = "USAA-P" + Math.floor(10000000 + Math.random() * 90000000);
+          const timeStr = new Date().toLocaleString();
+
+          document.getElementById('successContent').style.display = 'none';
+          document.getElementById('pendingContent').style.display = 'block';
+          document.getElementById('shareTitle').style.display = 'none';
+          document.getElementById('shareButtons').style.display = 'none';
+
+          document.getElementById('recConf').textContent = confNum;
+          document.getElementById('recTime').textContent = timeStr;
+          document.getElementById('recFrom').textContent = senderFullName;
+          document.getElementById('recName').textContent = recipientFullName;
+          document.getElementById('recBank').textContent = bank;
+          document.getElementById('recAccNum').textContent = recipientAccNum;
+          document.getElementById('recAmount').textContent = `$${amt.toFixed(2)}`;
+          document.getElementById('recFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
+          document.getElementById('recStatus').textContent = 'PENDING REVIEW';
+          document.getElementById('recStatus').style.color = '#856404';
+          document.getElementById('recStatusText').textContent = 'PENDING / UNDER REVIEW';
+          document.getElementById('recStatusText').style.color = '#856404';
+
+          goToStep(4);
+          return;
+        }
+
+        // ========== NORMAL TRANSFER (not blocked) ==========
         const { data, error } = await client.rpc('execute_transfer', {
           p_from_account_id: fromAccId,
           p_recipient_bank: bank,
@@ -621,7 +668,6 @@
         if (error) {
           console.warn("RPC call failed, executing fallback update:", error.message);
           
-          const selectedAcc = userAccounts.find(a => a.id === fromAccId);
           const totalDeduction = amt + calculatedFeeValue;
 
           if ((selectedAcc.balance || 0) < totalDeduction) {
@@ -653,7 +699,8 @@
               transaction_date: new Date().toISOString(),
               description: `Transfer to ${recipientFullName} via ${bank} | Account: ${recipientAccNum}`,
               recipient_name: recipientFullName,
-              type: 'transfer'
+              type: 'transfer',
+              status: 'completed'
             }
           ]);
 
@@ -672,15 +719,21 @@
                 transaction_date: new Date().toISOString(),
                 description: `Fee for transfer to ${recipientFullName} (${bank})`,
                 recipient_name: recipientFullName,
-                type: 'fee'
+                type: 'fee',
+                status: 'completed'
               }
             ]);
           }
         }
 
-        // Render Receipt
+        // Render Success Receipt
         const confNum = "USAA-" + Math.floor(10000000 + Math.random() * 90000000);
         const timeStr = new Date().toLocaleString();
+
+        document.getElementById('successContent').style.display = 'block';
+        document.getElementById('pendingContent').style.display = 'none';
+        document.getElementById('shareTitle').style.display = 'block';
+        document.getElementById('shareButtons').style.display = 'grid';
 
         document.getElementById('recConf').textContent = confNum;
         document.getElementById('recTime').textContent = timeStr;
@@ -690,6 +743,10 @@
         document.getElementById('recAccNum').textContent = recipientAccNum;
         document.getElementById('recAmount').textContent = `$${amt.toFixed(2)}`;
         document.getElementById('recFee').textContent = `$${calculatedFeeValue.toFixed(2)}`;
+        document.getElementById('recStatus').textContent = 'COMPLETED';
+        document.getElementById('recStatus').style.color = 'var(--usaa-green)';
+        document.getElementById('recStatusText').textContent = 'SUCCESSFUL / PROCESSED';
+        document.getElementById('recStatusText').style.color = 'var(--usaa-green)';
 
         lastReceiptData = {
           conf: confNum,
