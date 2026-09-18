@@ -8,43 +8,53 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background: #f4f6f8; color: #333; max-width: 1100px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; }
+    
+    body {
+      background: #0b141a;
+      color: #e9edef;
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
+    /* Header */
     .header {
-      background: linear-gradient(180deg, #002244 0%, #003366 100%);
-      color: white;
+      background: #202c33;
       padding: 14px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      border-bottom: 1px solid #2a3942;
     }
-    .header h1 { font-size: 18px; font-weight: 700; }
+    .header h1 { font-size: 17px; font-weight: 600; color: #e9edef; }
+    .header span { font-size: 13px; color: #8696a0; }
 
     .main { display: flex; flex: 1; overflow: hidden; }
 
-    /* Left sidebar */
+    /* ===== LEFT SIDEBAR ===== */
     .sidebar {
-      width: 340px;
-      background: white;
-      border-right: 1px solid #e1e8ed;
+      width: 360px;
+      background: #111b21;
+      border-right: 1px solid #2a3942;
       display: flex;
       flex-direction: column;
     }
     .sidebar-header {
-      padding: 14px 16px;
-      border-bottom: 1px solid #e1e8ed;
-      font-weight: 700;
-      color: #002244;
+      padding: 12px 16px;
+      background: #202c33;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+    .sidebar-header span { font-weight: 600; font-size: 16px; }
     .add-btn {
-      background: #002244;
+      background: #00a884;
       color: white;
       border: none;
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       font-size: 16px;
       cursor: pointer;
@@ -52,274 +62,242 @@
       align-items: center;
       justify-content: center;
     }
+    .search-box {
+      padding: 8px 12px;
+      background: #111b21;
+    }
+    .search-box input {
+      width: 100%;
+      background: #202c33;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 14px;
+      color: #e9edef;
+      font-size: 14px;
+      outline: none;
+    }
     .user-list { flex: 1; overflow-y: auto; }
     .user-item {
-      padding: 13px 16px;
-      border-bottom: 1px solid #f0f4f8;
-      cursor: pointer;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
+      cursor: pointer;
+      border-bottom: 1px solid #222d34;
       transition: background 0.15s;
     }
-    .user-item:hover, .user-item.active { background: #eef5fc; }
+    .user-item:hover, .user-item.active { background: #2a3942; }
     .user-avatar {
-      width: 44px;
-      height: 44px;
+      width: 49px;
+      height: 49px;
       border-radius: 50%;
-      background: #002244;
+      background: #6b7c85;
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
-      font-size: 15px;
+      font-weight: 600;
+      font-size: 16px;
       flex-shrink: 0;
     }
     .user-info { flex: 1; min-width: 0; }
-    .user-name { font-weight: 600; font-size: 14.5px; color: #002244; }
-    .user-last { font-size: 12.5px; color: #657786; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-    .user-time { font-size: 11px; color: #94a3b8; white-space: nowrap; }
+    .user-top { display: flex; justify-content: space-between; align-items: center; }
+    .user-name { font-weight: 500; font-size: 16px; color: #e9edef; }
+    .user-time { font-size: 12px; color: #8696a0; }
+    .user-last { font-size: 13.5px; color: #8696a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; }
 
-    /* Right chat panel */
+    /* ===== RIGHT CHAT PANEL ===== */
     .chat-panel {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: #eef2f5;
+      background: #0b141a;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23182229' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     }
     .chat-header {
-      background: white;
-      padding: 14px 18px;
-      border-bottom: 1px solid #e1e8ed;
-      font-weight: 700;
-      color: #002244;
+      background: #202c33;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
+      border-bottom: 1px solid #2a3942;
     }
+    .chat-header .back-mobile { display: none; }
+    .chat-header .user-avatar { width: 40px; height: 40px; font-size: 14px; }
+    .chat-header-info { flex: 1; }
+    .chat-header-info .name { font-size: 16px; font-weight: 500; }
+    .chat-header-info .status { font-size: 13px; color: #8696a0; }
+
     .chat-body {
       flex: 1;
       overflow-y: auto;
-      padding: 16px;
+      padding: 20px 60px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 4px;
     }
+
     .message {
-      max-width: 72%;
-      padding: 10px 14px;
-      border-radius: 14px;
+      max-width: 65%;
+      padding: 8px 12px 6px;
+      border-radius: 8px;
       font-size: 14.5px;
-      line-height: 1.45;
+      line-height: 1.4;
       position: relative;
       word-wrap: break-word;
+      margin-bottom: 2px;
     }
     .message.user {
-      background: white;
-      border: 1px solid #e1e8ed;
+      background: #202c33;
       align-self: flex-start;
-      border-bottom-left-radius: 4px;
+      border-top-left-radius: 0;
     }
     .message.admin {
-      background: #002244;
-      color: white;
+      background: #005c4b;
       align-self: flex-end;
-      border-bottom-right-radius: 4px;
+      border-top-right-radius: 0;
     }
     .message img, .message video {
-      max-width: 220px;
-      border-radius: 8px;
-      margin-top: 6px;
+      max-width: 280px;
+      border-radius: 6px;
+      margin-top: 4px;
       display: block;
     }
     .file-card {
       display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(0,0,0,0.06);
+      background: rgba(0,0,0,0.2);
       padding: 10px 12px;
-      border-radius: 10px;
-      margin-top: 6px;
+      border-radius: 8px;
+      margin-top: 4px;
       text-decoration: none;
       color: inherit;
     }
-    .message.admin .file-card {
-      background: rgba(255,255,255,0.15);
-    }
     .file-icon {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 8px;
-      background: #002244;
+      background: #00a884;
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0;
+      font-size: 18px;
     }
-    .message.admin .file-icon {
-      background: rgba(255,255,255,0.25);
-    }
-    .file-info { flex: 1; min-width: 0; }
-    .file-name {
-      font-weight: 600;
-      font-size: 13.5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .file-size { font-size: 11px; opacity: 0.75; }
+    .file-name { font-weight: 500; font-size: 14px; }
+    .file-size { font-size: 12px; opacity: 0.7; }
     .message-time {
-      font-size: 10.5px;
-      margin-top: 4px;
+      font-size: 11px;
+      margin-top: 3px;
       opacity: 0.7;
+      text-align: right;
     }
 
-    /* ===== INPUT AREA (WhatsApp style) ===== */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #8696a0;
+      font-size: 15px;
+      text-align: center;
+      gap: 12px;
+    }
+    .empty-state i { font-size: 48px; opacity: 0.5; }
+
+    /* Input area */
     .input-wrapper {
-      background: white;
-      border-top: 1px solid #e1e8ed;
-    }
-
-    #filePreview {
-      display: none;
-      padding: 10px 14px;
-      background: #f8fafc;
-      border-bottom: 1px solid #e1e8ed;
+      background: #202c33;
+      padding: 10px 16px;
+      display: flex;
       align-items: center;
       gap: 10px;
-    }
-    #filePreview img, #filePreview video {
-      max-height: 58px;
-      border-radius: 6px;
-    }
-    .preview-name {
-      flex: 1;
-      font-size: 13px;
-      color: #334155;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .preview-remove {
-      background: none;
-      border: none;
-      color: #ef4444;
-      font-size: 18px;
-      cursor: pointer;
-      padding: 4px;
-    }
-
-    .chat-input-area {
-      padding: 10px 12px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
       position: relative;
     }
+    #filePreview {
+      display: none;
+      position: absolute;
+      bottom: 70px;
+      left: 16px;
+      right: 16px;
+      background: #2a3942;
+      border-radius: 10px;
+      padding: 10px 14px;
+      align-items: center;
+      gap: 12px;
+      z-index: 20;
+    }
+    #filePreview img, #filePreview video { max-height: 60px; border-radius: 6px; }
+    .preview-name { flex: 1; font-size: 13px; }
+    .preview-remove { background: none; border: none; color: #ef4444; font-size: 18px; cursor: pointer; }
 
-    .attach-btn {
+    .attach-btn, .send-btn {
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: #f1f5f9;
       border: none;
-      color: #002244;
-      font-size: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 18px;
       cursor: pointer;
       flex-shrink: 0;
     }
-    .attach-btn:active {
-      background: #e2e8f0;
-    }
+    .attach-btn { background: transparent; color: #8696a0; }
+    .attach-btn:hover { color: #e9edef; }
+    .send-btn { background: #00a884; color: white; }
 
     .chat-input {
       flex: 1;
-      border: 1px solid #d1dbe5;
-      border-radius: 22px;
-      padding: 11px 16px;
-      font-size: 14.5px;
-      outline: none;
-      background: #f8fafc;
-    }
-    .chat-input:focus {
-      border-color: #002244;
-      background: white;
-    }
-
-    .send-btn {
-      background: #002244;
-      color: white;
+      background: #2a3942;
       border: none;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      font-size: 16px;
-      cursor: pointer;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border-radius: 8px;
+      padding: 11px 16px;
+      color: #e9edef;
+      font-size: 15px;
+      outline: none;
     }
 
-    /* Attach menu */
     .attach-menu {
       display: none;
       position: absolute;
-      bottom: 62px;
-      left: 12px;
-      background: white;
-      border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      bottom: 65px;
+      left: 16px;
+      background: #233138;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
       overflow: hidden;
-      z-index: 100;
-      min-width: 190px;
+      z-index: 30;
+      min-width: 200px;
     }
     .attach-option {
       padding: 14px 18px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       cursor: pointer;
       font-size: 15px;
-      color: #002244;
-      border-bottom: 1px solid #f1f5f9;
+      color: #e9edef;
     }
-    .attach-option:last-child { border-bottom: none; }
-    .attach-option:hover { background: #f8fafc; }
-    .attach-option i { width: 20px; text-align: center; }
-
-    .empty-state {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #64748b;
-      font-size: 15px;
-      text-align: center;
-      padding: 20px;
-    }
+    .attach-option:hover { background: #182229; }
+    .attach-option i { width: 22px; color: #00a884; }
 
     /* Modal */
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 1000;
     }
     .modal {
-      background: white;
+      background: #202c33;
       width: 90%;
       max-width: 400px;
-      border-radius: 14px;
+      border-radius: 12px;
       overflow: hidden;
       max-height: 70vh;
       display: flex;
@@ -327,54 +305,63 @@
     }
     .modal-header {
       padding: 16px;
-      border-bottom: 1px solid #e1e8ed;
-      font-weight: 700;
-      color: #002244;
+      border-bottom: 1px solid #2a3942;
+      font-weight: 600;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .modal-body { overflow-y: auto; flex: 1; }
     .modal-user {
-      padding: 13px 16px;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       cursor: pointer;
-      border-bottom: 1px solid #f0f4f8;
+      border-bottom: 1px solid #2a3942;
     }
-    .modal-user:hover { background: #f8fafc; }
+    .modal-user:hover { background: #2a3942; }
   </style>
 </head>
 <body>
 
   <div class="header">
     <h1><i class="fa-solid fa-headset"></i> USAA Admin Live Chat</h1>
-    <span style="font-size:13px;opacity:0.8;">Support Panel</span>
+    <span>Support Panel</span>
   </div>
 
   <div class="main">
-    <!-- Left: Conversations -->
+    <!-- LEFT -->
     <div class="sidebar">
       <div class="sidebar-header">
         <span>Conversations</span>
-        <button class="add-btn" onclick="openUserPicker()" title="Start new chat">
-          <i class="fa-solid fa-plus"></i>
-        </button>
+        <button class="add-btn" onclick="openUserPicker()"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="search-box">
+        <input type="text" placeholder="Search or start new chat" id="searchInput" oninput="filterUsers()">
       </div>
       <div class="user-list" id="userList">
-        <div style="padding:20px;text-align:center;color:#64748b;">Loading...</div>
+        <div style="padding:30px;text-align:center;color:#8696a0;">Loading...</div>
       </div>
     </div>
 
-    <!-- Right: Chat -->
+    <!-- RIGHT -->
     <div class="chat-panel">
-      <div class="chat-header" id="chatHeader">Select a conversation</div>
-      <div class="chat-body" id="chatBody">
-        <div class="empty-state">Select a user from the left<br>or click + to start a new chat</div>
+      <div class="chat-header" id="chatHeader" style="display:none;">
+        <div class="user-avatar" id="headerAvatar">US</div>
+        <div class="chat-header-info">
+          <div class="name" id="headerName">Select a chat</div>
+          <div class="status">online</div>
+        </div>
       </div>
 
-      <!-- Input area -->
+      <div class="chat-body" id="chatBody">
+        <div class="empty-state">
+          <i class="fa-solid fa-comments"></i>
+          <div>Select a conversation<br>or click + to start a new chat</div>
+        </div>
+      </div>
+
       <div class="input-wrapper" id="inputWrapper" style="display:none;">
         <div id="filePreview">
           <div id="previewContent"></div>
@@ -382,42 +369,38 @@
           <button class="preview-remove" onclick="clearFile()"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <div class="chat-input-area">
-          <button class="attach-btn" id="attachBtn" onclick="toggleAttachMenu()">
-            <i class="fa-solid fa-paperclip"></i>
-          </button>
+        <button class="attach-btn" id="attachBtn" onclick="toggleAttachMenu()">
+          <i class="fa-solid fa-plus"></i>
+        </button>
 
-          <div class="attach-menu" id="attachMenu">
-            <div class="attach-option" onclick="pickMedia()">
-              <i class="fa-solid fa-image"></i> Photo & Video
-            </div>
-            <div class="attach-option" onclick="pickDocument()">
-              <i class="fa-solid fa-file"></i> Document
-            </div>
+        <div class="attach-menu" id="attachMenu">
+          <div class="attach-option" onclick="pickMedia()">
+            <i class="fa-solid fa-image"></i> Photo & Video
           </div>
-
-          <input type="file" id="mediaInput" accept="image/*,video/*" style="display:none" onchange="handleFileSelect(event)">
-          <input type="file" id="docInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" style="display:none" onchange="handleFileSelect(event)">
-
-          <input type="text" class="chat-input" id="adminInput" placeholder="Type a message...">
-          <button class="send-btn" onclick="sendAdminReply()">
-            <i class="fa-solid fa-paper-plane"></i>
-          </button>
+          <div class="attach-option" onclick="pickDocument()">
+            <i class="fa-solid fa-file"></i> Document
+          </div>
         </div>
+
+        <input type="file" id="mediaInput" accept="image/*,video/*" style="display:none" onchange="handleFileSelect(event)">
+        <input type="file" id="docInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" style="display:none" onchange="handleFileSelect(event)">
+
+        <input type="text" class="chat-input" id="adminInput" placeholder="Type a message">
+        <button class="send-btn" onclick="sendAdminReply()">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- User Picker Modal -->
+  <!-- User Picker -->
   <div class="modal-overlay" id="userPicker">
     <div class="modal">
       <div class="modal-header">
-        <span>Select User</span>
-        <button onclick="closeUserPicker()" style="background:none;border:none;font-size:18px;cursor:pointer;">✕</button>
+        <span>New Chat</span>
+        <button onclick="closeUserPicker()" style="background:none;border:none;color:#e9edef;font-size:18px;cursor:pointer;">✕</button>
       </div>
-      <div class="modal-body" id="allUsersList">
-        <div style="padding:20px;text-align:center;color:#64748b;">Loading users...</div>
-      </div>
+      <div class="modal-body" id="allUsersList"></div>
     </div>
   </div>
 
@@ -430,109 +413,106 @@
     let selectedUserName = "User";
     let profilesMap = {};
     let selectedFile = null;
+    let allConversations = [];
 
     async function init() {
       await loadAllProfiles();
       await loadConversations();
 
-      client
-        .channel('admin-chat')
+      client.channel('admin-chat')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
           loadConversations();
           if (selectedUserId && payload.new.user_id === selectedUserId) {
             loadUserMessages(selectedUserId);
           }
-        })
-        .subscribe();
+        }).subscribe();
     }
 
     async function loadAllProfiles() {
       const { data } = await client.from('profiles').select('id, full_name, email');
       profilesMap = {};
-      (data || []).forEach(p => {
-        profilesMap[p.id] = p;
-      });
+      (data || []).forEach(p => profilesMap[p.id] = p);
     }
 
     function getUserName(userId) {
       const p = profilesMap[userId];
-      if (p && p.full_name) return p.full_name;
-      if (p && p.email) return p.email;
+      if (p?.full_name) return p.full_name;
+      if (p?.email) return p.email;
       return "User " + userId.substring(0, 8);
     }
 
     function getInitials(name) {
       if (!name) return "US";
       const parts = name.trim().split(" ");
-      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-      return name.substring(0, 2).toUpperCase();
+      return parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : name.substring(0, 2).toUpperCase();
     }
 
     async function loadConversations() {
-      const { data, error } = await client
-        .from('chat_messages')
-        .select('user_id, message, created_at, sender_type, image_url')
+      const { data } = await client.from('chat_messages')
+        .select('user_id, message, created_at, image_url')
         .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error(error);
-        return;
-      }
 
       const map = new Map();
       (data || []).forEach(msg => {
         if (!map.has(msg.user_id)) {
-          let last = msg.message || '';
-          if (!last && msg.image_url) last = '[File]';
           map.set(msg.user_id, {
             user_id: msg.user_id,
-            lastMessage: last,
+            lastMessage: msg.message || (msg.image_url ? '📎 File' : ''),
             lastTime: msg.created_at
           });
         }
       });
 
-      const conversations = Array.from(map.values());
-      const list = document.getElementById('userList');
+      allConversations = Array.from(map.values());
+      renderConversationList(allConversations);
+    }
 
-      if (conversations.length === 0) {
-        list.innerHTML = `<div style="padding:20px;text-align:center;color:#64748b;">No conversations yet<br><small>Click + to start one</small></div>`;
+    function renderConversationList(list) {
+      const el = document.getElementById('userList');
+      if (list.length === 0) {
+        el.innerHTML = `<div style="padding:40px;text-align:center;color:#8696a0;">No conversations yet</div>`;
         return;
       }
 
-      list.innerHTML = conversations.map(c => {
+      el.innerHTML = list.map(c => {
         const name = getUserName(c.user_id);
         const time = new Date(c.lastTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
         return `
           <div class="user-item ${selectedUserId === c.user_id ? 'active' : ''}" onclick="openConversation('${c.user_id}')">
             <div class="user-avatar">${getInitials(name)}</div>
             <div class="user-info">
-              <div class="user-name">${name}</div>
+              <div class="user-top">
+                <div class="user-name">${name}</div>
+                <div class="user-time">${time}</div>
+              </div>
               <div class="user-last">${c.lastMessage}</div>
             </div>
-            <div class="user-time">${time}</div>
           </div>
         `;
       }).join('');
+    }
+
+    function filterUsers() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = allConversations.filter(c => getUserName(c.user_id).toLowerCase().includes(q));
+      renderConversationList(filtered);
     }
 
     async function openConversation(userId) {
       selectedUserId = userId;
       selectedUserName = getUserName(userId);
 
-      document.getElementById('chatHeader').innerHTML = `
-        <div class="user-avatar" style="width:36px;height:36px;font-size:13px;">${getInitials(selectedUserName)}</div>
-        <span>${selectedUserName}</span>
-      `;
-      document.getElementById('inputWrapper').style.display = 'block';
+      document.getElementById('chatHeader').style.display = 'flex';
+      document.getElementById('headerAvatar').textContent = getInitials(selectedUserName);
+      document.getElementById('headerName').textContent = selectedUserName;
+      document.getElementById('inputWrapper').style.display = 'flex';
 
       await loadUserMessages(userId);
       await loadConversations();
     }
 
     async function loadUserMessages(userId) {
-      const { data, error } = await client
-        .from('chat_messages')
+      const { data } = await client.from('chat_messages')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: true });
@@ -540,14 +520,8 @@
       const body = document.getElementById('chatBody');
       body.innerHTML = '';
 
-      if (error) {
-        body.innerHTML = `<div class="empty-state">Error loading messages</div>`;
-        console.error(error);
-        return;
-      }
-
       if (!data || data.length === 0) {
-        body.innerHTML = `<div class="empty-state">No messages yet with this user</div>`;
+        body.innerHTML = `<div class="empty-state"><div>No messages yet</div></div>`;
         return;
       }
 
@@ -559,100 +533,77 @@
 
         if (msg.image_url) {
           const url = msg.image_url.toLowerCase();
-          if (url.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/)) {
-            content += `<img src="${msg.image_url}" alt="Photo">`;
-          } else if (url.match(/\.(mp4|webm|mov|avi)(\?|$)/)) {
-            content += `<video src="${msg.image_url}" controls style="max-width:220px;border-radius:8px;margin-top:6px;"></video>`;
+          if (url.match(/\.(jpg|jpeg|png|gif|webp)(\?|$)/)) {
+            content += `<img src="${msg.image_url}">`;
+          } else if (url.match(/\.(mp4|webm|mov)(\?|$)/)) {
+            content += `<video src="${msg.image_url}" controls></video>`;
           } else {
-            const fileName = msg.message || 'Document';
             content += `
               <a href="${msg.image_url}" target="_blank" class="file-card">
                 <div class="file-icon"><i class="fa-solid fa-file"></i></div>
-                <div class="file-info">
-                  <div class="file-name">${fileName}</div>
-                  <div class="file-size">Tap to download</div>
+                <div>
+                  <div class="file-name">${msg.message || 'Document'}</div>
+                  <div class="file-size">Tap to open</div>
                 </div>
-              </a>
-            `;
+              </a>`;
           }
         }
 
-        const time = new Date(msg.created_at).toLocaleString('en-US', {
-          month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
-        });
-
+        const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
         div.innerHTML = `${content}<div class="message-time">${time}</div>`;
         body.appendChild(div);
       });
 
       body.scrollTop = body.scrollHeight;
 
-      await client
-        .from('chat_messages')
-        .update({ is_read: true })
-        .eq('user_id', userId)
-        .eq('sender_type', 'user')
-        .eq('is_read', false);
+      await client.from('chat_messages').update({ is_read: true })
+        .eq('user_id', userId).eq('sender_type', 'user').eq('is_read', false);
     }
 
-    // ===== FILE UPLOAD =====
+    // File handling
     function toggleAttachMenu() {
       const menu = document.getElementById('attachMenu');
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
-
     function pickMedia() {
       document.getElementById('attachMenu').style.display = 'none';
       document.getElementById('mediaInput').click();
     }
-
     function pickDocument() {
       document.getElementById('attachMenu').style.display = 'none';
       document.getElementById('docInput').click();
     }
-
     function handleFileSelect(e) {
       const file = e.target.files[0];
       if (!file) return;
-
       selectedFile = file;
-      const preview = document.getElementById('filePreview');
-      const previewContent = document.getElementById('previewContent');
-      const previewName = document.getElementById('previewName');
+      document.getElementById('filePreview').style.display = 'flex';
+      document.getElementById('previewName').textContent = file.name;
 
-      preview.style.display = 'flex';
-      previewName.textContent = file.name;
-
+      const content = document.getElementById('previewContent');
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
-        reader.onload = (ev) => {
-          previewContent.innerHTML = `<img src="${ev.target.result}">`;
-        };
+        reader.onload = ev => content.innerHTML = `<img src="${ev.target.result}">`;
         reader.readAsDataURL(file);
       } else if (file.type.startsWith('video/')) {
         const reader = new FileReader();
-        reader.onload = (ev) => {
-          previewContent.innerHTML = `<video src="${ev.target.result}" style="max-height:58px;border-radius:6px;"></video>`;
-        };
+        reader.onload = ev => content.innerHTML = `<video src="${ev.target.result}" style="max-height:60px"></video>`;
         reader.readAsDataURL(file);
       } else {
-        previewContent.innerHTML = `<div style="width:42px;height:42px;background:#002244;color:white;border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-file"></i></div>`;
+        content.innerHTML = `<div style="width:42px;height:42px;background:#00a884;border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-file"></i></div>`;
       }
     }
-
     function clearFile() {
       selectedFile = null;
       document.getElementById('mediaInput').value = '';
       document.getElementById('docInput').value = '';
       document.getElementById('filePreview').style.display = 'none';
-      document.getElementById('previewContent').innerHTML = '';
     }
 
     async function sendAdminReply() {
       if (!selectedUserId) return;
       const input = document.getElementById('adminInput');
       const text = input.value.trim();
-
       if (!text && !selectedFile) return;
 
       try {
@@ -662,18 +613,10 @@
         if (selectedFile) {
           fileName = selectedFile.name;
           const safeName = `admin/${Date.now()}_${selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-
-          const { error: uploadError } = await client.storage
-            .from('chat-images')
-            .upload(safeName, selectedFile);
-
-          if (uploadError) throw uploadError;
-
-          const { data: publicUrl } = client.storage
-            .from('chat-images')
-            .getPublicUrl(safeName);
-
-          fileUrl = publicUrl.publicUrl;
+          const { error: upErr } = await client.storage.from('chat-images').upload(safeName, selectedFile);
+          if (upErr) throw upErr;
+          const { data } = client.storage.from('chat-images').getPublicUrl(safeName);
+          fileUrl = data.publicUrl;
         }
 
         const { error } = await client.from('chat_messages').insert([{
@@ -683,65 +626,42 @@
           image_url: fileUrl,
           is_read: false
         }]);
-
         if (error) throw error;
 
         input.value = '';
         clearFile();
         await loadUserMessages(selectedUserId);
         await loadConversations();
-
       } catch (err) {
-        console.error(err);
-        alert('Error sending: ' + err.message);
+        alert('Error: ' + err.message);
       }
     }
 
-    // ===== User Picker =====
     async function openUserPicker() {
       document.getElementById('userPicker').style.display = 'flex';
-      
       const { data } = await client.from('profiles').select('id, full_name, email').order('full_name');
-      const list = document.getElementById('allUsersList');
-      
-      if (!data || data.length === 0) {
-        list.innerHTML = `<div style="padding:20px;text-align:center;">No users found</div>`;
-        return;
-      }
-
-      list.innerHTML = data.map(p => {
+      document.getElementById('allUsersList').innerHTML = (data || []).map(p => {
         const name = p.full_name || p.email || p.id.substring(0,8);
         return `
           <div class="modal-user" onclick="startChatWith('${p.id}')">
             <div class="user-avatar">${getInitials(name)}</div>
             <div>
               <div class="user-name">${name}</div>
-              <div class="user-last">${p.email || ''}</div>
+              <div class="user-last" style="font-size:13px;color:#8696a0;">${p.email || ''}</div>
             </div>
-          </div>
-        `;
+          </div>`;
       }).join('');
     }
+    function closeUserPicker() { document.getElementById('userPicker').style.display = 'none'; }
+    async function startChatWith(id) { closeUserPicker(); await openConversation(id); }
 
-    function closeUserPicker() {
-      document.getElementById('userPicker').style.display = 'none';
-    }
-
-    async function startChatWith(userId) {
-      closeUserPicker();
-      await openConversation(userId);
-    }
-
-    // Close menu when clicking outside
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', e => {
       const menu = document.getElementById('attachMenu');
       const btn = document.getElementById('attachBtn');
-      if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
-        menu.style.display = 'none';
-      }
+      if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) menu.style.display = 'none';
     });
 
-    document.getElementById('adminInput').addEventListener('keypress', function(e) {
+    document.getElementById('adminInput').addEventListener('keypress', e => {
       if (e.key === 'Enter') sendAdminReply();
     });
 
