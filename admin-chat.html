@@ -113,6 +113,7 @@
       font-size: 14.5px;
       line-height: 1.45;
       position: relative;
+      word-wrap: break-word;
     }
     .message.user {
       background: white;
@@ -126,25 +127,117 @@
       align-self: flex-end;
       border-bottom-right-radius: 4px;
     }
-    .message img {
+    .message img, .message video {
       max-width: 220px;
       border-radius: 8px;
       margin-top: 6px;
       display: block;
     }
+    .file-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.06);
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-top: 6px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .message.admin .file-card {
+      background: rgba(255,255,255,0.15);
+    }
+    .file-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #002244;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .message.admin .file-icon {
+      background: rgba(255,255,255,0.25);
+    }
+    .file-info { flex: 1; min-width: 0; }
+    .file-name {
+      font-weight: 600;
+      font-size: 13.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .file-size { font-size: 11px; opacity: 0.75; }
     .message-time {
       font-size: 10.5px;
       margin-top: 4px;
       opacity: 0.7;
     }
-    .chat-input-area {
+
+    /* ===== INPUT AREA (WhatsApp style) ===== */
+    .input-wrapper {
       background: white;
       border-top: 1px solid #e1e8ed;
-      padding: 12px;
+    }
+
+    #filePreview {
+      display: none;
+      padding: 10px 14px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e1e8ed;
+      align-items: center;
+      gap: 10px;
+    }
+    #filePreview img, #filePreview video {
+      max-height: 58px;
+      border-radius: 6px;
+    }
+    .preview-name {
+      flex: 1;
+      font-size: 13px;
+      color: #334155;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .preview-remove {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .chat-input-area {
+      padding: 10px 12px;
       display: flex;
       gap: 8px;
       align-items: center;
+      position: relative;
     }
+
+    .attach-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      border: none;
+      color: #002244;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .attach-btn:active {
+      background: #e2e8f0;
+    }
+
     .chat-input {
       flex: 1;
       border: 1px solid #d1dbe5;
@@ -152,17 +245,55 @@
       padding: 11px 16px;
       font-size: 14.5px;
       outline: none;
+      background: #f8fafc;
     }
+    .chat-input:focus {
+      border-color: #002244;
+      background: white;
+    }
+
     .send-btn {
       background: #002244;
       color: white;
       border: none;
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       font-size: 16px;
       cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    /* Attach menu */
+    .attach-menu {
+      display: none;
+      position: absolute;
+      bottom: 62px;
+      left: 12px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      overflow: hidden;
+      z-index: 100;
+      min-width: 190px;
+    }
+    .attach-option {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 15px;
+      color: #002244;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .attach-option:last-child { border-bottom: none; }
+    .attach-option:hover { background: #f8fafc; }
+    .attach-option i { width: 20px; text-align: center; }
+
     .empty-state {
       flex: 1;
       display: flex;
@@ -174,7 +305,7 @@
       padding: 20px;
     }
 
-    /* Modal for selecting any user */
+    /* Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -242,9 +373,37 @@
       <div class="chat-body" id="chatBody">
         <div class="empty-state">Select a user from the left<br>or click + to start a new chat</div>
       </div>
-      <div class="chat-input-area" id="inputArea" style="display:none;">
-        <input type="text" class="chat-input" id="adminInput" placeholder="Type your reply...">
-        <button class="send-btn" onclick="sendAdminReply()"><i class="fa-solid fa-paper-plane"></i></button>
+
+      <!-- Input area -->
+      <div class="input-wrapper" id="inputWrapper" style="display:none;">
+        <div id="filePreview">
+          <div id="previewContent"></div>
+          <div class="preview-name" id="previewName"></div>
+          <button class="preview-remove" onclick="clearFile()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="chat-input-area">
+          <button class="attach-btn" id="attachBtn" onclick="toggleAttachMenu()">
+            <i class="fa-solid fa-paperclip"></i>
+          </button>
+
+          <div class="attach-menu" id="attachMenu">
+            <div class="attach-option" onclick="pickMedia()">
+              <i class="fa-solid fa-image"></i> Photo & Video
+            </div>
+            <div class="attach-option" onclick="pickDocument()">
+              <i class="fa-solid fa-file"></i> Document
+            </div>
+          </div>
+
+          <input type="file" id="mediaInput" accept="image/*,video/*" style="display:none" onchange="handleFileSelect(event)">
+          <input type="file" id="docInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" style="display:none" onchange="handleFileSelect(event)">
+
+          <input type="text" class="chat-input" id="adminInput" placeholder="Type a message...">
+          <button class="send-btn" onclick="sendAdminReply()">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -269,13 +428,13 @@
 
     let selectedUserId = null;
     let selectedUserName = "User";
-    let profilesMap = {};   // user_id → profile
+    let profilesMap = {};
+    let selectedFile = null;
 
     async function init() {
       await loadAllProfiles();
       await loadConversations();
 
-      // Realtime: new messages
       client
         .channel('admin-chat')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
@@ -320,21 +479,22 @@
         return;
       }
 
-      // Group by user_id (latest message first)
       const map = new Map();
       (data || []).forEach(msg => {
         if (!map.has(msg.user_id)) {
+          let last = msg.message || '';
+          if (!last && msg.image_url) last = '[File]';
           map.set(msg.user_id, {
             user_id: msg.user_id,
-            lastMessage: msg.message || (msg.image_url ? '[Photo]' : ''),
+            lastMessage: last,
             lastTime: msg.created_at
           });
         }
       });
 
       const conversations = Array.from(map.values());
-
       const list = document.getElementById('userList');
+
       if (conversations.length === 0) {
         list.innerHTML = `<div style="padding:20px;text-align:center;color:#64748b;">No conversations yet<br><small>Click + to start one</small></div>`;
         return;
@@ -364,13 +524,10 @@
         <div class="user-avatar" style="width:36px;height:36px;font-size:13px;">${getInitials(selectedUserName)}</div>
         <span>${selectedUserName}</span>
       `;
-      document.getElementById('inputArea').style.display = 'flex';
+      document.getElementById('inputWrapper').style.display = 'block';
 
-      // Highlight in list
-      document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
-      // We re-render list so active class is applied on next loadConversations, but for now:
       await loadUserMessages(userId);
-      await loadConversations(); // refresh list to show active
+      await loadConversations();
     }
 
     async function loadUserMessages(userId) {
@@ -397,22 +554,39 @@
       data.forEach(msg => {
         const div = document.createElement('div');
         div.className = `message ${msg.sender_type === 'admin' ? 'admin' : 'user'}`;
-        
+
         let content = msg.message ? msg.message.replace(/\n/g, '<br>') : '';
+
         if (msg.image_url) {
-          content += `<img src="${msg.image_url}" alt="photo">`;
+          const url = msg.image_url.toLowerCase();
+          if (url.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/)) {
+            content += `<img src="${msg.image_url}" alt="Photo">`;
+          } else if (url.match(/\.(mp4|webm|mov|avi)(\?|$)/)) {
+            content += `<video src="${msg.image_url}" controls style="max-width:220px;border-radius:8px;margin-top:6px;"></video>`;
+          } else {
+            const fileName = msg.message || 'Document';
+            content += `
+              <a href="${msg.image_url}" target="_blank" class="file-card">
+                <div class="file-icon"><i class="fa-solid fa-file"></i></div>
+                <div class="file-info">
+                  <div class="file-name">${fileName}</div>
+                  <div class="file-size">Tap to download</div>
+                </div>
+              </a>
+            `;
+          }
         }
-        const time = new Date(msg.created_at).toLocaleString('en-US', { 
-          month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' 
+
+        const time = new Date(msg.created_at).toLocaleString('en-US', {
+          month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
         });
-        
+
         div.innerHTML = `${content}<div class="message-time">${time}</div>`;
         body.appendChild(div);
       });
 
       body.scrollTop = body.scrollHeight;
 
-      // Mark user messages as read
       await client
         .from('chat_messages')
         .update({ is_read: true })
@@ -421,30 +595,109 @@
         .eq('is_read', false);
     }
 
+    // ===== FILE UPLOAD =====
+    function toggleAttachMenu() {
+      const menu = document.getElementById('attachMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function pickMedia() {
+      document.getElementById('attachMenu').style.display = 'none';
+      document.getElementById('mediaInput').click();
+    }
+
+    function pickDocument() {
+      document.getElementById('attachMenu').style.display = 'none';
+      document.getElementById('docInput').click();
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      selectedFile = file;
+      const preview = document.getElementById('filePreview');
+      const previewContent = document.getElementById('previewContent');
+      const previewName = document.getElementById('previewName');
+
+      preview.style.display = 'flex';
+      previewName.textContent = file.name;
+
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          previewContent.innerHTML = `<img src="${ev.target.result}">`;
+        };
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith('video/')) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          previewContent.innerHTML = `<video src="${ev.target.result}" style="max-height:58px;border-radius:6px;"></video>`;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previewContent.innerHTML = `<div style="width:42px;height:42px;background:#002244;color:white;border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-file"></i></div>`;
+      }
+    }
+
+    function clearFile() {
+      selectedFile = null;
+      document.getElementById('mediaInput').value = '';
+      document.getElementById('docInput').value = '';
+      document.getElementById('filePreview').style.display = 'none';
+      document.getElementById('previewContent').innerHTML = '';
+    }
+
     async function sendAdminReply() {
       if (!selectedUserId) return;
       const input = document.getElementById('adminInput');
       const text = input.value.trim();
-      if (!text) return;
 
-      const { error } = await client.from('chat_messages').insert([{
-        user_id: selectedUserId,
-        sender_type: 'admin',
-        message: text,
-        is_read: false
-      }]);
+      if (!text && !selectedFile) return;
 
-      if (error) {
-        alert('Error sending reply: ' + error.message);
-        return;
+      try {
+        let fileUrl = null;
+        let fileName = null;
+
+        if (selectedFile) {
+          fileName = selectedFile.name;
+          const safeName = `admin/${Date.now()}_${selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+
+          const { error: uploadError } = await client.storage
+            .from('chat-images')
+            .upload(safeName, selectedFile);
+
+          if (uploadError) throw uploadError;
+
+          const { data: publicUrl } = client.storage
+            .from('chat-images')
+            .getPublicUrl(safeName);
+
+          fileUrl = publicUrl.publicUrl;
+        }
+
+        const { error } = await client.from('chat_messages').insert([{
+          user_id: selectedUserId,
+          sender_type: 'admin',
+          message: text || fileName,
+          image_url: fileUrl,
+          is_read: false
+        }]);
+
+        if (error) throw error;
+
+        input.value = '';
+        clearFile();
+        await loadUserMessages(selectedUserId);
+        await loadConversations();
+
+      } catch (err) {
+        console.error(err);
+        alert('Error sending: ' + err.message);
       }
-
-      input.value = '';
-      await loadUserMessages(selectedUserId);
-      await loadConversations();
     }
 
-    // ===== User Picker (the + button) =====
+    // ===== User Picker =====
     async function openUserPicker() {
       document.getElementById('userPicker').style.display = 'flex';
       
@@ -479,7 +732,15 @@
       await openConversation(userId);
     }
 
-    // Enter key to send
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+      const menu = document.getElementById('attachMenu');
+      const btn = document.getElementById('attachBtn');
+      if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
+        menu.style.display = 'none';
+      }
+    });
+
     document.getElementById('adminInput').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') sendAdminReply();
     });
