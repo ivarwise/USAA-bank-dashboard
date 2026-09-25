@@ -194,7 +194,6 @@
 
   <div class="container">
 
-    <!-- Search Card -->
     <div class="card">
       <h2><i class="fa-solid fa-magnifying-glass"></i> Search User</h2>
       
@@ -207,7 +206,6 @@
 
       <div class="no-result" id="noResult">No user found. Try another name or email.</div>
 
-      <!-- User Result -->
       <div class="user-result" id="userResult">
         <div class="user-info">
           <div class="avatar" id="userAvatar">US</div>
@@ -220,7 +218,6 @@
 
         <div class="accounts-list" id="accountsList"></div>
 
-        <!-- Top-up Form -->
         <div class="topup-form" id="topupForm">
           <h3 style="font-size:15px;color:#002244;margin-bottom:14px;">Add Balance (Top-Up)</h3>
           
@@ -280,21 +277,35 @@
       document.getElementById('noResult').style.display = 'none';
       document.getElementById('topupForm').classList.remove('active');
 
-      // Search by full_name, email or id
-      let { data: profiles, error } = await client
-        .from('profiles')
-        .select('*')
-        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%,id.eq.${query}`);
+      let profiles = [];
 
-      // If searching by exact ID failed due to format, try again more loosely
-      if ((!profiles || profiles.length === 0) && query.length > 20) {
-        const { data } = await client.from('profiles').select('*').eq('id', query);
-        profiles = data;
-      }
+      // Check if the query looks like a UUID
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(query);
 
-      if (error) {
-        showAlert('Search error: ' + error.message, 'error');
-        return;
+      if (isUUID) {
+        // Search by exact ID
+        const { data, error } = await client
+          .from('profiles')
+          .select('*')
+          .eq('id', query);
+        
+        if (error) {
+          showAlert('Search error: ' + error.message, 'error');
+          return;
+        }
+        profiles = data || [];
+      } else {
+        // Search by name or email only
+        const { data, error } = await client
+          .from('profiles')
+          .select('*')
+          .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`);
+        
+        if (error) {
+          showAlert('Search error: ' + error.message, 'error');
+          return;
+        }
+        profiles = data || [];
       }
 
       if (!profiles || profiles.length === 0) {
