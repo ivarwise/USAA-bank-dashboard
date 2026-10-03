@@ -54,10 +54,24 @@
 
       <!-- Greeting -->
       <h1 class="serif-title text-[26px] font-bold leading-tight" id="user-greeting">Good morning</h1>
-      <p class="text-xs text-blue-200/80 mt-0.5" id="member-since">Member since 2019</p>
+      <p class="text-xs text-blue-200/80 mt-0.5" id="member-since">Your security. Our mission.®</p>
+
+      <!-- Total Account Balance -->
+      <div class="mt-5 mb-4 bg-[#003366] rounded-xl px-4 py-4 border border-white/10">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-xs text-blue-100/90 font-medium flex items-center gap-1.5">
+              Total Account Balance
+              <i data-lucide="eye" class="w-3.5 h-3.5 opacity-80"></i>
+            </p>
+            <p class="text-2xl font-bold tracking-tight mt-1" id="total-balance">$0.00</p>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 text-blue-200/70"></i>
+        </div>
+      </div>
 
       <!-- Accounts Header -->
-      <div class="flex justify-between items-center mt-6 mb-3">
+      <div class="flex justify-between items-center mt-2 mb-3">
         <h2 class="font-medium text-sm tracking-wide">Accounts</h2>
         <a href="banking.html" class="text-xs text-blue-200 hover:underline flex items-center gap-0.5 font-medium">
           View all <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
@@ -211,7 +225,7 @@
         document.getElementById('user-greeting').innerText = greeting;
       }
 
-      document.getElementById('member-since').innerText = "Member since 2019";
+      document.getElementById('member-since').innerText = "Your security. Our mission.®";
 
       await loadAccounts(user.id);
       await loadTransactions(user.id);
@@ -261,6 +275,11 @@
         await createDefaultAccounts(userId);
         return loadAccounts(userId);
       }
+
+      // Calculate Total Account Balance
+      const total = accounts.reduce((sum, acc) => sum + parseFloat(acc.balance || 0), 0);
+      document.getElementById('total-balance').textContent = 
+        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(total);
 
       const iconMap = {
         checking: 'wallet',
@@ -344,8 +363,8 @@
           color = 'text-[#002B49]';
         }
 
-        const date = tx.transaction_date 
-          ? new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) 
+        const date = tx.transaction_date  
+          ? new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })  
           : 'Recent';
 
         const isLast = index === recent.length - 1;
