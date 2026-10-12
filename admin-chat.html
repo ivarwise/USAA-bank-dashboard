@@ -177,7 +177,7 @@
       opacity: 0.7;
     }
 
-    /* ===== INPUT AREA (WhatsApp style) ===== */
+    /* Input area */
     .input-wrapper {
       background: white;
       border-top: 1px solid #e1e8ed;
@@ -233,9 +233,6 @@
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
-    }
-    .attach-btn:active {
-      background: #e2e8f0;
     }
 
     .chat-input {
@@ -344,6 +341,14 @@
       border-bottom: 1px solid #f0f4f8;
     }
     .modal-user:hover { background: #f8fafc; }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; }
+      .chat-panel { display: none; }
+      .main.chat-open .sidebar { display: none; }
+      .main.chat-open .chat-panel { display: flex; }
+    }
   </style>
 </head>
 <body>
@@ -353,7 +358,7 @@
     <span style="font-size:13px;opacity:0.8;">Support Panel</span>
   </div>
 
-  <div class="main">
+  <div class="main" id="mainContainer">
     <!-- Left: Conversations -->
     <div class="sidebar">
       <div class="sidebar-header">
@@ -503,8 +508,9 @@
       list.innerHTML = conversations.map(c => {
         const name = getUserName(c.user_id);
         const time = new Date(c.lastTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        const isActive = selectedUserId === c.user_id ? 'active' : '';
         return `
-          <div class="user-item ${selectedUserId === c.user_id ? 'active' : ''}" onclick="openConversation('${c.user_id}')">
+          <div class="user-item ${isActive}" onclick="openConversation('${c.user_id}')">
             <div class="user-avatar">${getInitials(name)}</div>
             <div class="user-info">
               <div class="user-name">${name}</div>
@@ -525,6 +531,9 @@
         <span>${selectedUserName}</span>
       `;
       document.getElementById('inputWrapper').style.display = 'block';
+
+      // Mobile: show chat panel
+      document.getElementById('mainContainer').classList.add('chat-open');
 
       await loadUserMessages(userId);
       await loadConversations();
