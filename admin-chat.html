@@ -177,10 +177,11 @@
       opacity: 0.7;
     }
 
-    /* Input area */
+    /* ===== FIXED INPUT AREA ===== */
     .input-wrapper {
       background: white;
       border-top: 1px solid #e1e8ed;
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     #filePreview {
@@ -218,11 +219,13 @@
       gap: 8px;
       align-items: center;
       position: relative;
+      width: 100%;
     }
 
     .attach-btn {
       width: 42px;
       height: 42px;
+      min-width: 42px;
       border-radius: 50%;
       background: #f1f5f9;
       border: none;
@@ -237,6 +240,7 @@
 
     .chat-input {
       flex: 1;
+      min-width: 0;
       border: 1px solid #d1dbe5;
       border-radius: 22px;
       padding: 11px 16px;
@@ -255,6 +259,7 @@
       border: none;
       width: 42px;
       height: 42px;
+      min-width: 42px;
       border-radius: 50%;
       font-size: 16px;
       cursor: pointer;
@@ -347,7 +352,17 @@
       .sidebar { width: 100%; }
       .chat-panel { display: none; }
       .main.chat-open .sidebar { display: none; }
-      .main.chat-open .chat-panel { display: flex; }
+      .main.chat-open .chat-panel { display: flex; width: 100%; }
+      
+      .chat-input-area {
+        padding: 10px 10px;
+        gap: 6px;
+      }
+      .attach-btn, .send-btn {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+      }
     }
   </style>
 </head>
@@ -405,6 +420,7 @@
           <input type="file" id="docInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" style="display:none" onchange="handleFileSelect(event)">
 
           <input type="text" class="chat-input" id="adminInput" placeholder="Type a message...">
+          
           <button class="send-btn" onclick="sendAdminReply()">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
