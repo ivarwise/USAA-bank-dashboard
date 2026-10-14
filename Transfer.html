@@ -330,7 +330,7 @@
           <h2 style="margin:0 0 10px 0; color:#856404;">⏳ Transfer Under Review</h2>
           <p style="margin:0; font-size:15px; line-height:1.5;">
             For your security, this transfer has been placed on hold pending additional verification.<br><br>
-            <strong>Please contact USAA Member Service</strong> to complete this request.
+            <strong>Please contact USAA customer support</strong> to complete this request.
           </p>
         </div>
       </div>
@@ -557,7 +557,7 @@
         
         const selectedAccId = document.getElementById('fromAccount').value;
         const fromAcc = userAccounts.find(a => a.id === selectedAccId);
-        const bank = document.getElementById('countrySelect').value === "MANUAL" ? 
+        const bank = document.getElementById('countrySelect').value === "MANUAL" ?  
                      document.getElementById('manualBankName').value.trim() : document.getElementById('toBank').value;
 
         if (!bank) {
@@ -598,7 +598,7 @@
 
       const fromAccId = document.getElementById('fromAccount').value;
       const amt = parseFloat(document.getElementById('amount').value);
-      const bank = document.getElementById('countrySelect').value === "MANUAL" ? 
+      const bank = document.getElementById('countrySelect').value === "MANUAL" ?  
                    document.getElementById('manualBankName').value.trim() : document.getElementById('toBank').value;
       const recipientAccNum = document.getElementById('accountNum').value.trim() || 'N/A';
       const recipientFullName = document.getElementById('recipientName').value.trim();
@@ -614,7 +614,6 @@
 
           const totalDeduction = amt + calculatedFeeValue;
 
-          // Check if enough balance
           if ((selectedAcc.balance || 0) < totalDeduction) {
             alert("Insufficient funds to cover this transfer.");
             authBtn.disabled = false;
@@ -651,7 +650,6 @@
             }
           ]);
 
-          // Also record the fee as pending if any
           if (calculatedFeeValue > 0) {
             await client.from('transactions').insert([
               {
@@ -728,7 +726,7 @@
             return;
           }
 
-          const { error: txError } = await client.from('transactions').insert([
+          await client.from('transactions').insert([
             {
               user_id: currentUser.id,
               account_id: fromAccId,
@@ -741,11 +739,6 @@
               status: 'completed'
             }
           ]);
-
-          if (txError) {
-            console.error("Transaction insert failed:", txError);
-            alert("Balance updated but transaction record failed: " + txError.message);
-          }
 
           if (calculatedFeeValue > 0) {
             await client.from('transactions').insert([
