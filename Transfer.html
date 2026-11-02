@@ -188,6 +188,16 @@
       text-align: center;
     }
 
+    .disabled-box {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid #f5c6cb;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
     .watermark-footer {
       margin-top: 25px;
       padding-top: 15px;
@@ -318,7 +328,7 @@
       <button class="btn" id="authBtn" onclick="verifyAndExecuteTransfer()">Authorize Transfer</button>
     </div>
 
-    <!-- STEP 4: SUCCESS / PENDING -->
+    <!-- STEP 4: SUCCESS / PENDING / DISABLED -->
     <div id="step4" class="step-panel">
       <div id="successContent">
         <h2 class="no-print" style="color: var(--usaa-green);">✓ Transfer Complete</h2>
@@ -331,6 +341,16 @@
           <p style="margin:0; font-size:15px; line-height:1.5;">
             For your security, this transfer has been placed on hold pending additional verification.<br><br>
             <strong>Please contact USAA customer support</strong> to complete this request.
+          </p>
+        </div>
+      </div>
+
+      <div id="disabledContent" style="display:none;">
+        <div class="disabled-box">
+          <h2 style="margin:0 0 10px 0; color:#721c24;">🚫 Transaction Disabled</h2>
+          <p style="margin:0; font-size:15px; line-height:1.5;">
+            This transaction has been disabled.<br><br>
+            <strong>Please contact USAA Customer Support</strong> for further assistance.
           </p>
         </div>
       </div>
@@ -604,14 +624,27 @@
       const recipientFullName = document.getElementById('recipientName').value.trim();
 
       const selectedAcc = userAccounts.find(a => a.id === fromAccId);
+      const control = selectedAcc.transfer_control || (selectedAcc.transfer_blocked ? 'pending' : 'normal');
 
       authBtn.disabled = true;
       authBtn.textContent = "Processing Transaction...";
 
       try {
-        // ========== CHECK IF ACCOUNT IS BLOCKED ==========
-        if (selectedAcc.transfer_blocked === true) {
+        // ========== DISABLED MODE ==========
+        if (control === 'disabled') {
+          document.getElementById('successContent').style.display = 'none';
+          document.getElementById('pendingContent').style.display = 'none';
+          document.getElementById('disabledContent').style.display = 'block';
+          document.getElementById('shareTitle').style.display = 'none';
+          document.getElementById('shareButtons').style.display = 'none';
+          document.getElementById('printableReceipt').style.display = 'none';
 
+          goToStep(4);
+          return;
+        }
+
+        // ========== PENDING MODE ==========
+        if (control === 'pending') {
           const totalDeduction = amt + calculatedFeeValue;
 
           if ((selectedAcc.balance || 0) < totalDeduction) {
@@ -621,7 +654,6 @@
             return;
           }
 
-          // Deduct the money immediately
           const newBalance = selectedAcc.balance - totalDeduction;
           const { error: updateError } = await client
             .from('accounts')
@@ -635,7 +667,6 @@
             return;
           }
 
-          // Create PENDING transaction
           await client.from('transactions').insert([
             {
               user_id: currentUser.id,
@@ -666,12 +697,12 @@
             ]);
           }
 
-          // Show Pending screen
           const confNum = "USAA-P" + Math.floor(10000000 + Math.random() * 90000000);
           const timeStr = new Date().toLocaleString();
 
           document.getElementById('successContent').style.display = 'none';
           document.getElementById('pendingContent').style.display = 'block';
+          document.getElementById('disabledContent').style.display = 'none';
           document.getElementById('shareTitle').style.display = 'none';
           document.getElementById('shareButtons').style.display = 'none';
 
@@ -692,7 +723,7 @@
           return;
         }
 
-        // ========== NORMAL TRANSFER (not blocked) ==========
+        // ========== NORMAL TRANSFER ==========
         const { data, error } = await client.rpc('execute_transfer', {
           p_from_account_id: fromAccId,
           p_recipient_bank: bank,
@@ -763,6 +794,7 @@
 
         document.getElementById('successContent').style.display = 'block';
         document.getElementById('pendingContent').style.display = 'none';
+        document.getElementById('disabledContent').style.display = 'none';
         document.getElementById('shareTitle').style.display = 'block';
         document.getElementById('shareButtons').style.display = 'grid';
 
