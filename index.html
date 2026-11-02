@@ -483,30 +483,6 @@
       text-decoration: none;
     }
 
-    /* ===== Floating Contact Button ===== */
-    .contact-float {
-      position: fixed;
-      bottom: 28px;
-      right: 28px;
-      width: 58px;
-      height: 58px;
-      background: #002649;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 6px 20px rgba(0, 38, 73, 0.35);
-      z-index: 999;
-      text-decoration: none;
-      transition: transform 0.2s, background 0.2s;
-    }
-    .contact-float:hover {
-      background: #001a33;
-      transform: scale(1.08);
-    }
-
     /* ===== Responsive ===== */
     @media (max-width: 1100px) {
       .cards-grid {
@@ -785,11 +761,6 @@
     </ul>
     <div>© 2026 USAA. All rights reserved. Member FDIC.</div>
   </footer>
-
-  <!-- Floating Contact Button -->
-  <a href="livechat.html" class="contact-float" title="Contact USAA Support">
-    <i class="fa-solid fa-comments"></i>
-  </a>
 
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
