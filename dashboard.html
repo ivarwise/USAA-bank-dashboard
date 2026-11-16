@@ -603,6 +603,22 @@
       return "Good evening";
     }
 
+    // Smart name display for joint accounts
+    function getDisplayName(fullName) {
+      if (!fullName) return '';
+      
+      // If it's a joint account (contains &)
+      if (fullName.includes('&')) {
+        const parts = fullName.split('&').map(p => p.trim());
+        const firstPerson = parts[0].split(' ')[0]; // David
+        const secondPerson = parts[1].split(' ')[0]; // Linda
+        return `${firstPerson} & ${secondPerson}`;
+      }
+      
+      // Normal single name
+      return fullName.split(' ')[0];
+    }
+
     async function initDashboard() {
       const { data: { user }, error } = await supabase.auth.getUser();
       if (error || !user) {
@@ -618,10 +634,10 @@
         .single();
 
       const greeting = getGreeting();
-      const firstName = profile?.full_name ? profile.full_name.split(' ')[0] : '';
+      const displayName = getDisplayName(profile?.full_name);
 
-      document.getElementById('user-greeting-mobile').innerText = firstName ? `${greeting}, ${firstName}` : greeting;
-      document.getElementById('user-greeting-desktop').innerText = firstName ? `Welcome back, ${firstName}` : 'Welcome back';
+      document.getElementById('user-greeting-mobile').innerText = displayName ? `${greeting}, ${displayName}` : greeting;
+      document.getElementById('user-greeting-desktop').innerText = displayName ? `Welcome back, ${displayName}` : 'Welcome back';
 
       await loadAccounts(user.id);
       await loadTransactions(user.id);
